@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex DOM Test</title>
+    <style>
+        :root {
+            --primary-color: #4a6da7;
+            --secondary-color: #5eb8b8;
+            --accent-color: #ff6b6b;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .hidden-element {
+            display: none;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .flex-item {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--secondary-color);
+            transition: transform 0.2s;
+        }
+        .flex-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        nav {
+            background-color: var(--dark-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            padding: 0;
+            margin: 0;
+        }
+        nav li {
+            margin-right: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover {
+            background-color: var(--primary-color);
+        }
+        h1, h2 {
+            color: var(--primary-color);
+        }
+        h3 {
+            color: var(--secondary-color);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3a5a8f;
+        }
+        button.delete-btn {
+            background-color: var(--accent-color);
+        }
+        button.delete-btn:hover {
+            background-color: #e55858;
+        }
+        input, select, textarea {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 109, 167, 0.2);
+        }
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        .action-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .action-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Complex DOM Test Page</h1>
+            <nav>
+                <ul>
+                    <li><a href="#section1" data-nav="section1">Section 1</a></li>
+                    <li><a href="#section2" data-nav="section2">Section 2</a></li>
+                    <li><a href="#section3" data-nav="section3">Section 3</a></li>
+                    <li><a href="#section4" data-custom-attr="special">Section 4</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section id="section1" class="card">
+            <h2>Form Elements</h2>
+            <form id="testForm" action="#" method="post">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter username" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="Enter email" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <div>
+                    <label>Interests:</label>
+                    <div>
+                        <input type="checkbox" id="coding" name="interests" value="coding">
+                        <label for="coding">Coding</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="music" name="interests" value="music">
+                        <label for="music">Music</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="sports" name="interests" value="sports">
+                        <label for="sports">Sports</label>
+                    </div>
+                </div>
+                <div>
+                    <label for="country">Country:</label>
+                    <select id="country" name="country">
+                        <option value="">Select a country</option>
+                        <option value="us">United States</option>
+                        <option value="ca">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="au">Australia</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Enter your message"></textarea>
+                </div>
+                <div>
+                    <button type="submit" id="submitBtn">Submit</button>
+                    <button type="reset" style="background-color: #6c757d;">Reset</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="section2" class="card">
+            <h2>Table Data</h2>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-id="1">
+                        <td>001</td>
+                        <td>John Doe</td>
+                        <td>john@example.com</td>
+                        <td><span style="background-color: #4a6da7; color: white; padding: 3px 8px; border-radius: 12px;">Admin</span></td>
+                        <td>
+                            <button class="edit-btn" data-id="1">Edit</button>
+                            <button class="delete-btn" data-id="1">Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-id="2">
+                        <td>002</td>
+                        <td>Jane Smith</td>
+                        <td>jane@example.com</td>
+                        <td><span style="background-color: #5eb8b8; color: white; padding: 3px 8px; border-radius: 12px;">User</span></td>
+                        <td>
+                            <button class="edit-btn" data-id="2">Edit</button>
+                            <button class="delete-btn" data-id="2">Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-id="3">
+                        <td>003</td>
+                        <td>Bob Johnson</td>
+                        <td>bob@example.com</td>
+                        <td><span style="background-color: #5eb8b8; color: white; padding: 3px 8px; border-radius: 12px;">User</span></td>
+                        <td>
+                            <button class="edit-btn" data-id="3">Edit</button>
+                            <button class="delete-btn" data-id="3">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="section3" class="card">
+            <h2>Flexbox Content</h2>
+            <div class="flex-container">
+                <div class="flex-item" style="border-left-color: #4a6da7;">
+                    <h3>Item 1</h3>
+                    <p>This is the first flex item with some content.</p>
+                    <a href="#" class="action-link">Learn More</a>
+                </div>
+                <div class="flex-item" style="border-left-color: #ff6b6b;">
+                    <h3>Item 2</h3>
+                    <p>This is the second flex item with some content.</p>
+                    <a href="#" class="action-link">Learn More</a>
+                </div>
+                <div class="flex-item" style="border-left-color: #5eb8b8;">
+                    <h3>Item 3</h3>
+                    <p>This is the third flex item with some content.</p>
+                    <a href="#" class="action-link">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="section4" class="card">
+            <h2>Media Elements</h2>
+            <div>
+                <h3>Video Example</h3>
+                <video width="320" height="240" controls style="border: 3px solid var(--primary-color); border-radius: 5px;">
+                    <source src="video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div>
+                <h3>Audio Example</h3>
+                <audio controls style="width: 100%;">
+                    <source src="audio.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div>
+                <h3>Canvas Example</h3>
+                <canvas id="demoCanvas" width="300" height="200" style="border:2px solid var(--accent-color); border-radius: 5px;"></canvas>
+            </div>
+        </section>
+
+        <div id="modalOverlay" class="hidden-element">
+            <div id="modalContent">
+                <h3>Modal Title</h3>
+                <p>This is a modal dialog with some content.</p>
+                <button id="closeModal">Close</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2023 Complex DOM Test Page</p>
+            <div>
+                <a href="#" style="color: var(--primary-color);">Terms of Service</a> |
+                <a href="#" style="color: var(--primary-color);">Privacy Policy</a> |
+                <a href="#" style="color: var(--primary-color);">Contact Us</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Add some canvas drawing with more colors
+        const canvas = document.getElementById('demoCanvas');
+        if (canvas.getContext) {
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, 300, 200);
+            
+            // Blue square
+            ctx.fillStyle = '#4a6da7';
+            ctx.fillRect(25, 25, 100, 100);
+            
+            // Inner cutout
+            ctx.clearRect(45, 45, 60, 60);
+            
+            // Border
+            ctx.strokeStyle = '#343a40';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(50, 50, 50, 50);
+            
+            // Red circle
+            ctx.beginPath();
+            ctx.arc(200, 100, 50, 0, Math.PI * 2, true);
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fill();
+            
+            // Green triangle
+            ctx.beginPath();
+            ctx.moveTo(150, 180);
+            ctx.lineTo(200, 120);
+            ctx.lineTo(250, 180);
+            ctx.closePath();
+            ctx.fillStyle = '#5eb8b8';
+            ctx.fill();
+        }
+    </script>
+</body>
+</html> 
