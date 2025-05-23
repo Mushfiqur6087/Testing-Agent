@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Dict, Any, Union
 
-# adjust this import to wherever your browser_context.py actually lives
+# Import from the browser package
 from browser.browser_context import BrowserSession
 
 # Configure logging
