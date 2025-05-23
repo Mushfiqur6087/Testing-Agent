@@ -8,12 +8,12 @@ and extracts a flat selector-map of interactive elements.
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from playwright.sync_api import sync_playwright
-from dom_tree_builder import DomTreeBuilder  # assume this is on your PYTHONPATH
+from playwright.sync_api import sync_playwright, Page
+from .dom_tree_builder import DomTreeBuilder  # import from the same package
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

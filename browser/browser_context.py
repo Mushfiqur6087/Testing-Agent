@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 
 from playwright.sync_api import Page, BrowserContext, sync_playwright, Browser
 
-from dom_tree_parser import DOMTreeParser, DOMElementNode
+from .dom_tree_parser import DOMTreeParser, DOMElementNode
 
 # Simple logging setup
 logging.basicConfig(level=logging.INFO)
