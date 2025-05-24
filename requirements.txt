@@ -1,0 +1,33 @@
+# Testing Agent - AI-Powered Browser Automation
+# Core dependencies for the Testing Agent project
+
+# Browser automation
+playwright>=1.40.0
+
+# AI/LLM integration
+google-generativeai>=0.3.0
+
+# Core Python libraries (usually included with Python 3.8+)
+# Listed here for completeness and version tracking
+pathlib2>=2.3.0; python_version < "3.4"
+
+# Development and testing (optional)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Logging and utilities
+python-dateutil>=2.8.0
+
+# Note: The following are typically included with Python 3.8+
+# but listed here for reference:
+# - json (built-in)
+# - logging (built-in)
+# - datetime (built-in)
+# - pathlib (built-in in Python 3.4+)
+# - typing (built-in in Python 3.5+)
+# - dataclasses (built-in in Python 3.7+)
+
+# Installation instructions:
+# 1. pip install -r requirements.txt
+# 2. playwright install
+# 3. Set up your Google Gemini API key
