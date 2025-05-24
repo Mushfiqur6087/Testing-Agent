@@ -64,17 +64,16 @@ class BrowserController:
 
             element = selector_map[element_index]
             xpath   = element.xpath
-            attrs   = element.attributes or {}
-
-            # Try ID first
+            attrs   = element.attributes or {}            # Try ID first
             if (elem_id := attrs.get("id")):
                 selector = f"#{elem_id}"
+                logger.info(f"Clicking element using ID selector: {selector}")
+                page.click(selector, timeout=5000)
             else:
-                # fallback to XPath
-                selector = f"xpath={xpath}"
-
-            logger.info(f"Clicking element using selector: {selector}")
-            page.click(selector, timeout=5000)
+                # fallback to XPath - use page.locator() with xpath= prefix for XPath selectors
+                xpath_selector = f"xpath={xpath}"
+                logger.info(f"Clicking element using XPath selector: {xpath_selector}")
+                page.locator(xpath_selector).click(timeout=5000)
             page.wait_for_load_state("networkidle", timeout=5000)
 
             # clear parser & selector_map cache
@@ -101,16 +100,16 @@ class BrowserController:
 
             element = selector_map[element_index]
             xpath   = element.xpath
-            attrs   = element.attributes or {}
-
-            # Try ID first
+            attrs   = element.attributes or {}            # Try ID first
             if (elem_id := attrs.get("id")):
                 selector = f"#{elem_id}"
+                logger.info(f"Filling element using ID selector: {selector} with text: {text!r}")
+                page.fill(selector, text, timeout=5000)
             else:
-                selector = f"xpath={xpath}"
-
-            logger.info(f"Filling element using selector: {selector} with text: {text!r}")
-            page.fill(selector, text, timeout=5000)
+                # fallback to XPath - use page.locator() with xpath= prefix for XPath selectors
+                xpath_selector = f"xpath={xpath}"
+                logger.info(f"Filling element using XPath selector: {xpath_selector} with text: {text!r}")
+                page.locator(xpath_selector).fill(text, timeout=5000)
 
             # clear parser & selector_map cache
             self.browser_context._parser = None

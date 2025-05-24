@@ -57,7 +57,8 @@ class DOMTreeParser:
         data = DomTreeBuilder(self.page, debug_mode=False).get_dom_tree()
         self._raw_json = data["tree"]
         self._counts.clear()
-        self.dom_tree = self._build_element(self._raw_json, parent_xpath="/", parent=None)
+        # Start XPath with /html[1]/ since DomTreeBuilder starts from body element
+        self.dom_tree = self._build_element(self._raw_json, parent_xpath="/html[1]/", parent=None)
         return self.dom_tree
 
     def _build_element(
