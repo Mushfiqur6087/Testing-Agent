@@ -168,21 +168,32 @@ class DOMTreeParser:
         return json.dumps(out, indent=2)
     def get_selector_map_string(self) -> str:
         """
-        Return a simple, human-readable list of all interactive elements:
-        index, tag name, xpath, and attributes only.
-        Omits parent/child, is_visible, is_interactive flags.
+        Return a human-readable list of all interactive elements preserving
+        the hierarchy via indentation. Each line: [index]<tag attr1='val1' ... />
         """
-        sel_map = self.selector_map()
-        lines: List[str] = []
-        for idx, node in sel_map.items():
-            # format attributes as key='value', …
-            if node.attributes:
-                attrs_str = ", ".join(f"{k}='{v}'" for k, v in node.attributes.items())
-                attr_part = f", attrs={{ {attrs_str} }}"
-            else:
-                attr_part = ""
-            lines.append(f"{idx}: tag={node.tag_name}, xpath={node.xpath}{attr_part}")
+        if not self.dom_tree:
+            raise ValueError("DOM tree not built, call parse() first.")
+
+        self._flat_index = 0
+        self._flat_map: Dict[int, str] = {}
+
+        def traverse(node: DOMElementNode, depth: int) -> None:
+            if node.is_interactive:
+                index = self._flat_index
+                self._flat_index += 1
+                indent = "    " * depth
+                attrs = " ".join(f"{k}='{v}'" for k, v in node.attributes.items())
+                attrs_str = f" {attrs}" if attrs else ""
+                tag_str = f"<{node.tag_name}{attrs_str} />"
+                self._flat_map[index] = f"{indent}[{index}]{tag_str}"
+            for child in node.children:
+                if isinstance(child, DOMElementNode):
+                    traverse(child, depth + 1)
+
+        traverse(self.dom_tree, depth=0)
+        lines = [line.lstrip(" ") for line in self._flat_map.values()]  # remove accidental spaces
         return "\n".join(lines)
+
 
 
 

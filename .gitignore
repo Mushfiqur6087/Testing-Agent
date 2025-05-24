@@ -6,4 +6,9 @@ __pycache__/
 # Python distribution/packaging
 dist/
 build/
-*.egg-info/ 
+*.egg-info/
+
+# Logs directory
+logs/
+*.log
+*.json
