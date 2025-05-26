@@ -1,0 +1,87 @@
+{
+    "URL": "https://automationintesting.online/",
+    "Type": "Web UI and API Site",
+    "Description": "An online site for bed & breakfast bookings from Mark Winteringham. The frontend is a React app, and the backend is a REST API. Great for testing both UI and API flows.",
+    "TestCases": [
+    {
+        "Name": "Open Home Page",
+        "Description": "Verify that the home page loads successfully.",
+        "Steps": [
+        "Go to https://automationintesting.online/",
+        "Verify that the page title contains 'Restful Booker Platform'."
+        ]
+    },
+    {
+        "Name": "Login with Valid Credentials",
+        "Description": "Verify that a user can log in with valid credentials.",
+        "Steps": [
+        "Click the 'Login' button in the navigation bar.",
+        "Enter 'admin' as username.",
+        "Enter 'password' as password.",
+        "Click 'Submit'.",
+        "Verify that the admin panel is displayed."
+        ]
+    },
+    {
+        "Name": "Login with Invalid Credentials",
+        "Description": "Verify that login fails with incorrect credentials.",
+        "Steps": [
+        "Click the 'Login' button in the navigation bar.",
+        "Enter 'wronguser' as username.",
+        "Enter 'wrongpass' as password.",
+        "Click 'Submit'.",
+        "Verify that an error message is displayed."
+        ]
+    },
+    {
+        "Name": "Book a Room with Valid Data",
+        "Description": "Verify that a user can book a room with valid information.",
+        "Steps": [
+        "On the home page, fill in the 'Room Booking' form.",
+        "Enter 'John' in the First Name field.",
+        "Enter 'Doe' in the Last Name field.",
+        "Enter 'john.doe@example.com' in the Email field.",
+        "Enter '1234567890' in the Phone field.",
+        "Select a date range for booking.",
+        "Click the 'Book' button.",
+        "Verify that a booking confirmation message is displayed."
+        ]
+    },
+    {
+        "Name": "Book a Room with Missing Data",
+        "Description": "Verify that booking fails when required fields are missing.",
+        "Steps": [
+        "On the home page, leave the First Name field empty.",
+        "Fill in the rest of the 'Room Booking' form with valid data.",
+        "Click the 'Book' button.",
+        "Verify that an error message is displayed indicating required fields."
+        ]
+    },
+    {
+        "Name": "API: Get All Bookings",
+        "Description": "Verify that the API returns a list of all bookings.",
+        "Steps": [
+        "Send a GET request to https://automationintesting.online/booking/",
+        "Verify that the response status is 200.",
+        "Verify that the response contains a list of bookings."
+        ]
+    },
+    {
+        "Name": "API: Create Booking with Valid Data",
+        "Description": "Verify that a booking can be created via the API with valid data.",
+        "Steps": [
+        "Send a POST request to https://automationintesting.online/booking/ with a valid JSON body for booking.",
+        "Verify that the response status is 201.",
+        "Verify that the response contains the booking details."
+        ]
+    },
+    {
+        "Name": "API: Create Booking with Invalid Data",
+        "Description": "Verify that the API returns an error when required fields are missing.",
+        "Steps": [
+        "Send a POST request to https://automationintesting.online/booking/ with an incomplete JSON body (missing required fields).",
+        "Verify that the response status is 400 or an error message is returned."
+        ]
+    }
+    ]
+}

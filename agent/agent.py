@@ -1,7 +1,7 @@
-from memory import Memory
-from llm import GeminiFlashClient
-from prompt_builder import SystemPromptBase
-from logging_utils import debug_logger
+from agent.memory import Memory
+from agent.llm import GeminiFlashClient
+from agent.prompt_builder import SystemPromptBase
+from agent.logging_utils import debug_logger
 import json
 import logging
 from typing import Dict, List, Any, Optional, Union
@@ -28,11 +28,11 @@ class Agent:
         self.system_prompt = SystemPromptBase(max_actions_per_step=max_actions)
         self.browser_controller = None
         self.session_start_time = datetime.now()
-          # Create debug log file if debug is enabled
+        # Create debug log file if debug is enabled
         if self.debug:
             self.debug_file = debug_logger.get_debug_file_path("agent")
             logger.info(f"Debug mode enabled. Logging to: {self.debug_file}")
-              # Enable debug mode for memory with synchronized debug file
+            # Enable debug mode for memory with synchronized debug file
             memory_debug_file = debug_logger.get_debug_file_path("memory")
             self.memory.enable_debug(memory_debug_file)
         
@@ -58,8 +58,8 @@ class Agent:
         self.browser_controller = browser_controller
         logger.info("Browser controller attached to agent")
         
-    def update_browser_state(self, url: str = None, tabs: List[str] = None, 
-                           elements: str = None, actions: str = None):
+    def update_browser_state(self, url: str = None, tabs: List[str] = None,
+                        elements: str = None, actions: str = None):
         """Update the current browser state information."""
         if url is not None:
             self.current_url = url

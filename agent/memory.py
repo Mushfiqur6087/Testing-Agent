@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 from typing import Optional
-from logging_utils import debug_logger
+from agent.logging_utils import debug_logger
 
 # Configure logging
 logger = logging.getLogger(__name__)

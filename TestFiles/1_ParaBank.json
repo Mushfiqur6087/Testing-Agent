@@ -1,0 +1,46 @@
+{
+  "URL": "https://parabank.parasoft.com/parabank/index.htm",
+  "Type": "Web UI and API Site",
+  "Description": "An online banking site from Parasoft with login and REST/SOAP APIs. You can also access the database if you run the project locally using the source code.",
+  "TestCases": [
+    {
+      "Name": "Login to Web UI",
+      "Description": "Test case for testing whether a user is able to login into the web application.",
+      "Steps": [
+        "Open the URL in your browser and navigate through the website until you reach the login page."
+      ]
+    },
+    {
+      "Name": "Login with Valid Credentials",
+      "Description": "Verify that a user can log in with valid credentials.",
+      "Steps": [
+        "Go to https://parabank.parasoft.com/parabank/index.htm",
+        "Enter 'test@example.com' in the username/email field.",
+        "Enter 'password123' in the password field.",
+        "Click the 'Log In' button.",
+        "Verify that the user is redirected to the account overview page."
+      ]
+    },
+    {
+      "Name": "Login with Invalid Credentials",
+      "Description": "Verify that login fails with incorrect credentials.",
+      "Steps": [
+        "Go to https://parabank.parasoft.com/parabank/index.htm",
+        "Enter 'wronguser@example.com' in the username/email field.",
+        "Enter 'wrongpassword' in the password field.",
+        "Click the 'Log In' button.",
+        "Verify that an error message is displayed and login is not successful."
+      ]
+    },
+    {
+      "Name": "Login with Empty Fields",
+      "Description": "Verify that login fails when required fields are left empty.",
+      "Steps": [
+        "Go to https://parabank.parasoft.com/parabank/index.htm",
+        "Leave the username/email and password fields empty.",
+        "Click the 'Log In' button.",
+        "Verify that an error message is displayed indicating required fields."
+      ]
+    }
+  ]
+}
