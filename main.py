@@ -77,25 +77,15 @@ def main():
 
     url, test_cases = parse_test_cases(testfile)
 
-    # First loop: print debug info for all test cases
-    for case in test_cases:
-        print(f"\n[DEBUG] URL: {url}")
-        print(f"[DEBUG] Running Test: {case.get('Name')}")
-        print(f"[DEBUG] Description: {case.get('Description')}")
-        print(f"[DEBUG] Steps:")
-        for idx, step in enumerate(case.get("Steps", []), 1):
-            print(f"  Step {idx}: {step}")
-        task_description = " ".join(case.get("Steps", []))
-        print(f"[DEBUG] Task Description: {task_description}")
-
-    # Second loop: execute test cases one by one
-    for case in test_cases:
-        task_description = " ".join(case.get("Steps", []))
+    # execute test cases one by one
+    for idx, case in enumerate(test_cases, 1):
+        task_description = case.get("Description", "")
+        print(f"[DEBUG] Running Test Case {idx}: {task_description}")
         try:
             perform_web_testing(url, task_description)
         except Exception as e:
-            print(f"[ERROR] Test case '{case.get('Name')}' failed with error: {e}")
-            sys.exit(1)  # Stop execution if a test case fails
+            print(f"[ERROR] Test case {idx} failed with error: {e}")
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()
