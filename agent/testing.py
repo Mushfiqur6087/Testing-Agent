@@ -30,7 +30,7 @@ def test_agent():
     try:        # Execute a plan to test a login form
         user_goal = """
 Navigate to the login form test page and test the login functionality:
-1. Go to file://d:/Testing Agent/html/login_form.html
+1. Go to file:///home/mushfiqur/vscode/Testing-Agent/html/login_form.html
 2. Fill in the email field with 'test@example.com'
 3. Fill in the password field with 'password123'
 4. Click the login button

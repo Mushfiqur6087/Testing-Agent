@@ -150,6 +150,112 @@ class BrowserController:
             logger.error(f"Error navigating to URL: {e}")
             return False
 
+    def available_commands(self) -> list:
+        """Return a list of available command names."""
+        return [
+            "navigate_to",
+            "click_element", 
+            "input_text",
+            "switch_tab",
+            "open_tab",
+            "close_tab",
+            "go_back"
+        ]
+    
+    def get_available_actions(self) -> list:
+        """
+        Return a list of actions that can be executed in the current state.
+        Only returns command names from the command_map based on current browser state.
+        """
+        available = []
+
+        # These two always make sense as long as the session exists
+        available.append("open_tab")
+        available.append("navigate_to")
+
+        # Try to see if there is a "current page":
+        try:
+            page = self.browser_context.get_current_page()
+        except Exception:
+            page = None
+
+        if page is not None:
+            # If a page is open, you can generally go back
+            available.append("go_back")
+
+            # Check if there are any selectors/elements visible on this page
+            try:
+                selector_map = self.browser_context.get_selector_map(refresh=True)
+            except Exception:
+                selector_map = {}
+
+            if selector_map:
+                available.append("click_element")
+                available.append("input_text")
+
+            # See how many tabs exist to decide if switch/close are feasible
+            try:
+                # Access the _tabs attribute directly since there's no get_all_pages method
+                all_tabs = self.browser_context._tabs
+            except Exception:
+                all_tabs = []
+
+            if isinstance(all_tabs, (list, tuple)):
+                if len(all_tabs) > 1:
+                    available.append("switch_tab")
+                # You can always close at least the current tab if one exists:
+                if len(all_tabs) > 0:
+                    available.append("close_tab")
+
+        return available
+
+    def get_available_actions_description(self) -> str:
+        """Return a detailed description of currently available actions for the LLM."""
+        available_actions = self.get_available_actions()
+        
+        # Action descriptions mapping - using exact command_map names
+        action_descriptions = {
+            "navigate_to": """navigate_to: Navigate to a URL
+   Format: {"navigate_to": {"url": "string"}}
+   Example: {"navigate_to": {"url": "https://example.com"}}""",
+   
+            "click_element": """click_element: Click on an interactive element by its index
+   Format: {"click_element": {"index": number}}
+   Example: {"click_element": {"index": 0}}
+   Note: Use element indices from the Interactive Elements list""",
+   
+            "input_text": """input_text: Type text into an input field by its index
+   Format: {"input_text": {"index": number, "text": "string"}}
+   Example: {"input_text": {"index": 1, "text": "hello@example.com"}}
+   Note: Use element indices from the Interactive Elements list""",
+   
+            "switch_tab": """switch_tab: Switch to a different browser tab
+   Format: {"switch_tab": {"index": number}}
+   Example: {"switch_tab": {"index": 1}}""",
+   
+            "open_tab": """open_tab: Open a new browser tab (optionally with URL)
+   Format: {"open_tab": {"url": "string"}} or {"open_tab": {}}
+   Example: {"open_tab": {"url": "https://google.com"}}""",
+   
+            "close_tab": """close_tab: Close a browser tab by its index
+   Format: {"close_tab": {"index": number}}
+   Example: {"close_tab": {"index": 1}}""",
+   
+            "go_back": """go_back: Navigate back in browser history
+   Format: {"go_back": {}}
+   Example: {"go_back": {}}"""
+        }
+        
+        # Build description for currently available actions
+        descriptions = ["Currently Available Browser Actions:\n"]
+        
+        counter = 1
+        for action in available_actions:
+            if action in action_descriptions:
+                descriptions.append(f"{counter}. {action_descriptions[action]}")
+                counter += 1         
+        return "\n".join(descriptions)
+
     def close(self) -> None:
         try:
             self.browser_context.close()

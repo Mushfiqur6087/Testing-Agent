@@ -24,7 +24,7 @@ class Agent:
         self.current_url = ""
         self.open_tabs = []
         self.interactive_elements = ""
-        self.valid_actions = ""
+        self.valid_actions = "No browser controller attached. Available actions will be populated when browser controller is set."
         self.system_prompt = SystemPromptBase(max_actions_per_step=max_actions)
         self.browser_controller = None
         self.session_start_time = datetime.now()
@@ -56,6 +56,9 @@ class Agent:
     def set_browser_controller(self, browser_controller):
         """Set the browser controller instance for the agent."""
         self.browser_controller = browser_controller
+        # Initialize valid actions immediately
+        if browser_controller:
+            self.valid_actions = browser_controller.get_available_actions_description()
         logger.info("Browser controller attached to agent")
         
     def update_browser_state(self, url: str = None, tabs: List[str] = None, 
@@ -86,14 +89,19 @@ class Agent:
         
         self.previous_steps.append(step)
         
-        # Store in memory with structured format
+        # Store in memory with structured format and more details
+        action_name = list(action.keys())[0] if isinstance(action, dict) and action else "unknown"
+        action_params = action.get(action_name, {}) if isinstance(action, dict) else {}
+        
         memory_entry = {
             "type": "action_execution",
             "step": step["step_number"],
-            "action": action.get("action", "unknown"),
+            "action": action_name,
+            "action_params": action_params,  # Store the parameters too
             "success": success,
             "url": self.current_url,
-            "timestamp": step["timestamp"]
+            "timestamp": step["timestamp"],
+            "result_summary": str(result)[:200] if result else ""  # Store truncated result
         }
         self.memory.add(memory_entry)
         
@@ -101,7 +109,7 @@ class Agent:
         if self.debug:
             self.memory.log_memory_snapshot(
                 step_number=step["step_number"],
-                custom_message=f"After executing {action.get('action', 'unknown')} ({'success' if success else 'failed'})"
+                custom_message=f"After executing {action_name} ({'success' if success else 'failed'})"
             )
         
         logger.info(f"Step {step['step_number']} added: {action} -> Success: {success}")
@@ -145,23 +153,45 @@ Please provide your next action(s) in the required JSON format.
         return context_prompt
         
     def _format_memory_context(self) -> str:
-        """Format recent memory entries for context."""
+        """Format recent memory entries for context - simplified to show only success rate and behavior patterns."""
         if len(self.memory) == 0:
             return "No previous memory entries."
             
-        recent_entries = self.memory.history[-5:]  # Last 5 entries
-        formatted_entries = []
+        recent_entries = self.memory.history[-10:]  # Look at recent entries for analysis
+        
+        # Extract basic statistics
+        success_count = 0
+        failure_count = 0
+        actions_performed = []
         
         for entry in recent_entries:
             if entry.get("type") == "action_execution":
-                formatted_entries.append(
-                    f"- Step {entry.get('step', '?')}: {entry.get('action', 'unknown')} "
-                    f"({'Success' if entry.get('success') else 'Failed'})"
-                )
-            else:
-                formatted_entries.append(f"- {entry}")
+                action_name = entry.get("action", "unknown")
+                success = entry.get("success", False)
                 
-        return "\n".join(formatted_entries)
+                # Count successes and failures
+                if success:
+                    success_count += 1
+                else:
+                    failure_count += 1
+                
+                # Track actions for pattern analysis
+                actions_performed.append(action_name)
+        
+        # Build simplified context
+        summary_lines = []
+        if recent_entries:
+            total_actions = success_count + failure_count
+            success_rate = (success_count / total_actions * 100) if total_actions > 0 else 0
+            
+            summary_lines.append(f"📊 Success rate: {success_rate:.1f}% ({success_count}/{total_actions})")
+            
+            # Show recent action flow (behavior patterns)
+            if actions_performed:
+                recent_flow = " → ".join(actions_performed[-5:])  # Last 5 actions
+                summary_lines.append(f"🔄 Recent flow: {recent_flow}")
+        
+        return "\n".join(summary_lines)
         
     def _format_previous_steps(self) -> str:
         """Format previous steps for the prompt."""
@@ -170,7 +200,13 @@ Please provide your next action(s) in the required JSON format.
             
         formatted_steps = []
         for step in self.previous_steps[-3:]:  # Show last 3 steps
-            action_name = step["action"].get("action", "unknown") if isinstance(step["action"], dict) else str(step["action"])
+            # Extract action name from the action dictionary
+            if isinstance(step["action"], dict):
+                # Get the first (and should be only) key from the action dict
+                action_name = list(step["action"].keys())[0] if step["action"] else "unknown"
+            else:
+                action_name = str(step["action"])
+            
             status = "✓" if step["success"] else "✗"
             formatted_steps.append(
                 f"{status} Step {step['step_number']}: {action_name} "
@@ -373,9 +409,8 @@ Interactive Elements:
             selector_map_string = self.browser_controller.browser_context.get_selector_map_string(refresh=True)
             self.interactive_elements = selector_map_string
             
-            # Get available commands
-            available_commands = self.browser_controller.available_commands()
-            self.valid_actions = f"Available commands: {', '.join(available_commands)}"
+            # Get available actions with detailed descriptions
+            self.valid_actions = self.browser_controller.get_available_actions_description()
             
             logger.info(f"Browser state refreshed: {len(self.open_tabs)} tabs, URL: {self.current_url}")
             
@@ -399,6 +434,10 @@ Interactive Elements:
             
             # Get next action from LLM
             action_response = self.get_next_action(user_goal)
+            
+            # Store LLM insights in memory
+            self.add_llm_insight(action_response)
+            
             execution_log.append({
                 "step": len(self.previous_steps) + 1,
                 "llm_response": action_response,
@@ -566,6 +605,32 @@ RESPONSE FROM LLM:
                 
         except Exception as e:
             logger.error(f"Failed to write debug log: {e}")
+            
+    def add_llm_insight(self, llm_response: Dict[str, Any]):
+        """Store LLM insights and goal evaluation in memory."""
+        if not isinstance(llm_response, dict):
+            return
+            
+        current_state = llm_response.get("current_state", {})
+        
+        memory_entry = {
+            "type": "llm_insight",
+            "step": len(self.previous_steps),
+            "evaluation": current_state.get("evaluation_previous_goal", "Unknown"),
+            "memory_note": current_state.get("memory", ""),
+            "next_goal": current_state.get("next_goal", ""),
+            "timestamp": datetime.now().isoformat(),
+            "url": self.current_url
+        }
+        
+        self.memory.add(memory_entry)
+        
+        # Log LLM insight if debug mode is enabled
+        if self.debug:
+            self.memory.log_memory_snapshot(
+                step_number=len(self.previous_steps),
+                custom_message=f"LLM Insight: {current_state.get('next_goal', 'No goal specified')}"
+            )
 
 
 
