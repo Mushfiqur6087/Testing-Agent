@@ -460,22 +460,12 @@ Interactive Elements:
             # Execute each action in sequence
             all_success = True
             action_results = []
+            should_terminate = False
             
             for action_item in actions:
                 action_name = list(action_item.keys())[0]
                 
-                # Check for termination actions
-                if action_name in ["end"]:
-                    logger.info(f"Termination action received: {action_name}")
-                    action_results.append({
-                        "action": action_item,
-                        "result": {"success": True, "message": f"Plan {action_name}"},
-                        "terminate": True
-                    })
-                    all_success = True
-                    break
-                    
-                # Execute the action
+                # Execute the action (including termination actions)
                 try:
                     result = self.execute_action(action_item)
                     action_results.append({
@@ -492,7 +482,9 @@ Interactive Elements:
                         break
                         
                     # Check if this action terminates the sequence
-                    if result.get("terminate", False):
+                    if result.get("terminate", False) or action_name in ["end"]:
+                        logger.info(f"Termination action executed: {action_name}")
+                        should_terminate = True
                         break
                         
                 except Exception as e:
@@ -510,7 +502,7 @@ Interactive Elements:
             execution_log[-1]["overall_success"] = all_success
             
             # Check for termination
-            if any(result.get("result", {}).get("terminate", False) for result in action_results):
+            if should_terminate or any(result.get("result", {}).get("terminate", False) for result in action_results):
                 logger.info("Plan execution terminated by action")
                 break
                 

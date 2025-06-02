@@ -30,7 +30,7 @@ Interactive Elements
    "next_goal": "What needs to be done with the next immediate action"}},
    "action":[{{"one_action_name": {{// action-specific parameter}}}}, // ... more actions in sequence]}}
 
-2. ACTIONS: You can specify multiple actions in the list to be executed in sequence. But always specify only one action name per item. Use maximum {max_actions_per_step} actions per sequence.
+2. ACTIONS: You can specify multiple actions (except end action) in the list to be executed in sequence. But always specify only one action name per item. Use maximum {max_actions_per_step} actions per sequence.
 Common action sequences:
 
 - Form filling: [{{"input_text": {{"index": 1, "text": "username"}}}}, {{"input_text": {{"index": 2, "text": "password"}}}}, {{"click_element": {{"index": 3}}}}]
@@ -45,6 +45,7 @@ Common action sequences:
 - Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page
 - only use multiple actions if it makes sense.
 - Only use end action if the task is done, otherwise continue with next_goal.
+- Do not use end action chained with other actions, it is only used to end the task.
 '''
 
 

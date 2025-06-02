@@ -1,17 +1,23 @@
 # Agent Usage Example with TestAgent Class
 import sys
-import time
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Add parent directory to Python path to import controller module
 current_dir = Path(__file__).parent
 project_root = current_dir.parent
 sys.path.append(str(project_root))
 
+# Load environment variables from .env file
+load_dotenv(project_root / '.env')
+
 from test_agent import TestAgent
 
 # Configuration - Define once, use everywhere
-API_KEY = "AIzaSyAqCma6o6JFNFEPM_Tq4OMpeKtUNLBdmvA"  # Replace with actual API key
+API_KEY = os.getenv('GEMINI_API_KEY')
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY not found in environment variables. Please check your .env file.")
 
 USER_GOAL = """
 Navigate to the login form test page and test the login functionality:
