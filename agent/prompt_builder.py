@@ -1,4 +1,3 @@
-import json
 from typing import Optional
 
 SYSTEM_PROMPT_TEMPLATE = '''
@@ -37,11 +36,15 @@ Common action sequences:
 - Form filling: [{{"input_text": {{"index": 1, "text": "username"}}}}, {{"input_text": {{"index": 2, "text": "password"}}}}, {{"click_element": {{"index": 3}}}}]
 - Navigation and extraction: [{{"navigate_to": {{"url": "https://example.com"}}}}]
 - Tab Operations: [{{"switch_tab": {{"index": "0"}}}}, {{"close_tab": {{"index": "1"}}}}]
+- Tool Actions: [{{"tools": {{ "reason": "Give detailed reason about why tool is necessary (e.g.verify login, validate form data)"}}}}]
+- Ending: [{{"end": {{"reason": "Give detailed reason why the task is done"}}}}]
+- You can use tools for every action that requires a more complex operation, like verifying a login or validating form data.
 - Actions are executed in the given order
 - If the page changes after an action, the sequence is interrupted and you get the new state.
 - Only provide the action sequence until an action which changes the page state significantly.
 - Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page
 - only use multiple actions if it makes sense.
+- Only use end action if the task is done, otherwise continue with next_goal.
 '''
 
 

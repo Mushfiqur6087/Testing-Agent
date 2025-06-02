@@ -29,6 +29,7 @@ class BrowserController:
             "open_tab":      self.open_tab,
             "close_tab":     self.close_tab,
             "navigate_to":   self.navigate_to,
+            "end":           self.end,
         }
 
         if command not in command_map:
@@ -150,6 +151,15 @@ class BrowserController:
             logger.error(f"Error navigating to URL: {e}")
             return False
 
+    def end(self, reason: Optional[str] = None) -> bool:
+        try:
+            logger.info(f"Ending browser session. Reason: {reason or 'Task completed'}")
+            self.browser_context.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error ending session: {e}")
+            return False
+
     def available_commands(self) -> list:
         """Return a list of available command names."""
         return [
@@ -159,7 +169,8 @@ class BrowserController:
             "switch_tab",
             "open_tab",
             "close_tab",
-            "go_back"
+            "go_back",
+            "end"
         ]
     
     def get_available_actions(self) -> list:
@@ -207,6 +218,9 @@ class BrowserController:
                 if len(all_tabs) > 0:
                     available.append("close_tab")
 
+        # The 'end' action is always available to terminate the session
+        available.append("end")
+
         return available
 
     def get_available_actions_description(self) -> str:
@@ -243,7 +257,12 @@ class BrowserController:
    
             "go_back": """go_back: Navigate back in browser history
    Format: {"go_back": {}}
-   Example: {"go_back": {}}"""
+   Example: {"go_back": {}}""",
+   
+            "end": """end: End the browser session and terminate the automation
+   Format: {"end": {"reason": "string"}}
+   Example: {"end": {"reason": "Task completed successfully"}}
+   Note: This action closes the browser session and stops the LLM"""
         }
         
         # Build description for currently available actions

@@ -379,8 +379,10 @@ Interactive Elements:
                 result = self.browser_controller.execute_command("go_back")
                 return {"success": result, "message": "Navigated back"}
                 
-            elif action_name in ["stop", "complete", "error"]:
-                return {"success": True, "message": f"Action {action_name} completed", "terminate": True}
+            elif action_name == "end":
+                reason = action_params.get("reason", "Session ended by user request")
+                result = self.browser_controller.execute_command("end", reason)
+                return {"success": result, "message": f"Session ended: {reason}", "terminate": True}
                 
             else:
                 return {"success": False, "error": f"Unknown action: {action_name}"}
@@ -458,7 +460,7 @@ Interactive Elements:
                 action_name = list(action_item.keys())[0]
                 
                 # Check for termination actions
-                if action_name in ["stop", "complete", "error"]:
+                if action_name in ["end"]:
                     logger.info(f"Termination action received: {action_name}")
                     action_results.append({
                         "action": action_item,
