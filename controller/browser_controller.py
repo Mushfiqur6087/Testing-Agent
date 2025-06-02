@@ -29,6 +29,7 @@ class BrowserController:
             "open_tab":      self.open_tab,
             "close_tab":     self.close_tab,
             "navigate_to":   self.navigate_to,
+            "tools":         self.tools,
             "end":           self.end,
         }
 
@@ -151,6 +152,32 @@ class BrowserController:
             logger.error(f"Error navigating to URL: {e}")
             return False
 
+    def tools(self, reason: str) -> Dict[str, Any]:
+        """
+        Execute tools action - currently empty implementation.
+        
+        Args:
+            reason: The reason why tools action is needed
+            
+        Returns:
+            Dictionary indicating success and any relevant information
+        """
+        try:
+            logger.info(f"Tools action called with reason: {reason}")
+            # Empty implementation - placeholder for future tool functionality
+            return {
+                "success": True,
+                "message": f"Tools action executed with reason: {reason}",
+                "data": {}
+            }
+        except Exception as e:
+            logger.error(f"Error in tools action: {e}")
+            return {
+                "success": False,
+                "message": f"Tools action failed: {e}",
+                "data": {}
+            }
+
     def end(self, reason: Optional[str] = None) -> bool:
         try:
             logger.info(f"Ending browser session. Reason: {reason or 'Task completed'}")
@@ -170,6 +197,7 @@ class BrowserController:
             "open_tab",
             "close_tab",
             "go_back",
+            "tools",
             "end"
         ]
     
@@ -218,7 +246,8 @@ class BrowserController:
                 if len(all_tabs) > 0:
                     available.append("close_tab")
 
-        # The 'end' action is always available to terminate the session
+        # The 'tools' and 'end' actions are always available
+        available.append("tools")
         available.append("end")
 
         return available
@@ -258,6 +287,10 @@ class BrowserController:
             "go_back": """go_back: Navigate back in browser history
    Format: {"go_back": {}}
    Example: {"go_back": {}}""",
+   
+            "tools": """tools: Execute tools action for complex operations
+   Format: {"tools": {"reason": "string"}}
+   Example: {"tools": {"reason": "Need to verify login success or validate form data"}}""",
    
             "end": """end: End the browser session and terminate the automation
    Format: {"end": {"reason": "string"}}

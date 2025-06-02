@@ -4,7 +4,7 @@ from prompt_builder import SystemPromptBase
 from logging_utils import debug_logger
 import json
 import logging
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any
 from datetime import datetime
 
 # Configure logging
@@ -378,6 +378,11 @@ Interactive Elements:
             elif action_name == "go_back":
                 result = self.browser_controller.execute_command("go_back")
                 return {"success": result, "message": "Navigated back"}
+                
+            elif action_name == "tools":
+                reason = action_params.get("reason", "No reason provided")
+                result = self.browser_controller.execute_command("tools", reason)
+                return {"success": result.get("success", True), "message": result.get("message", f"Tools action executed with reason: {reason}"), "data": result.get("data", {})}
                 
             elif action_name == "end":
                 reason = action_params.get("reason", "Session ended by user request")
