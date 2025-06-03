@@ -52,8 +52,8 @@ class TestAgent:
             # Initialize LLM client
             self.llm = GeminiFlashClient(api_key=self.api_key)
             
-            # Initialize browser controller
-            self.browser_controller = BrowserController()
+            # Initialize browser controller with LLM client for intelligent tools
+            self.browser_controller = BrowserController(llm_client=self.llm)
             
             # Initialize agent with LLM instance
             self.agent = Agent(
@@ -62,11 +62,11 @@ class TestAgent:
                 debug=self.debug
             )
             
-            # Set browser controller for the agent
+            # Set browser controller for the agent (LLM will be passed automatically)
             self.agent.set_browser_controller(self.browser_controller)
             
             if self.debug:
-                print("✅ TestAgent initialized successfully")
+                print("✅ TestAgent initialized successfully with LLM-powered tools")
                 
         except Exception as e:
             print(f"❌ Failed to initialize TestAgent: {e}")

@@ -34,6 +34,7 @@ class DOMElementNode:
     children: List[Any]
     is_visible: bool
     is_interactive: bool
+    inner_text: str = ""
     parent: Optional["DOMElementNode"] = None
 
 
@@ -75,6 +76,7 @@ class DOMTreeParser:
 
         is_visible = node.get("isVisible", True)
         is_interactive = node.get("isInteractive", False)
+        inner_text = node.get("innerText", "")
 
         elm = DOMElementNode(
             tag_name=tag,
@@ -83,6 +85,7 @@ class DOMTreeParser:
             children=[],
             is_visible=is_visible,
             is_interactive=is_interactive,
+            inner_text=inner_text,
             parent=parent,
         )
 
@@ -111,9 +114,20 @@ class DOMTreeParser:
         if isinstance(node, DOMTextNode):
             lines.append(f"{indent}└── DOMTextNode(text={node.text!r}, is_visible={node.is_visible})")
         else:
+            # Format attributes as a readable string
+            attrs_str = ""
+            if node.attributes:
+                attrs_list = [f"{k}='{v}'" for k, v in node.attributes.items()]
+                attrs_str = f", attributes={{{', '.join(attrs_list)}}}"
+            
+            # Add inner_text if it exists
+            inner_text_str = ""
+            if node.inner_text:
+                inner_text_str = f", inner_text={node.inner_text!r}"
+            
             lines.append(
                 f"{indent}DOMElementNode(tag={node.tag_name!r}, xpath={node.xpath!r}, "
-                f"is_visible={node.is_visible}, is_interactive={node.is_interactive})"
+                f"is_visible={node.is_visible}, is_interactive={node.is_interactive}{attrs_str}{inner_text_str})"
             )
             for i, child in enumerate(node.children):
                 last = i == len(node.children) - 1
@@ -155,6 +169,7 @@ class DOMTreeParser:
                 "attributes": node.attributes,
                 "is_visible": node.is_visible,
                 "is_interactive": node.is_interactive,
+                "inner_text": node.inner_text,
                 "children": [
                     {
                         "text": child.text,
@@ -185,7 +200,8 @@ class DOMTreeParser:
                 indent = "    " * depth
                 attrs = " ".join(f"{k}='{v}'" for k, v in node.attributes.items())
                 attrs_str = f" {attrs}" if attrs else ""
-                tag_str = f"<{node.tag_name}{attrs_str} />"
+                inner_text_str = f" inner_text='{node.inner_text}'" if node.inner_text else ""
+                tag_str = f"<{node.tag_name}{attrs_str}{inner_text_str} />"
                 self._flat_map[index] = f"{indent}[{index}]{tag_str}"
             for child in node.children:
                 if isinstance(child, DOMElementNode):

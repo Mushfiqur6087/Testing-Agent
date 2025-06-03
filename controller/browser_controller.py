@@ -3,6 +3,8 @@ from typing import Optional, Dict, Any, Union
 
 # Import from the browser package
 from browser.browser_context import BrowserSession
+# Import from the tools package
+from tools.tools import Tools
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,9 +15,11 @@ class BrowserController:
     Controller class that wraps the BrowserSession to provide high-level browser operations.
     """
 
-    def __init__(self):
-        """Initialize the BrowserController with a BrowserSession."""
+    def __init__(self, llm_client=None):
+        """Initialize the BrowserController with a BrowserSession and optional LLM client."""
         self.browser_context = BrowserSession()
+        self.tools_instance = Tools(llm_client)
+        self.llm_client = llm_client
 
     def execute_command(self, command: str, *args) -> Union[bool, Dict[str, Any], str]:
         """
@@ -154,7 +158,7 @@ class BrowserController:
 
     def tools(self, reason: str) -> Dict[str, Any]:
         """
-        Execute tools action - currently empty implementation.
+        Execute tools action using the Tools class.
         
         Args:
             reason: The reason why tools action is needed
@@ -164,12 +168,9 @@ class BrowserController:
         """
         try:
             logger.info(f"Tools action called with reason: {reason}")
-            # Empty implementation - placeholder for future tool functionality
-            return {
-                "success": True,
-                "message": f"Tools action executed with reason: {reason}",
-                "data": {}
-            }
+            # Use the Tools class to execute the action, passing the LLM client
+            result = self.tools_instance.execute(reason, self.browser_context, self.llm_client)
+            return result
         except Exception as e:
             logger.error(f"Error in tools action: {e}")
             return {
@@ -313,3 +314,10 @@ class BrowserController:
             self.browser_context.close()
         except Exception as e:
             logger.error(f"Error closing browser session: {e}")
+
+    def set_llm_client(self, llm_client):
+        """Set or update the LLM client for intelligent tools operations."""
+        self.llm_client = llm_client
+        # Update the tools instance with the new LLM client
+        self.tools_instance.llm_client = llm_client
+        logger.info("LLM client set for browser controller and tools")

@@ -153,6 +153,7 @@ class DomTreeBuilder:
 
         tag_name = element_handle.evaluate("el => el.tagName.toLowerCase()")
         text_content = element_handle.evaluate("el => el.textContent || ''")
+        inner_text = element_handle.evaluate("el => el.innerText || ''")
 
         attributes = element_handle.evaluate("""
             element => {
@@ -167,6 +168,7 @@ class DomTreeBuilder:
         node_data = {
             "nodeName": tag_name,
             "textContent": text_content,
+            "innerText": inner_text,
             "attributes": attributes,
             "children": [],
             "isInteractive": is_interactive,

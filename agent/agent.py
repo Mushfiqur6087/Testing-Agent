@@ -1,4 +1,3 @@
-from memory import Memory
 from llm import GeminiFlashClient
 from prompt_builder import SystemPromptBase
 from logging_utils import debug_logger
@@ -16,7 +15,6 @@ class Agent:
     Agent to generate JSON responses for browser automation tasks, using GeminiFlashClient for LLM evaluations.
     """
     def __init__(self, llm: GeminiFlashClient, max_actions: int = 10, debug: bool = True):
-        self.memory = Memory()
         self.llm = llm
         self.max_actions = max_actions
         self.debug = debug
@@ -33,29 +31,28 @@ class Agent:
             self.debug_file = debug_logger.get_debug_file_path("agent")
             logger.info(f"Debug mode enabled. Logging to: {self.debug_file}")
               # Enable debug mode for memory with synchronized debug file
-            memory_debug_file = debug_logger.get_debug_file_path("memory")
-            self.memory.enable_debug(memory_debug_file)
         
     def enable_debug_mode(self, debug_file_prefix: str = None):
-        """Enable debug mode for both agent and memory."""
+        """Enable debug mode for agent."""
         self.debug = True
-        
         self.debug_file = debug_logger.get_debug_file_path("agent", debug_file_prefix)
-        memory_debug_file = debug_logger.get_debug_file_path("memory", debug_file_prefix)
-            
-        self.memory.enable_debug(memory_debug_file)
-        logger.info(f"Debug mode enabled. Agent logging to: {self.debug_file}, Memory logging to: {memory_debug_file}")
+        logger.info(f"Debug mode enabled. Agent logging to: {self.debug_file}")
         
     def disable_debug_mode(self):
-        """Disable debug mode for both agent and memory."""
+        """Disable debug mode for agent."""
         self.debug = False
         self.debug_file = None
-        self.memory.disable_debug()
-        logger.info("Debug mode disabled for agent and memory")
+        logger.info("Debug mode disabled for agent")
 
     def set_browser_controller(self, browser_controller):
         """Set the browser controller instance for the agent."""
         self.browser_controller = browser_controller
+        
+        # Pass the LLM client to the browser controller for intelligent tools operations
+        if hasattr(browser_controller, 'set_llm_client') and self.llm:
+            browser_controller.set_llm_client(self.llm)
+            logger.info("LLM client passed to browser controller for intelligent tools")
+        
         # Initialize valid actions immediately
         if browser_controller:
             self.valid_actions = browser_controller.get_available_actions_description()
@@ -76,7 +73,7 @@ class Agent:
         logger.debug(f"Browser state updated: URL={self.current_url}, Tabs={len(self.open_tabs)}")
         
     def add_step(self, action: Dict[str, Any], result: Any, success: bool = True):
-        """Add a completed step to the previous steps list and memory."""
+        """Add a completed step to the previous steps list."""
         step = {
             "step_number": len(self.previous_steps) + 1,
             "action": action,
@@ -88,30 +85,6 @@ class Agent:
         }
         
         self.previous_steps.append(step)
-        
-        # Store in memory with structured format and more details
-        action_name = list(action.keys())[0] if isinstance(action, dict) and action else "unknown"
-        action_params = action.get(action_name, {}) if isinstance(action, dict) else {}
-        
-        memory_entry = {
-            "type": "action_execution",
-            "step": step["step_number"],
-            "action": action_name,
-            "action_params": action_params,  # Store the parameters too
-            "success": success,
-            "url": self.current_url,
-            "timestamp": step["timestamp"],
-            "result_summary": str(result)[:200] if result else ""  # Store truncated result
-        }
-        self.memory.add(memory_entry)
-        
-        # Log memory snapshot if debug mode is enabled
-        if self.debug:
-            self.memory.log_memory_snapshot(
-                step_number=step["step_number"],
-                custom_message=f"After executing {action_name} ({'success' if success else 'failed'})"
-            )
-        
         logger.info(f"Step {step['step_number']} added: {action} -> Success: {success}")
         
     def build_context_prompt(self, user_goal: str) -> str:
@@ -153,45 +126,28 @@ Please provide your next action(s) in the required JSON format.
         return context_prompt
         
     def _format_memory_context(self) -> str:
-        """Format recent memory entries for context - simplified to show only success rate and behavior patterns."""
-        if len(self.memory) == 0:
-            return "No previous memory entries."
+        """Format recent execution context for LLM - based on previous steps."""
+        if not self.previous_steps:
+            return "No previous actions executed in this session."
             
-        recent_entries = self.memory.history[-10:]  # Look at recent entries for analysis
+        # Get last few steps for context
+        recent_steps = self.previous_steps[-5:] if len(self.previous_steps) > 5 else self.previous_steps
         
-        # Extract basic statistics
-        success_count = 0
-        failure_count = 0
-        actions_performed = []
+        # Extract basic patterns
+        success_count = sum(1 for step in recent_steps if step.get("success", False))
+        total_steps = len(recent_steps)
         
-        for entry in recent_entries:
-            if entry.get("type") == "action_execution":
-                action_name = entry.get("action", "unknown")
-                success = entry.get("success", False)
-                
-                # Count successes and failures
-                if success:
-                    success_count += 1
-                else:
-                    failure_count += 1
-                
-                # Track actions for pattern analysis
-                actions_performed.append(action_name)
+        context_lines = [
+            f"Recent execution summary: {success_count}/{total_steps} successful steps",
+            "Recent actions performed:"
+        ]
         
-        # Build simplified context
-        summary_lines = []
-        if recent_entries:
-            total_actions = success_count + failure_count
-            success_rate = (success_count / total_actions * 100) if total_actions > 0 else 0
-            
-            summary_lines.append(f"📊 Success rate: {success_rate:.1f}% ({success_count}/{total_actions})")
-            
-            # Show recent action flow (behavior patterns)
-            if actions_performed:
-                recent_flow = " → ".join(actions_performed[-5:])  # Last 5 actions
-                summary_lines.append(f"🔄 Recent flow: {recent_flow}")
+        for step in recent_steps:
+            action = step.get("action", "unknown")
+            success = "✓" if step.get("success", False) else "✗"
+            context_lines.append(f"  {success} {action}")
         
-        return "\n".join(summary_lines)
+        return "\n".join(context_lines)
         
     def _format_previous_steps(self) -> str:
         """Format previous steps for the prompt."""
@@ -210,7 +166,7 @@ Please provide your next action(s) in the required JSON format.
             status = "✓" if step["success"] else "✗"
             formatted_steps.append(
                 f"{status} Step {step['step_number']}: {action_name} "
-                f"(Result: {step['result'][:100]}{'...' if len(step['result']) > 100 else ''})"
+                f"(Result: {step['result']})"
             )
             
         return "\n".join(formatted_steps)
@@ -442,9 +398,6 @@ Interactive Elements:
             # Get next action from LLM
             action_response = self.get_next_action(user_goal)
             
-            # Store LLM insights in memory
-            self.add_llm_insight(action_response)
-            
             execution_log.append({
                 "step": len(self.previous_steps) + 1,
                 "llm_response": action_response,
@@ -457,10 +410,19 @@ Interactive Elements:
                 logger.warning("No actions provided by LLM")
                 break
                 
+            # Filter out 'end' actions when chained with other actions
+            actions = self._filter_chained_end_actions(actions)
+            if not actions:
+                logger.warning("All actions were filtered out (end action was chained)")
+                break
+                
             # Execute each action in sequence
             all_success = True
             action_results = []
             should_terminate = False
+            
+            # Filter out 'end' actions if they are chained with other actions
+            actions = self._filter_chained_end_actions(actions)
             
             for action_item in actions:
                 action_name = list(action_item.keys())[0]
@@ -605,31 +567,40 @@ RESPONSE FROM LLM:
         except Exception as e:
             logger.error(f"Failed to write debug log: {e}")
             
-    def add_llm_insight(self, llm_response: Dict[str, Any]):
-        """Store LLM insights and goal evaluation in memory."""
-        if not isinstance(llm_response, dict):
-            return
+
             
-        current_state = llm_response.get("current_state", {})
+            
+    def _filter_chained_end_actions(self, actions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Filter out 'end' actions when they are chained with other actions.
+        The 'end' action should only be executed if it's the only action in the list.
         
-        memory_entry = {
-            "type": "llm_insight",
-            "step": len(self.previous_steps),
-            "evaluation": current_state.get("evaluation_previous_goal", "Unknown"),
-            "memory_note": current_state.get("memory", ""),
-            "next_goal": current_state.get("next_goal", ""),
-            "timestamp": datetime.now().isoformat(),
-            "url": self.current_url
-        }
+        Args:
+            actions: List of action dictionaries from LLM response
+            
+        Returns:
+            Filtered list of actions with 'end' removed if chained with others
+        """
+        if not actions or len(actions) <= 1:
+            return actions
+            
+        # Check if there's an 'end' action in a list with multiple actions
+        has_end_action = any(
+            list(action.keys())[0] == "end" 
+            for action in actions 
+            if isinstance(action, dict) and action
+        )
         
-        self.memory.add(memory_entry)
-        
-        # Log LLM insight if debug mode is enabled
-        if self.debug:
-            self.memory.log_memory_snapshot(
-                step_number=len(self.previous_steps),
-                custom_message=f"LLM Insight: {current_state.get('next_goal', 'No goal specified')}"
-            )
+        if has_end_action and len(actions) > 1:
+            # Filter out 'end' actions when chained with others
+            filtered_actions = [
+                action for action in actions 
+                if not (isinstance(action, dict) and action and list(action.keys())[0] == "end")
+            ]
+            logger.info(f"Filtered out 'end' action from chain of {len(actions)} actions. Remaining: {len(filtered_actions)} actions")
+            return filtered_actions
+            
+        return actions
 
 
 
