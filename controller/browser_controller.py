@@ -1,14 +1,9 @@
-import logging
 from typing import Optional, Dict, Any, Union
 
 # Import from the browser package
 from browser.browser_context import BrowserSession
 # Import from the tools package
 from tools.tools import Tools
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 class BrowserController:
     """
@@ -20,6 +15,9 @@ class BrowserController:
         self.browser_context = BrowserSession()
         self.tools_instance = Tools(llm_client)
         self.llm_client = llm_client
+        # Store logging functions for tools integration
+        self.log_debug_func = None
+        self.debug_file_path = None
 
     def execute_command(self, command: str, *args) -> Union[bool, Dict[str, Any], str]:
         """
@@ -38,14 +36,11 @@ class BrowserController:
         }
 
         if command not in command_map:
-            logger.error(f"Unknown command: {command}")
-            logger.info(f"Available commands: {', '.join(command_map.keys())}")
             return False
 
         try:
             return command_map[command](*args)
         except Exception as e:
-            logger.error(f"Error executing command '{command}': {e}")
             return False
 
     def go_back(self) -> bool:
@@ -53,19 +48,16 @@ class BrowserController:
             self.browser_context.go_back()
             return True
         except Exception as e:
-            logger.error(f"Error navigating back: {e}")
             return False
 
     def click_element_by_index(self, element_index: int) -> bool:
         try:
             page = self.browser_context.get_current_page()
             if page is None:
-                logger.error("No active page to interact with")
                 return False
 
             selector_map = self.browser_context.get_selector_map(refresh=True)
             if not selector_map or element_index not in selector_map:
-                logger.error(f"Element index {element_index} not found in selector map")
                 return False
 
             element = selector_map[element_index]
@@ -73,12 +65,10 @@ class BrowserController:
             attrs   = element.attributes or {}            # Try ID first
             if (elem_id := attrs.get("id")):
                 selector = f"#{elem_id}"
-                logger.info(f"Clicking element using ID selector: {selector}")
                 page.click(selector, timeout=5000)
             else:
                 # fallback to XPath - use page.locator() with xpath= prefix for XPath selectors
                 xpath_selector = f"xpath={xpath}"
-                logger.info(f"Clicking element using XPath selector: {xpath_selector}")
                 page.locator(xpath_selector).click(timeout=5000)
             page.wait_for_load_state("networkidle", timeout=5000)
 
@@ -89,19 +79,16 @@ class BrowserController:
             return True
 
         except Exception as e:
-            logger.error(f"Error clicking element: {e}")
             return False
 
     def input_text(self, element_index: int, text: str) -> bool:
         try:
             page = self.browser_context.get_current_page()
             if page is None:
-                logger.error("No active page to interact with")
                 return False
 
             selector_map = self.browser_context.get_selector_map(refresh=True)
             if not selector_map or element_index not in selector_map:
-                logger.error(f"Element index {element_index} not found in selector map")
                 return False
 
             element = selector_map[element_index]
@@ -109,12 +96,10 @@ class BrowserController:
             attrs   = element.attributes or {}            # Try ID first
             if (elem_id := attrs.get("id")):
                 selector = f"#{elem_id}"
-                logger.info(f"Filling element using ID selector: {selector} with text: {text!r}")
                 page.fill(selector, text, timeout=5000)
             else:
                 # fallback to XPath - use page.locator() with xpath= prefix for XPath selectors
                 xpath_selector = f"xpath={xpath}"
-                logger.info(f"Filling element using XPath selector: {xpath_selector} with text: {text!r}")
                 page.locator(xpath_selector).fill(text, timeout=5000)
 
             # clear parser & selector_map cache
@@ -124,28 +109,24 @@ class BrowserController:
             return True
 
         except Exception as e:
-            logger.error(f"Error inputting text: {e}")
             return False
 
     def switch_tab(self, tab_index: int) -> bool:
         try:
             return self.browser_context.switch_to_tab(tab_index)
         except Exception as e:
-            logger.error(f"Error switching tab: {e}")
             return False
 
     def open_tab(self, url: Optional[str] = None) -> Dict[str, Any]:
         try:
             return self.browser_context.create_new_tab(url)
         except Exception as e:
-            logger.error(f"Error opening tab: {e}")
             return {}
 
     def close_tab(self, tab_index: int) -> bool:
         try:
             return self.browser_context.close_tab(tab_index)
         except Exception as e:
-            logger.error(f"Error closing tab: {e}")
             return False
 
     def navigate_to(self, url: str) -> bool:
@@ -153,7 +134,6 @@ class BrowserController:
             self.browser_context.navigate_to(url)
             return True
         except Exception as e:
-            logger.error(f"Error navigating to URL: {e}")
             return False
 
     def tools(self, reason: str) -> Dict[str, Any]:
@@ -167,12 +147,10 @@ class BrowserController:
             Dictionary indicating success and any relevant information
         """
         try:
-            logger.info(f"Tools action called with reason: {reason}")
             # Use the Tools class to execute the action, passing the LLM client
             result = self.tools_instance.execute(reason, self.browser_context, self.llm_client)
             return result
         except Exception as e:
-            logger.error(f"Error in tools action: {e}")
             return {
                 "success": False,
                 "message": f"Tools action failed: {e}",
@@ -181,11 +159,9 @@ class BrowserController:
 
     def end(self, reason: Optional[str] = None) -> bool:
         try:
-            logger.info(f"Ending browser session. Reason: {reason or 'Task completed'}")
             self.browser_context.close()
             return True
         except Exception as e:
-            logger.error(f"Error ending session: {e}")
             return False
 
     def available_commands(self) -> list:
@@ -313,11 +289,23 @@ class BrowserController:
         try:
             self.browser_context.close()
         except Exception as e:
-            logger.error(f"Error closing browser session: {e}")
+            pass
 
     def set_llm_client(self, llm_client):
         """Set or update the LLM client for intelligent tools operations."""
         self.llm_client = llm_client
         # Update the tools instance with the new LLM client
         self.tools_instance.llm_client = llm_client
-        logger.info("LLM client set for browser controller and tools")
+        
+    def set_logging_functions(self, log_debug_func=None, debug_file_path=None):
+        """
+        Set logging functions for the tools integration.
+        
+        Args:
+            log_debug_func: Function to log debug information (from agent's _log_debug)
+            debug_file_path: Path to the debug file for structured logging
+        """
+        self.log_debug_func = log_debug_func
+        self.debug_file_path = debug_file_path
+        # Update the tools instance with the logging functions
+        self.tools_instance.set_logging_functions(log_debug_func, debug_file_path)

@@ -2,13 +2,11 @@ from llm import GeminiFlashClient
 from prompt_builder import SystemPromptBase
 from logging_utils import debug_logger
 import json
-import logging
 from typing import Dict, List, Any
 from datetime import datetime
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 class Agent:
     """
@@ -29,20 +27,31 @@ class Agent:
           # Create debug log file if debug is enabled
         if self.debug:
             self.debug_file = debug_logger.get_debug_file_path("agent")
-            logger.info(f"Debug mode enabled. Logging to: {self.debug_file}")
               # Enable debug mode for memory with synchronized debug file
         
     def enable_debug_mode(self, debug_file_prefix: str = None):
         """Enable debug mode for agent."""
         self.debug = True
         self.debug_file = debug_logger.get_debug_file_path("agent", debug_file_prefix)
-        logger.info(f"Debug mode enabled. Agent logging to: {self.debug_file}")
+        
+        # Update browser controller logging functions if available
+        if self.browser_controller and hasattr(self.browser_controller, 'set_logging_functions'):
+            self.browser_controller.set_logging_functions(
+                log_debug_func=self._log_debug,
+                debug_file_path=self.debug_file
+            )
         
     def disable_debug_mode(self):
         """Disable debug mode for agent."""
         self.debug = False
         self.debug_file = None
-        logger.info("Debug mode disabled for agent")
+        
+        # Clear browser controller logging functions if available
+        if self.browser_controller and hasattr(self.browser_controller, 'set_logging_functions'):
+            self.browser_controller.set_logging_functions(
+                log_debug_func=None,
+                debug_file_path=None
+            )
 
     def set_browser_controller(self, browser_controller):
         """Set the browser controller instance for the agent."""
@@ -51,12 +60,17 @@ class Agent:
         # Pass the LLM client to the browser controller for intelligent tools operations
         if hasattr(browser_controller, 'set_llm_client') and self.llm:
             browser_controller.set_llm_client(self.llm)
-            logger.info("LLM client passed to browser controller for intelligent tools")
+        
+        # Pass logging functions to the browser controller for tools integration
+        if hasattr(browser_controller, 'set_logging_functions') and self.debug:
+            browser_controller.set_logging_functions(
+                log_debug_func=self._log_debug,
+                debug_file_path=self.debug_file
+            )
         
         # Initialize valid actions immediately
         if browser_controller:
             self.valid_actions = browser_controller.get_available_actions_description()
-        logger.info("Browser controller attached to agent")
         
     def update_browser_state(self, url: str = None, tabs: List[str] = None, 
                            elements: str = None, actions: str = None):
@@ -70,7 +84,6 @@ class Agent:
         if actions is not None:
             self.valid_actions = actions
             
-        logger.debug(f"Browser state updated: URL={self.current_url}, Tabs={len(self.open_tabs)}")
         
     def add_step(self, action: Dict[str, Any], result: Any, success: bool = True):
         """Add a completed step to the previous steps list."""
@@ -85,7 +98,6 @@ class Agent:
         }
         
         self.previous_steps.append(step)
-        logger.info(f"Step {step['step_number']} added: {action} -> Success: {success}")
         
     def build_context_prompt(self, user_goal: str) -> str:
         """Build the complete context prompt for the LLM."""
@@ -199,7 +211,6 @@ Interactive Elements:
             context = self.build_context_prompt(user_goal)
             
             # Get response from LLM
-            logger.info("Requesting next action from LLM...")
             response = self.llm.ask(context)
             
             # Log debug information if enabled
@@ -231,7 +242,6 @@ Interactive Elements:
             return action_data
             
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse LLM response as JSON: {e}")
             return {
                 "current_state": {
                     "evaluation_previous_goal": "Failed",
@@ -241,7 +251,6 @@ Interactive Elements:
                 "action": [{"error": {"reason": f"JSON parsing failed: {str(e)}"}}]
             }
         except Exception as e:
-            logger.error(f"Error getting next action: {e}")
             return {
                 "current_state": {
                     "evaluation_previous_goal": "Failed",
@@ -287,7 +296,6 @@ Interactive Elements:
         action_name = list(action_item.keys())[0]
         action_params = action_item[action_name]
         
-        logger.info(f"Executing action: {action_name} with params: {action_params}")
         
         try:
             if action_name == "navigate_to":
@@ -349,13 +357,11 @@ Interactive Elements:
                 return {"success": False, "error": f"Unknown action: {action_name}"}
                 
         except Exception as e:
-            logger.error(f"Error executing action {action_name}: {e}")
             return {"success": False, "error": f"Exception during execution: {str(e)}"}
             
     def refresh_browser_state(self):
         """Refresh the current browser state from the browser controller."""
         if not self.browser_controller:
-            logger.warning("No browser controller available to refresh state")
             return
             
         try:
@@ -375,10 +381,13 @@ Interactive Elements:
             # Get available actions with detailed descriptions
             self.valid_actions = self.browser_controller.get_available_actions_description()
             
-            logger.info(f"Browser state refreshed: {len(self.open_tabs)} tabs, URL: {self.current_url}")
             
         except Exception as e:
-            logger.error(f"Error refreshing browser state: {e}")
+            self.current_url = "Error: Unable to get current URL"
+            self.open_tabs = ["Error: Unable to get tabs info"]
+            self.interactive_elements = "Error: Unable to get interactive elements"
+            self.valid_actions = "Error: Unable to get available actions"
+            
             
     def execute_plan(self, user_goal: str) -> List[Dict[str, Any]]:
         """
@@ -389,7 +398,6 @@ Interactive Elements:
             return [{"error": "No browser controller available", "success": False}]
             
         execution_log = []
-        logger.info(f"Starting execution plan for goal: {user_goal}")
         
         while len(self.previous_steps) < self.max_actions:
             # Refresh browser state
@@ -406,15 +414,9 @@ Interactive Elements:
             
             # Check if we should stop
             actions = action_response.get("action", [])
-            if not actions:
-                logger.warning("No actions provided by LLM")
-                break
                 
             # Filter out 'end' actions when chained with other actions
             actions = self._filter_chained_end_actions(actions)
-            if not actions:
-                logger.warning("All actions were filtered out (end action was chained)")
-                break
                 
             # Execute each action in sequence
             all_success = True
@@ -440,12 +442,10 @@ Interactive Elements:
                     
                     if not result.get("success", False):
                         all_success = False
-                        logger.warning(f"Action failed: {action_item}")
                         break
                         
                     # Check if this action terminates the sequence
                     if result.get("terminate", False) or action_name in ["end"]:
-                        logger.info(f"Termination action executed: {action_name}")
                         should_terminate = True
                         break
                         
@@ -457,7 +457,6 @@ Interactive Elements:
                     })
                     self.add_step(action_item, error_result, False)
                     all_success = False
-                    logger.error(f"Exception executing action {action_item}: {e}")
                     break
                       # Update execution log with results
             execution_log[-1]["action_results"] = action_results
@@ -465,14 +464,11 @@ Interactive Elements:
             
             # Check for termination
             if should_terminate or any(result.get("result", {}).get("terminate", False) for result in action_results):
-                logger.info("Plan execution terminated by action")
                 break
                 
             if not all_success:
-                logger.warning("Plan execution stopped due to failed action")
                 break
                 
-        logger.info(f"Plan execution completed. Total steps: {len(self.previous_steps)}")
         return execution_log
         
     def reset_session(self):
@@ -489,9 +485,7 @@ Interactive Elements:
             self.memory.log_memory_snapshot(
                 custom_message="Session reset - starting new session"
             )
-            
-        logger.info("Agent session reset")
-        
+                    
     def get_session_summary(self) -> Dict[str, Any]:
         """Get a summary of the current session."""
         session_duration = (datetime.now() - self.session_start_time).total_seconds()
@@ -529,10 +523,8 @@ Interactive Elements:
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(session_data, f, indent=2, ensure_ascii=False)
-            logger.info(f"Session log saved to {filename}")
             return filename
         except Exception as e:
-            logger.error(f"Failed to save session log: {e}")
             return ""
         
     def _log_debug(self, request: str, response: str, step_number: int = None):
@@ -565,7 +557,8 @@ RESPONSE FROM LLM:
                 f.write(debug_entry)
                 
         except Exception as e:
-            logger.error(f"Failed to write debug log: {e}")
+            print(f"Error logging debug information: {str(e)}")
+
             
 
             
@@ -597,7 +590,6 @@ RESPONSE FROM LLM:
                 action for action in actions 
                 if not (isinstance(action, dict) and action and list(action.keys())[0] == "end")
             ]
-            logger.info(f"Filtered out 'end' action from chain of {len(actions)} actions. Remaining: {len(filtered_actions)} actions")
             return filtered_actions
             
         return actions
