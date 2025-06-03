@@ -58,12 +58,15 @@ Requirement: "The signup form must require the user to enter their email address
 TEST_CASE = """
 Go to file:///home/mushfiqur/vscode/Testing-Agent/html/signup.html
 signup with email field, password field, and confirm password field.
-Test whether the account creation field contains password verify inout which takes the second password. If it doesn't match the first password, it shows an error message "passwords must matc
+Test whether the account creation field contains password verify input which takes the second password. If it doesn't match the first password, it shows an error message "passwords must match"
 """
 
 if __name__ == "__main__":
-    # Replace 'YOUR_API_KEY' with your actual Gemini API key or set it as an environment variable
-    api_key = "AIzaSyCkDQ9iYC_C7HuK4nRa9NsXC1j4NdCVS6A"
+    # Get API key from environment variable for security
+    api_key = os.getenv('GEMINI_API_KEY')
+    if not api_key:
+        print("Error: Please set the GEMINI_API_KEY environment variable")
+        exit(1)
     client = GeminiFlashClient(api_key=api_key)
 
     # Combine the general prompt template with the specific test-case instruction
