@@ -1,9 +1,13 @@
 from typing import Optional, Dict, Any, Union
-
+import os
+import sys
+# Add the project root to Python path so imports work
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, PROJECT_ROOT)
 # Import from the browser package
-from browser.browser_context import BrowserSession
+from src.browser.browser_context import BrowserSession
 # Import from the tools package
-from tools.tools import Tools
+from src.agent.tool_agent.tools import Tools
 
 class BrowserController:
     """

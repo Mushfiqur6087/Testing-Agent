@@ -1,4 +1,9 @@
 from typing import Optional
+# Set up project root and add to sys.path
+import os
+import sys
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, PROJECT_ROOT)
 
 SYSTEM_PROMPT_TEMPLATE = '''
 You are an AI agent designed to automate browser component testing. Your goal is to accomplish the ultimate task following the rules.

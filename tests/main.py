@@ -1,18 +1,14 @@
 # Agent Usage Example with TestAgent Class
 import sys
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 
-# Add parent directory to Python path to import controller module
-current_dir = Path(__file__).parent
-project_root = current_dir.parent
-sys.path.append(str(project_root))
 
-# Load environment variables from .env file
-load_dotenv(project_root / '.env')
+# Add the project root to Python path so imports work
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
 
-from test_agent import TestAgent
+
+from src.test_agent import TestAgent
 
 # Configuration - Define once, use everywhere
 API_KEY = os.getenv('GEMINI_API_KEY')

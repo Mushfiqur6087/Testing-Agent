@@ -4,9 +4,14 @@ Ensures all debug logs are stored in the logs directory.
 """
 
 import os
+import sys
 import logging
 from datetime import datetime
 from pathlib import Path
+
+# Set up project root and add to sys.path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, PROJECT_ROOT)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -15,8 +20,8 @@ class DebugLogger:
     """Centralized debug logging utility for consistent log file management."""
     
     def __init__(self):
-        # Get the project root directory (Testing Agent)
-        self.project_root = self._get_project_root()
+        # Get the project root directory using the PROJECT_ROOT variable
+        self.project_root = Path(PROJECT_ROOT)
         self.logs_dir = self.project_root / "logs"
         
         # Ensure logs directory exists

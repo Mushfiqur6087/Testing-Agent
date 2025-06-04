@@ -1,4 +1,10 @@
 import time
+import sys
+import os
+
+# Add the project root to Python path so imports work
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, PROJECT_ROOT)
 
 class DomTreeBuilder:
     def __init__(self, page, debug_mode=False):

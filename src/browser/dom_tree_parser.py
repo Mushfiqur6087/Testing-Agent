@@ -1,22 +1,15 @@
-#!/usr/bin/env python3
-"""
-DOMTreeParser module
-
-Parses a Playwright page into a tree of DOMElementNode/DOMTextNode,
-and extracts a flat selector-map of interactive elements.
-"""
-
 import json
-import logging
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+import os
+import sys
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from playwright.sync_api import sync_playwright, Page
-from .dom_tree_builder import DomTreeBuilder  # import from the same package
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# Add the project root to Python path so imports work
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, PROJECT_ROOT)
+
+from src.browser.dom_tree_builder import DomTreeBuilder
 
 
 @dataclass
@@ -43,7 +36,6 @@ class DOMTreeParser:
 
     def __init__(self, page) -> None:
         if page is None:
-            logger.error("A Playwright 'page' object is required.")
             raise ValueError("No page object provided for parsing.")
         self.page = page
         self.dom_tree: Optional[DOMElementNode] = None
@@ -212,31 +204,3 @@ class DOMTreeParser:
         return "\n".join(lines)
 
 
-
-
-# def run_demo(html_file: Path) -> None:
-#     """Demo entry: load HTML, parse DOM, and print both tree and selector map."""
-#     with sync_playwright() as pw:
-#         browser = pw.chromium.launch()
-#         page = browser.new_page()
-#         page.goto(html_file.as_uri())
-
-#         parser = DOMTreeParser(page)
-#         parser.parse()
-
-#         print("\n=== DOM Tree ===")
-#         print(parser.get_dom_string())
-
-#         print("\n=== Selector Map ===")
-#         print(parser.selector_map_json())
-
-#         print("\n=== Selector Map String ===")
-#         print(parser.get_selector_map_string())
-
-#         browser.close()
-
-
-# if __name__ == "__main__":
-#     project_root = Path(__file__).parent.parent
-#     demo_html = project_root / "html" / "login_form.html"
-#     run_demo(demo_html)

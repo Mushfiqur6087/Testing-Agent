@@ -1,15 +1,15 @@
-# TestAgent Class for Controlled Agent Execution
+
+import os
 import sys
-from pathlib import Path
 
-# Add parent directory to Python path to import modules
-current_dir = Path(__file__).parent
-project_root = current_dir.parent
-sys.path.append(str(project_root))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
 
-from agent import Agent
-from llm import GeminiFlashClient
-from controller.browser_controller import BrowserController
+# Import the required classes from the agent package
+from src.agent.main_agent.agent import Agent
+from src.agent.core_utils.llm import GeminiFlashClient
+from src.controller.browser_controller import BrowserController
+
 
 class TestAgent:
     """

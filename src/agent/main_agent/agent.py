@@ -1,7 +1,12 @@
-from llm import GeminiFlashClient
-from prompt_builder import SystemPromptBase
-from logging_utils import debug_logger
 import json
+import os
+import sys
+import ast
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, PROJECT_ROOT)
+from src.agent.core_utils.llm import GeminiFlashClient
+from src.agent.main_agent.prompt_generator import SystemPromptBase
+from src.agent.core_utils.logging_utils import debug_logger
 from typing import Dict, List, Any
 from datetime import datetime
 
@@ -219,7 +224,6 @@ Interactive Elements:
                 # Try to extract data from the result string
                 try:
                     # The result might be a string representation of a dict
-                    import ast
                     if "data" in result_str:
                         # Look for the data section in the result
                         start_idx = result_str.find("'data': {")

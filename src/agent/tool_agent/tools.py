@@ -2,7 +2,11 @@ import json
 from typing import Dict, Any, Optional
 from datetime import datetime
 from pathlib import Path
-from browser.browser_context import BrowserSession
+import os
+import sys
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, PROJECT_ROOT)
+from src.browser.browser_context import BrowserSession
 
 class Tools:
     """
