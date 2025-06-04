@@ -83,3 +83,12 @@ temp_*.py
 screenshots/
 videos/
 traces/
+
+# Environment variables and sensitive files
+.env
+.env.local
+.env.production
+
+# Log files
+logs/
+*.log
