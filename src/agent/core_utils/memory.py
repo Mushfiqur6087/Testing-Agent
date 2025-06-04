@@ -47,20 +47,23 @@ class EnhancedMemory:
             self.llm_states.append(memory_entry)
         
     def save_tool_output(self, tool_output: Dict[str, Any], 
-                        step_number: int, browser_context: Dict[str, Any] = None):
+                        step_number: int, browser_context: Dict[str, Any] = None,
+                        request_reason: str = None):
         """
-        Save only essential tool execution output.
+        Save tool execution output including request reason.
         
         Args:
             tool_output: Complete output from tool execution
             step_number: Current step number
             browser_context: Not used in simplified version
+            request_reason: The reason/request that triggered the tool execution
         """
         # Extract only the essential fields
         essential_output = {
             "message": tool_output.get("message", ""),
             "findings": tool_output.get("findings", ""),
-            "validation_passed": tool_output.get("validation_passed", None)
+            "validation_passed": tool_output.get("validation_passed", None),
+            "request_reason": request_reason or "No reason provided"
         }
         
         memory_entry = {
@@ -167,10 +170,9 @@ class EnhancedMemory:
             for tool in recent_tools:
                 tool_output = tool["tool_output"]
                 context_lines.append(f"  Step {tool['step_number']} Tool:")
-                context_lines.append(f"    Message: {tool_output.get('message', 'No message')}")
-                context_lines.append(f"    Validation: {tool_output.get('validation_passed', 'Unknown')}")
+                context_lines.append(f"    Request: {tool_output.get('request_reason', 'No reason provided')}")
                 if tool_output.get('findings'):
-                    context_lines.append(f"    Findings: {tool_output['findings'][:500]}...")
+                    context_lines.append(f"    Findings: {tool_output['findings'][:1000]}...")
             context_lines.append("")
         
         return "\n".join(context_lines)

@@ -44,10 +44,10 @@ def clean_cache_and_logs(root_dir=None):
             pyo_file.unlink()
             removed_files += 1
     
-    # Remove log files
+    # Remove all log files
     logs_dir = root_dir / "logs"
     if logs_dir.exists() and logs_dir.is_dir():
-        for log_file in logs_dir.rglob("*.log"):
+        for log_file in logs_dir.rglob("*"):
             if log_file.is_file():
                 print(f"  📄 Removing log: {log_file.relative_to(root_dir)}")
                 log_file.unlink()

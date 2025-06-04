@@ -352,7 +352,7 @@ Interactive Elements:
                 reason = action_params.get("reason", "No reason provided")
                 result = self.browser_controller.execute_command("tools", reason)
                 
-                # Save tool output to memory
+                # Save tool output to memory with request reason
                 tool_output = {
                     "message": result.get("message", f"Tools action executed with reason: {reason}"),
                     "findings": result.get("data", {}).get("findings", ""),
@@ -360,7 +360,8 @@ Interactive Elements:
                 }
                 self.memory.save_tool_output(
                     tool_output=tool_output,
-                    step_number=len(self.previous_steps) + 1
+                    step_number=len(self.previous_steps) + 1,
+                    request_reason=reason
                 )
                 
                 return {"success": result.get("success", True), "message": result.get("message", f"Tools action executed with reason: {reason}"), "data": result.get("data", {})}

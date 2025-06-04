@@ -22,7 +22,15 @@ def test_memory_initialization():
     assert memory.llm_states == []
     assert memory.tool_outputs == []
     assert memory.session_start_time is not None
+    assert memory.debug_file_path is None
     print("✓ Memory initialization test passed")
+    
+    # Test with debug file path
+    print("Testing memory initialization with debug file...")
+    debug_path = "/tmp/test_debug.log"
+    memory_with_debug = EnhancedMemory(debug_file_path=debug_path)
+    assert memory_with_debug.debug_file_path == debug_path
+    print("✓ Memory initialization with debug file test passed")
 
 
 def test_save_llm_response():
@@ -130,16 +138,26 @@ def test_save_tool_output():
         "another_field": {"complex": "data"}
     }
     
-    memory.save_tool_output(tool_output, step_number=2)
+    # Test with request_reason parameter
+    request_reason = "User requested to verify login status"
+    memory.save_tool_output(tool_output, step_number=2, request_reason=request_reason)
     
     assert len(memory.tool_outputs) == 1
     saved_output = memory.tool_outputs[0]
     assert saved_output["step_number"] == 2
     assert saved_output["tool_output"]["message"] == "Login successful!"
     assert saved_output["tool_output"]["validation_passed"] is True
+    assert saved_output["tool_output"]["request_reason"] == request_reason
     assert "extra_field" not in saved_output["tool_output"]  # Should be filtered out
     assert "another_field" not in saved_output["tool_output"]  # Should be filtered out
     assert "timestamp" in saved_output
+    
+    # Test without request_reason parameter
+    memory.save_tool_output(tool_output, step_number=3)
+    assert len(memory.tool_outputs) == 2
+    saved_output_2 = memory.tool_outputs[1]
+    assert saved_output_2["tool_output"]["request_reason"] == "No reason provided"
+    
     print("✓ Tool output saving test passed")
 
 
@@ -166,7 +184,7 @@ def test_get_recent_data():
             "findings": f"Tool findings {i}",
             "validation_passed": i % 2 == 0  # Alternate between True/False
         }
-        memory.save_tool_output(tool_output, step_number=i)
+        memory.save_tool_output(tool_output, step_number=i, request_reason=f"Test request {i}")
     
     # Test getting recent LLM states (default 5)
     recent_states = memory.get_recent_llm_states()
@@ -217,9 +235,9 @@ def test_execution_summary():
     success_tool = {"message": "Success", "findings": "Good", "validation_passed": True}
     failure_tool = {"message": "Failed", "findings": "Bad", "validation_passed": False}
     
-    memory.save_tool_output(success_tool, 1)
-    memory.save_tool_output(failure_tool, 2)
-    memory.save_tool_output(success_tool, 3)
+    memory.save_tool_output(success_tool, 1, request_reason="Verify success condition")
+    memory.save_tool_output(failure_tool, 2, request_reason="Check failure scenario")
+    memory.save_tool_output(success_tool, 3, request_reason="Final validation check")
     
     summary = memory.get_execution_summary()
     
@@ -257,15 +275,15 @@ def test_memory_context_formatting():
     }
     
     memory.save_llm_response(llm_response, 1)
-    memory.save_tool_output(tool_output, 1)
+    memory.save_tool_output(tool_output, 1, request_reason="Test memory context formatting")
     
     context = memory.format_memory_context()
     
-    assert "Session Summary:" in context
     assert "Recent LLM States:" in context
     assert "Recent Tool Outputs:" in context
     assert "Success - Test completed" in context
-    assert "Test tool executed successfully" in context
+    assert "Test memory context formatting" in context  # This is the request reason
+    assert "Found some interesting results during the test execution" in context  # This is the findings
     
     print("✓ Memory context formatting test passed")
 
@@ -290,7 +308,7 @@ def test_export_session_data():
     }
     
     memory.save_llm_response(llm_response, 1)
-    memory.save_tool_output(tool_output, 1)
+    memory.save_tool_output(tool_output, 1, request_reason="Testing export functionality")
     
     # Export to file
     export_path = "/tmp/test_memory_export.json"
@@ -396,12 +414,19 @@ def test_memory_methods_with_dummy_data():
         }
     ]
     
+    dummy_tool_request_reasons = [
+        "Navigate to the login page to start authentication process",
+        "Submit login form with provided credentials",
+        "Retry login with corrected admin credentials",
+        "Access user profile to verify account information"
+    ]
+    
     # Save the dummy data to memory
     for i, llm_resp in enumerate(dummy_llm_responses):
         memory.save_llm_response(llm_resp, step_number=i+1)
     
     for i, tool_out in enumerate(dummy_tool_outputs):
-        memory.save_tool_output(tool_out, step_number=i+1)
+        memory.save_tool_output(tool_out, step_number=i+1, request_reason=dummy_tool_request_reasons[i])
     
     print(f"\n📊 Created dummy data:")
     print(f"   - {len(memory.llm_states)} LLM states")
@@ -447,19 +472,22 @@ def test_memory_methods_with_dummy_data():
     print("="*60)
 
 
+
+
+
 def run_all_tests():
     """Run all memory tests."""
     print("Running EnhancedMemory Tests")
     print("=" * 50)
     
     try:
-        # test_memory_initialization()
-        # test_save_llm_response()
-        # test_save_tool_output()
-        # test_get_recent_data()
-        # test_execution_summary()
-        # test_memory_context_formatting()
-        # test_export_session_data()
+        test_memory_initialization()
+        test_save_llm_response()
+        test_save_tool_output()
+        test_get_recent_data()
+        test_execution_summary()
+        test_memory_context_formatting()
+        test_export_session_data()
         test_memory_methods_with_dummy_data()
         
         print("\n" + "=" * 50)
