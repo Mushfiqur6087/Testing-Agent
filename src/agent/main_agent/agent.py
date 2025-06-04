@@ -7,6 +7,7 @@ sys.path.insert(0, PROJECT_ROOT)
 from src.agent.core_utils.llm import GeminiFlashClient
 from src.agent.main_agent.prompt_generator import SystemPromptBase
 from src.agent.core_utils.logging_utils import debug_logger
+from src.agent.core_utils.memory import EnhancedMemory
 from typing import Dict, List, Any
 from datetime import datetime
 
@@ -29,15 +30,23 @@ class Agent:
         self.system_prompt = SystemPromptBase(max_actions_per_step=max_actions)
         self.browser_controller = None
         self.session_start_time = datetime.now()
-          # Create debug log file if debug is enabled
+        
+        # Create debug log file if debug is enabled
         if self.debug:
             self.debug_file = debug_logger.get_debug_file_path("agent")
-              # Enable debug mode for memory with synchronized debug file
+        else:
+            self.debug_file = None
+            
+        # Initialize enhanced memory system with debug file path
+        self.memory = EnhancedMemory(debug_file_path=self.debug_file)
         
     def enable_debug_mode(self, debug_file_prefix: str = None):
         """Enable debug mode for agent."""
         self.debug = True
         self.debug_file = debug_logger.get_debug_file_path("agent", debug_file_prefix)
+        
+        # Update memory system with new debug file path
+        self.memory = EnhancedMemory(debug_file_path=self.debug_file)
         
         # Update browser controller logging functions if available
         if self.browser_controller and hasattr(self.browser_controller, 'set_logging_functions'):
@@ -118,9 +127,6 @@ class Agent:
         # Format current browser state
         browser_state = self._format_browser_state()
         
-        # Format tool results
-        tool_results_text = self._format_tool_results()
-        
         # Build the complete prompt
         context_prompt = f"""
 {system_prompt}
@@ -140,36 +146,14 @@ class Agent:
 # Available Actions
 {self.valid_actions}
 
-{tool_results_text}
-
 Please provide your next action(s) in the required JSON format.
 """
         
         return context_prompt
         
     def _format_memory_context(self) -> str:
-        """Format recent execution context for LLM - based on previous steps."""
-        if not self.previous_steps:
-            return "No previous actions executed in this session."
-            
-        # Get last few steps for context
-        recent_steps = self.previous_steps[-5:] if len(self.previous_steps) > 5 else self.previous_steps
-        
-        # Extract basic patterns
-        success_count = sum(1 for step in recent_steps if step.get("success", False))
-        total_steps = len(recent_steps)
-        
-        context_lines = [
-            f"Recent execution summary: {success_count}/{total_steps} successful steps",
-            "Recent actions performed:"
-        ]
-        
-        for step in recent_steps:
-            action = step.get("action", "unknown")
-            success = "✓" if step.get("success", False) else "✗"
-            context_lines.append(f"  {success} {action}")
-        
-        return "\n".join(context_lines)
+        """Format memory context using the enhanced memory system."""
+        return self.memory.format_memory_context()
         
     def _format_previous_steps(self) -> str:
         """Format previous steps for the prompt."""
@@ -186,9 +170,14 @@ Please provide your next action(s) in the required JSON format.
                 action_name = str(step["action"])
             
             status = "✓" if step["success"] else "✗"
+            # Truncate result to 100 characters since memory system handles full details
+            result_text = str(step['result'])
+            if len(result_text) > 100:
+                result_text = result_text[:100] + "..."
+            
             formatted_steps.append(
                 f"{status} Step {step['step_number']}: {action_name} "
-                f"(Result: {step['result']})"
+                f"(Result: {result_text})"
             )
             
         return "\n".join(formatted_steps)
@@ -201,93 +190,6 @@ Please provide your next action(s) in the required JSON format.
 Open Tabs: {tabs_text}
 Interactive Elements:
 {self.interactive_elements or 'No interactive elements detected'}"""
-
-    def _format_tool_results(self) -> str:
-        """Format recent tool results for the prompt. Only shows if tools were recently invoked."""
-        if not self.previous_steps:
-            return ""
-            
-        # Look for recent tool actions in the last few steps
-        recent_steps = self.previous_steps[-3:] if len(self.previous_steps) > 3 else self.previous_steps
-        tool_results = []
-        
-        for step in recent_steps:
-            action = step.get("action", {})
-            if not isinstance(action, dict):
-                continue
-                
-            action_name = list(action.keys())[0] if action else ""
-            if action_name == "tools":
-                # Extract the result string and try to parse it for data
-                result_str = step.get("result", "")
-                
-                # Try to extract data from the result string
-                try:
-                    # The result might be a string representation of a dict
-                    if "data" in result_str:
-                        # Look for the data section in the result
-                        start_idx = result_str.find("'data': {")
-                        if start_idx != -1:
-                            # Extract the data portion
-                            data_start = result_str.find("{", start_idx)
-                            bracket_count = 1
-                            data_end = data_start + 1
-                            
-                            while data_end < len(result_str) and bracket_count > 0:
-                                if result_str[data_end] == '{':
-                                    bracket_count += 1
-                                elif result_str[data_end] == '}':
-                                    bracket_count -= 1
-                                data_end += 1
-                            
-                            if bracket_count == 0:
-                                data_str = result_str[data_start:data_end]
-                                try:
-                                    data_dict = ast.literal_eval(data_str)
-                                    
-                                    # Extract findings and validation results
-                                    findings = data_dict.get("findings", "")
-                                    validation_passed = data_dict.get("validation_passed", False)
-                                    
-                                    if findings:
-                                        # Clean up findings if it contains JSON
-                                        if findings.startswith('{\n  "message"'):
-                                            try:
-                                                findings_json = json.loads(findings.split('```')[0])
-                                                message = findings_json.get("message", "")
-                                                detailed_findings = findings_json.get("findings", "")
-                                                validation_status = "✓ PASSED" if findings_json.get("validation_passed", False) else "✗ FAILED"
-                                                
-                                                tool_results.append(f"""Step {step['step_number']} Tool Result:
-  Status: {validation_status}
-  Message: {message}
-  Findings: {detailed_findings}""")
-                                            except:
-                                                # Fallback to raw findings
-                                                validation_status = "✓ PASSED" if validation_passed else "✗ FAILED"
-                                                tool_results.append(f"""Step {step['step_number']} Tool Result:
-  Status: {validation_status}
-  Details: {findings}""")
-                                        else:
-                                            validation_status = "✓ PASSED" if validation_passed else "✗ FAILED"
-                                            tool_results.append(f"""Step {step['step_number']} Tool Result:
-  Status: {validation_status}
-  Details: {findings}""")
-                                except:
-                                    # Fallback to basic result
-                                    tool_results.append(f"""Step {step['step_number']} Tool Result:
-  Raw Result: {result_str}""")
-                except:
-                    # Fallback for any parsing errors
-                    tool_results.append(f"""Step {step['step_number']} Tool Result:
-  Raw Result: {result_str}""")
-        
-        if tool_results:
-            return f"""
-# Recent Tool Results
-{chr(10).join(tool_results)}"""
-        
-        return ""
 
     def get_next_action(self, user_goal: str) -> Dict[str, Any]:
         """
@@ -335,6 +237,12 @@ Interactive Elements:
                     },
                     "action": [{"error": {"reason": "Invalid response format from LLM"}}]
                 }
+            
+            # Save LLM response to memory
+            self.memory.save_llm_response(
+                llm_response=action_data,
+                step_number=len(self.previous_steps) + 1
+            )
                 
             return action_data
             
@@ -443,11 +351,33 @@ Interactive Elements:
             elif action_name == "tools":
                 reason = action_params.get("reason", "No reason provided")
                 result = self.browser_controller.execute_command("tools", reason)
+                
+                # Save tool output to memory
+                tool_output = {
+                    "message": result.get("message", f"Tools action executed with reason: {reason}"),
+                    "findings": result.get("data", {}).get("findings", ""),
+                    "validation_passed": result.get("data", {}).get("validation_passed", None)
+                }
+                self.memory.save_tool_output(
+                    tool_output=tool_output,
+                    step_number=len(self.previous_steps) + 1
+                )
+                
                 return {"success": result.get("success", True), "message": result.get("message", f"Tools action executed with reason: {reason}"), "data": result.get("data", {})}
                 
             elif action_name == "end":
                 reason = action_params.get("reason", "Session ended by user request")
                 result = self.browser_controller.execute_command("end", reason)
+                
+                # Export memory data when session ends
+                try:
+                    memory_export_path = debug_logger.get_debug_file_path("memory_export")
+                    memory_export_path = memory_export_path.replace('.log', '.json')
+                    self.memory.export_session_data(memory_export_path)
+                except Exception as e:
+                    # Silent fail for memory export - don't break main execution
+                    pass
+                
                 return {"success": result, "message": f"Session ended: {reason}", "terminate": True}
                 
             else:
@@ -569,7 +499,7 @@ Interactive Elements:
         return execution_log
         
     def reset_session(self):
-        """Reset the current session while keeping memory intact."""
+        """Reset the current session and create a new memory instance."""
         self.previous_steps = []
         self.current_url = ""
         self.open_tabs = []
@@ -577,15 +507,15 @@ Interactive Elements:
         self.valid_actions = ""
         self.session_start_time = datetime.now()
         
-        # Log memory snapshot at session reset if debug mode is enabled
-        if self.debug:
-            self.memory.log_memory_snapshot(
-                custom_message="Session reset - starting new session"
-            )
+        # Create a new memory instance for the new session
+        self.memory = EnhancedMemory(debug_file_path=self.debug_file)
                     
     def get_session_summary(self) -> Dict[str, Any]:
         """Get a summary of the current session."""
         session_duration = (datetime.now() - self.session_start_time).total_seconds()
+        
+        # Get memory execution summary
+        memory_summary = self.memory.get_execution_summary()
         
         return {
             "session_duration_seconds": session_duration,
@@ -594,9 +524,13 @@ Interactive Elements:
             "failed_steps": len([s for s in self.previous_steps if not s["success"]]),
             "current_url": self.current_url,
             "open_tabs_count": len(self.open_tabs),
-            "memory_entries": len(self.memory),
+            "memory_llm_states": memory_summary["total_llm_states"],
+            "memory_tool_executions": memory_summary["total_tool_executions"],
+            "memory_goal_success_rate": memory_summary["goal_success_rate"],
+            "memory_tool_success_rate": memory_summary["tool_success_rate"],
             "last_action": self.previous_steps[-1]["action"] if self.previous_steps else None,
-            "browser_controller_attached": self.browser_controller is not None        }
+            "browser_controller_attached": self.browser_controller is not None
+        }
         
     def save_session_log(self, filename: str = None) -> str:
         """Save the current session to a JSON file."""
@@ -609,7 +543,9 @@ Interactive Elements:
         session_data = {
             "session_summary": self.get_session_summary(),
             "previous_steps": self.previous_steps,
-            "memory_history": self.memory.history,
+            "memory_llm_states": self.memory.llm_states,
+            "memory_tool_outputs": self.memory.tool_outputs,
+            "memory_execution_summary": self.memory.get_execution_summary(),
             "final_state": {
                 "current_url": self.current_url,
                 "open_tabs": self.open_tabs,
@@ -656,54 +592,6 @@ RESPONSE FROM LLM:
         except Exception as e:
             print(f"Error logging debug information: {str(e)}")
 
-    def _format_tool_results(self) -> str:
-        """Format tool results from recent steps for inclusion in the next prompt."""
-        if not self.previous_steps:
-            return ""
-            
-        # Find recent tool actions and their results
-        tool_results = []
-        for step in self.previous_steps[-5:]:  # Check last 5 steps for tool actions
-            if isinstance(step["action"], dict):
-                action_name = list(step["action"].keys())[0] if step["action"] else ""
-                
-                # Check if this was a tools action
-                if action_name == "tools" and step.get("success", False):
-                    # Try to parse the result to extract tool data
-                    try:
-                        result_str = str(step["result"])
-                        # The result might be a string representation of a dict
-                        if "data" in result_str and ("findings" in result_str or "validation_passed" in result_str):
-                            # Extract the step number and action reason
-                            step_num = step.get("step_number", "Unknown")
-                            action_params = step["action"].get("tools", {})
-                            reason = action_params.get("reason", "No reason provided") if isinstance(action_params, dict) else "No reason provided"
-                            
-                            tool_results.append({
-                                "step_number": step_num,
-                                "reason": reason,
-                                "result": result_str
-                            })
-                    except Exception:
-                        # If parsing fails, skip this tool result
-                        continue
-        
-        if not tool_results:
-            return ""
-        
-        # Format tool results for the prompt
-        formatted_results = ["# Recent Tool Results"]
-        formatted_results.append("")
-        
-        for tool_result in tool_results[-2:]:  # Show last 2 tool results
-            formatted_results.append(f"**Step {tool_result['step_number']} Tool Analysis:**")
-            formatted_results.append(f"Request: {tool_result['reason']}")
-            formatted_results.append(f"Result: {tool_result['result']}")
-            formatted_results.append("")
-            
-        return "\n".join(formatted_results)
-
-    # ...existing code...
     def _filter_chained_end_actions(self, actions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Filter out 'end' actions when they are chained with other actions.
@@ -734,7 +622,6 @@ RESPONSE FROM LLM:
             return filtered_actions
             
         return actions
-
 
 
 

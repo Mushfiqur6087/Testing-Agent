@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 
-def clean_pycache(root_dir=None):
+def clean_cache_and_logs(root_dir=None):
     """Remove all __pycache__ directories, .pyc files, and log files from the project."""
     if root_dir is None:
         root_dir = Path(__file__).parent
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     try:
         # Allow custom root directory as command line argument
         root_dir = sys.argv[1] if len(sys.argv) > 1 else None
-        clean_pycache(root_dir)
+        clean_cache_and_logs(root_dir)
     except KeyboardInterrupt:
         print("\n❌ Cleanup interrupted by user")
         sys.exit(1)
