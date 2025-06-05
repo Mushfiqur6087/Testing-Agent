@@ -1,13 +1,175 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple DOM Test</title>
+    <title>Signup Form Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .success {
+            color: #27ae60;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Simple DOM Test Page</h1>
-    <p>This is a paragraph for testing DOM interactions.</p>
-    <button id="test-button">Click Me</button>
-    <a href="https://www.google.com" id="test-link">Google Link</a>
-    <input type="text" id="test-input" placeholder="Input field">
+    <div class="form-container">
+        <h1>Sign Up</h1>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <div class="error" id="email-error">Please enter a valid email address with @</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <div class="error" id="password-error">Password is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+                <div class="error" id="confirm-password-error">Passwords do not match</div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submit-btn">Sign Up</button>
+            <div class="success" id="success-message">Account created successfully!</div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form elements
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm-password');
+            
+            // Get error elements
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            const confirmPasswordError = document.getElementById('confirm-password-error');
+            const successMessage = document.getElementById('success-message');
+            
+            // Reset error states
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+            confirmPasswordError.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            let isValid = true;
+            
+            // Validate email
+            if (!email.value.includes('@')) {
+                emailError.style.display = 'block';
+                alert('Email must contain @ symbol');
+                isValid = false;
+            }
+            
+            // Validate password
+            if (password.value.trim() === '') {
+                passwordError.style.display = 'block';
+                alert('Password is required');
+                isValid = false;
+            }
+            
+            // Validate password confirmation
+            if (password.value !== confirmPassword.value) {
+                confirmPasswordError.style.display = 'block';
+                alert('Passwords do not match');
+                isValid = false;
+            }
+            
+            // If all validations pass
+            if (isValid) {
+                successMessage.style.display = 'block';
+                alert('Account created successfully!');
+                // Reset form
+                this.reset();
+            }
+        });
+        
+        // Real-time validation
+        document.getElementById('email').addEventListener('blur', function() {
+            const emailError = document.getElementById('email-error');
+            if (!this.value.includes('@')) {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('confirm-password').addEventListener('blur', function() {
+            const password = document.getElementById('password');
+            const confirmPasswordError = document.getElementById('confirm-password-error');
+            if (this.value !== password.value) {
+                confirmPasswordError.style.display = 'block';
+            } else {
+                confirmPasswordError.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html> 

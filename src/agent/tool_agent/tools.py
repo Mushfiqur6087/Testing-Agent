@@ -127,11 +127,22 @@ class Tools:
             # Get element tree string which contains all information
             element_tree_string = browser_context.get_element_tree_string(refresh=True)
             
-            return {
+            # Get alert information
+            alerts_info = browser_context.get_formatted_alerts_for_llm()
+            has_alerts = browser_context.has_recent_alerts()
+            
+            page_info = {
                 "url": url,
                 "title": title,
-                "element_tree": element_tree_string or "No elements found"
+                "element_tree": element_tree_string or "No elements found",
+                "has_alerts": has_alerts
             }
+            
+            # Only include alerts info if there are alerts
+            if alerts_info:
+                page_info["alerts"] = alerts_info
+            
+            return page_info
             
         except Exception as e:
             return {"error": f"Failed to get page info: {e}"}
@@ -147,7 +158,16 @@ ANALYSIS REQUEST: {reason}
 
 CURRENT PAGE INFORMATION:
 - URL: {page_info.get('url', 'Unknown')}
-- Page Title: {page_info.get('title', 'Unknown')}
+- Page Title: {page_info.get('title', 'Unknown')}"""
+
+            # Add alert information only if present
+            if page_info.get('has_alerts', False):
+                analysis_prompt += f"""
+- Browser Alerts Detected: YES
+
+{page_info.get('alerts', '')}"""
+
+            analysis_prompt += f"""
 
 COMPLETE DOM TREE STRUCTURE:
 {page_info.get('element_tree', 'No elements found')}
@@ -160,7 +180,7 @@ Based on the analysis request and current page state, please provide your assess
     "validation_passed": true/false
 }}
 
-Focus on the specific request and provide actionable insights.
+Focus on the specific request and provide actionable insights. If there were any browser alerts, include them in your analysis as they may be important for understanding the current state of the page.
 """
 
             # Log the tools LLM request and response if debug logging is enabled

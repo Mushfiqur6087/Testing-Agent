@@ -26,6 +26,10 @@ class BrowserSession:
         # Caches for DOM/tree + selector map
         self._parser: Optional[DOMTreeParser] = None
         self._selector_map: Optional[Dict[int, DOMElementNode]] = None
+        
+        # Alert tracking
+        self._recent_alerts: List[Dict[str, Any]] = []
+        self._max_alert_history: int = 2
 
     def _initialize_session(self, headless: bool = False) -> Browser:
         if self._playwright is None:
@@ -69,6 +73,7 @@ class BrowserSession:
         self._tabs.append(page)
         self._current_page = page
         page.once("close", lambda _: self._on_close(page))
+        self._setup_alert_handlers(page)
         return page
 
     def _on_close(self, page: Page):
@@ -242,6 +247,81 @@ class BrowserSession:
         self._context = None
         self._current_page = None
         self._playwright = None
+
+    def _track_alert(self, message: str, alert_type: str = "info") -> None:
+        """
+        Track an alert message.
+        """
+        if len(self._recent_alerts) >= self._max_alert_history:
+            self._recent_alerts.pop(0)  # remove oldest alert
+        self._recent_alerts.append({
+            "message": message,
+            "type": alert_type
+        })
+
+    def get_recent_alerts(self) -> List[Dict[str, Any]]:
+        """
+        Get the list of recent alerts.
+        """
+        return self._recent_alerts
+
+    def clear_alerts(self) -> None:
+        """
+        Clear the alert history.
+        """
+        self._recent_alerts.clear()
+
+    def _setup_alert_handlers(self, page: Page) -> None:
+        """
+        Set up handlers for various types of JavaScript alerts/dialogs.
+        """
+        def handle_alert(dialog):
+            """Handle JavaScript alert dialogs."""
+            try:
+                message = dialog.message
+                dialog_type = dialog.type
+                
+                # Track the alert
+                self._track_alert(message, dialog_type)
+                
+                # Accept the dialog (you can customize this behavior)
+                if dialog_type in ['alert', 'confirm']:
+                    dialog.accept()
+                elif dialog_type == 'prompt':
+                    # For prompts, you might want to provide a default value
+                    dialog.accept("")  # or dialog.accept("default_value")
+                else:
+                    dialog.accept()
+                    
+            except Exception as e:
+                # If there's an error handling the dialog, accept it anyway
+                try:
+                    dialog.accept()
+                except:
+                    pass
+        
+        # Set up the dialog handler
+        page.on("dialog", handle_alert)
+
+    def get_formatted_alerts_for_llm(self) -> str:
+        """
+        Get a formatted string of recent alerts suitable for LLM context.
+        """
+        if not self._recent_alerts:
+            return ""
+        
+        alert_lines = []
+        alert_lines.append("Recent Browser Alerts:")
+        for i, alert in enumerate(self._recent_alerts, 1):
+            alert_lines.append(f"{i}. [{alert['type'].upper()}] {alert['message']}")
+        
+        return "\n".join(alert_lines)
+
+    def has_recent_alerts(self) -> bool:
+        """
+        Check if there are any recent alerts.
+        """
+        return len(self._recent_alerts) > 0
 
 
 

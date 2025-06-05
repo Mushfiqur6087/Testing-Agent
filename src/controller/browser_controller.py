@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List
 import os
 import sys
 # Add the project root to Python path so imports work
@@ -313,3 +313,19 @@ class BrowserController:
         self.debug_file_path = debug_file_path
         # Update the tools instance with the logging functions
         self.tools_instance.set_logging_functions(log_debug_func, debug_file_path)
+
+    def get_recent_alerts(self) -> List[Dict[str, Any]]:
+        """Get the list of recent browser alerts."""
+        return self.browser_context.get_recent_alerts()
+    
+    def has_recent_alerts(self) -> bool:
+        """Check if there are any recent browser alerts."""
+        return self.browser_context.has_recent_alerts()
+    
+    def get_formatted_alerts(self) -> str:
+        """Get a formatted string of recent alerts."""
+        return self.browser_context.get_formatted_alerts_for_llm()
+    
+    def clear_alerts(self) -> None:
+        """Clear the alert history."""
+        self.browser_context.clear_alerts()

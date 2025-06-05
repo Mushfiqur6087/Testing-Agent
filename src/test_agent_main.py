@@ -67,7 +67,7 @@ class TestAgentMain:
         expected_outcome = test_case.get('expected_outcome', '')
         
         # Use steps_or_input as user_goal
-        user_goal = steps_or_input+ "\n REMEMBER: validate the expected outcome with tools before returning the result."
+        user_goal = steps_or_input+ "\n DETERMINE whether this test can be successfully executed given the current requirements and implementation, or if there are any errors, inconsistencies, or missing validations in the requirements or the form itself."
         
         
         try:
@@ -119,13 +119,10 @@ def main():
     
     # Example test case description
     test_description = """
-Navigate to the login form test page and test the login functionality:
-1. Go to file:///home/mushfiqur/vscode/Testing-Agent/html/login_form.html
-2. Fill in the email field with 'test@example.com'
-3. Fill in the password field with 'password123'
-4. Click the login button
-5. Verify that your test is successful
-    """
+Go to file:///home/mushfiqur/vscode/Testing-Agent/html/test_page.html
+Test the signup form functionality and verify that emails contain @ and password and confirm password fields match.
+If not then alert will be shown.
+"""
     
     # Initialize the main agent
     main_agent = TestAgentMain(

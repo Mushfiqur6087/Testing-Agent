@@ -21,7 +21,6 @@ Navigate to the login form test page and test the login functionality:
 2. Fill in the email field with 'test@example.com'
 3. Fill in the password field with 'password123'
 4. Click the login button
-5. Verify that your test is successful
 """
 
 EXPECTED_OUTCOME = "The login should succeed and shows login success."
