@@ -24,6 +24,8 @@ Navigate to the login form test page and test the login functionality:
 5. Verify that your test is successful
 """
 
+EXPECTED_OUTCOME = "The login should succeed and shows login success."
+
 def simple_test_agent():
     """Simple example of TestAgent usage."""
     
@@ -32,12 +34,14 @@ def simple_test_agent():
     try:
         # Initialize and execute
         test_agent.initialize()
-        results = test_agent.execute_plan(USER_GOAL)
-        
+        results = test_agent.execute_plan(USER_GOAL,EXPECTED_OUTCOME)
         print(f"✅ Results: {results}")
         
     except Exception as e:
+        import traceback
         print(f"❌ Error during execution: {e}")
+        print("Full traceback:")
+        traceback.print_exc()
     
     finally:
         test_agent.cleanup()

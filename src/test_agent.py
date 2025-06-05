@@ -8,6 +8,7 @@ sys.path.insert(0, PROJECT_ROOT)
 # Import the required classes from the agent package
 from src.agent.main_agent.agent import Agent
 from src.agent.core_utils.llm import GeminiFlashClient
+from src.agent.core_utils.test_result_analyzer import TestResultAnalyzer
 from src.controller.browser_controller import BrowserController
 
 
@@ -33,6 +34,7 @@ class TestAgent:
         self.llm = None
         self.agent = None
         self.browser_controller = None
+        self.test_analyzer = None
         
     def __enter__(self):
         """Context manager entry."""
@@ -46,11 +48,11 @@ class TestAgent:
     def initialize(self):
         """Initialize the agent and browser controller."""
         try:
-            if self.debug:
-                print("🔧 Initializing TestAgent...")
-            
             # Initialize LLM client
             self.llm = GeminiFlashClient(api_key=self.api_key)
+            
+            # Initialize test result analyzer
+            self.test_analyzer = TestResultAnalyzer(llm_client=self.llm)
             
             # Initialize browser controller with LLM client for intelligent tools
             self.browser_controller = BrowserController(llm_client=self.llm)
@@ -64,9 +66,6 @@ class TestAgent:
             
             # Set browser controller for the agent (LLM will be passed automatically)
             self.agent.set_browser_controller(self.browser_controller)
-            
-            if self.debug:
-                print("✅ TestAgent initialized successfully with LLM-powered tools")
                 
         except Exception as e:
             print(f"❌ Failed to initialize TestAgent: {e}")
@@ -75,67 +74,39 @@ class TestAgent:
     def cleanup(self):
         """Clean up resources and close browser session."""
         try:
-            if self.debug:
-                print("🧹 Cleaning up TestAgent...")
-            
             # Close browser if it exists
             if self.browser_controller and hasattr(self.browser_controller, 'driver') and self.browser_controller.driver:
                 self.browser_controller.driver.quit()
-                if self.debug:
-                    print("🌐 Browser session closed")
-            
-            if self.debug:
-                print("✅ TestAgent cleanup completed")
                 
         except Exception as e:
-            if self.debug:
-                print(f"⚠️ Error during cleanup: {e}")
+            pass
     
-    def execute_plan(self, user_goal):
+    def execute_plan(self, user_goal, expected_outcome):
         """
         Execute the agent plan.
         
         Args:
             user_goal (str): The goal for the agent to achieve
+            expected_outcome (str): The expected outcome of the test
             
         Returns:
-            Results from agent execution
+            Results from agent execution including test analysis
         """
         if not self.agent:
             self.initialize()
             
         try:
-            if self.debug:
-                print(f"🚀 Starting execution...")
-                print(f"📋 Goal: {user_goal}")
-            
             # Execute the plan
             results = self.agent.execute_plan(user_goal)
             
-            if self.debug:
-                print("✅ Execution completed successfully")
-                
+            # Analyze the test results using the memory from execution
+            if hasattr(self.agent, 'memory') and self.agent.memory:
+                self.test_analyzer.analyze_test_execution(
+                    memory=self.agent.memory,
+                    original_test_goal=user_goal,
+                    expected_outcome=expected_outcome
+                )                
             return results
             
         except Exception as e:
-            if self.debug:
-                print(f"❌ Execution failed: {e}")
             raise
-    
-    def stop(self):
-        """Stop the agent by closing the browser session."""
-        if self.debug:
-            print("🛑 Stopping agent...")
-        
-        if self.browser_controller and hasattr(self.browser_controller, 'driver') and self.browser_controller.driver:
-            try:
-                # Execute an "end" action to properly close
-                self.browser_controller.execute_command({"action": "end"})
-                if self.debug:
-                    print("✅ Agent stopped successfully")
-            except Exception as e:
-                if self.debug:
-                    print(f"⚠️ Error during stop: {e}")
-        else:
-            if self.debug:
-                print("⚠️ No active browser session to stop")
