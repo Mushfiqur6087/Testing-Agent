@@ -247,6 +247,7 @@ Interactive Elements:
             return action_data
             
         except json.JSONDecodeError as e:
+            print(f"JSON parsing error: {str(e)}")
             return {
                 "current_state": {
                     "evaluation_previous_goal": "Failed",
@@ -256,6 +257,7 @@ Interactive Elements:
                 "action": [{"error": {"reason": f"JSON parsing failed: {str(e)}"}}]
             }
         except Exception as e:
+            print(f"Unexpected error: {str(e)}")
             return {
                 "current_state": {
                     "evaluation_previous_goal": "Failed",
@@ -376,6 +378,7 @@ Interactive Elements:
                     memory_export_path = memory_export_path.replace('.log', '.json')
                     self.memory.export_session_data(memory_export_path)
                 except Exception as e:
+                    print(f"Error exporting memory data: {str(e)}")
                     # Silent fail for memory export - don't break main execution
                     pass
                 
@@ -385,6 +388,7 @@ Interactive Elements:
                 return {"success": False, "error": f"Unknown action: {action_name}"}
                 
         except Exception as e:
+            print(f"Exception during action execution: {str(e)}")
             return {"success": False, "error": f"Exception during execution: {str(e)}"}
             
     def refresh_browser_state(self):
@@ -411,6 +415,7 @@ Interactive Elements:
             
             
         except Exception as e:
+            print(f"Error refreshing browser state: {str(e)}")
             self.current_url = "Error: Unable to get current URL"
             self.open_tabs = ["Error: Unable to get tabs info"]
             self.interactive_elements = "Error: Unable to get interactive elements"
@@ -478,6 +483,7 @@ Interactive Elements:
                         break
                         
                 except Exception as e:
+                    print(f"Exception during action execution: {str(e)}")
                     error_result = {"success": False, "error": f"Exception: {str(e)}"}
                     action_results.append({
                         "action": action_item,
@@ -559,6 +565,7 @@ Interactive Elements:
                 json.dump(session_data, f, indent=2, ensure_ascii=False)
             return filename
         except Exception as e:
+            print(f"Error saving session log: {str(e)}")
             return ""
         
     def _log_debug(self, request: str, response: str, step_number: int = None):

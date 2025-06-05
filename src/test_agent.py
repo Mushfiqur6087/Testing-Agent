@@ -74,9 +74,9 @@ class TestAgent:
     def cleanup(self):
         """Clean up resources and close browser session."""
         try:
-            # Close browser if it exists
-            if self.browser_controller and hasattr(self.browser_controller, 'driver') and self.browser_controller.driver:
-                self.browser_controller.driver.quit()
+            # Close browser session properly
+            if self.browser_controller and hasattr(self.browser_controller, 'browser_context'):
+                self.browser_controller.browser_context.close()
                 
         except Exception as e:
             pass
