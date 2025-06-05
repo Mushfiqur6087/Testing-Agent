@@ -67,7 +67,7 @@ class TestAgentMain:
         expected_outcome = test_case.get('expected_outcome', '')
         
         # Use steps_or_input as user_goal
-        user_goal = steps_or_input
+        user_goal = steps_or_input+ "\n REMEMBER: validate the expected outcome with tools before returning the result."
         
         
         try:
@@ -99,11 +99,6 @@ class TestAgentMain:
         for i, test_case in enumerate(test_cases, 1):
             print(f"\nExecuting Test Case {i}")
             self.execute_test_case(test_case)
-            
-            # Add 40-second delay between test cases to avoid API quota limits
-            if i < len(test_cases):  # Don't wait after the last test case
-                print(f"Waiting 40 seconds before next test case to avoid API quota limits...")
-                time.sleep(40)
             
 
 

@@ -18,8 +18,8 @@
         </div>        <div>
             <button type="submit" onclick="showLoginFeedback(event)">Login</button>
         </div>
-        <div id="feedback" style="margin-top: 10px; padding: 10px; display: none; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;">
-            Login attempt successful! Email: <span id="email-display"></span>
+        <div id="feedback" style="margin-top: 10px; padding: 10px; display: none;">
+            <span id="feedback-message"></span>
         </div>
     </form>
 
@@ -29,16 +29,40 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const feedbackDiv = document.getElementById('feedback');
+            const feedbackMessage = document.getElementById('feedback-message');
             
             if (email && password) {
-                document.getElementById('email-display').textContent = email;
-                document.getElementById('feedback').style.display = 'block';
-                
-                // Change button text to show it was clicked
-                event.target.textContent = 'Logged In!';
-                event.target.style.backgroundColor = '#28a745';
-                
-                console.log('Login button clicked successfully!');
+                // Check if credentials match the expected values
+                if (email === 'test@example.com' && password === 'password123') {
+                    // Successful login
+                    feedbackMessage.textContent = `Login attempt successful! Email: ${email}`;
+                    feedbackDiv.style.backgroundColor = '#d4edda';
+                    feedbackDiv.style.border = '1px solid #c3e6cb';
+                    feedbackDiv.style.borderRadius = '4px';
+                    feedbackDiv.style.color = '#155724';
+                    feedbackDiv.style.display = 'block';
+                    
+                    // Change button text to show success
+                    event.target.textContent = 'Logged In!';
+                    event.target.style.backgroundColor = '#28a745';
+                    
+                    console.log('Login button clicked successfully!');
+                } else {
+                    // Failed login
+                    feedbackMessage.textContent = "Can't login - Invalid email or password";
+                    feedbackDiv.style.backgroundColor = '#f8d7da';
+                    feedbackDiv.style.border = '1px solid #f5c6cb';
+                    feedbackDiv.style.borderRadius = '4px';
+                    feedbackDiv.style.color = '#721c24';
+                    feedbackDiv.style.display = 'block';
+                    
+                    // Change button text to show failure
+                    event.target.textContent = 'Login Failed';
+                    event.target.style.backgroundColor = '#dc3545';
+                    
+                    console.log('Login failed - Invalid credentials');
+                }
             } else {
                 alert('Please fill in both email and password fields.');
             }

@@ -1,20 +1,25 @@
-# 🤖 Testing Agent - AI-Powered Multi-Agent Browser Automation
+# 🤖 Testing Agent - AI-Powered Intelligent Test Case Generation and Execution
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![Playwright](https://img.shields.io/badge/Playwright-Supported-green.svg)](https://playwright.dev)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An intelligent multi-agent browser automation framework that combines AI-powered decision making with robust web automation capabilities. The Testing Agent uses Large Language Models (LLM) to intelligently navigate, interact with, and test web applications with human-like reasoning through a sophisticated multi-agent architecture.
+An intelligent test automation framework that automatically generates and executes multiple test cases from a single test description. The Testing Agent uses Large Language Models (LLM) to intelligently create comprehensive test scenarios and execute them with robust browser automation through a sophisticated multi-agent architecture.
 
 ## 🚀 Features
 
-### 🧠 **Multi-Agent AI Architecture**
-- **Main Agent**: Core decision-making agent with LLM integration for intelligent action planning
-- **Tool Agent**: Specialized agent for complex operations like form validation and login verification
-- **Instruction Agent**: Handles system instructions and prompt engineering for optimal LLM interactions
-- **Context-Aware**: Understands page structure and makes smart interaction decisions across agents
-- **Goal-Oriented**: Executes complex multi-step automation plans based on natural language goals
-- **Inter-Agent Communication**: Seamless communication between agents for complex task execution
+### 🧠 **Intelligent Test Case Generation**
+- **Test Case Generation**: Automatically generates multiple comprehensive test cases from a single test description
+- **TestAgentMain Orchestrator**: Central coordinator that manages test generation and execution workflow
+- **InstructionAgent**: Specialized agent for parsing test descriptions and generating varied test scenarios
+- **Smart Test Planning**: Creates detailed test steps with expected outcomes for thorough validation
+
+### 🎯 **Automated Test Execution**
+- **TestAgent Execution**: Individual test agent instances for isolated test case execution
+- **Sequential Processing**: Executes test cases one by one for thorough testing
+- **Result Validation**: Validates expected outcomes using AI-powered tools during execution
+- **Error Handling**: Robust error handling with comprehensive error detection and recovery
+- **Session Management**: Proper initialization and cleanup for each test execution
 
 ### 🌐 **Advanced Browser Automation**
 - **Multi-Tab Management**: Create, switch, and manage multiple browser tabs
@@ -37,22 +42,29 @@ An intelligent multi-agent browser automation framework that combines AI-powered
 - **Debug Mode**: Detailed logging for development and troubleshooting
 - **Execution History**: Complete audit trail of all actions and results across agents
 
-## 🏗️ Multi-Agent Architecture
+## 🏗️ Test Execution Architecture
 
 ```
-Testing Agent Multi-Agent System
-├── 🤖 Main Agent             # Core orchestrator with LLM integration
-│   ├── Decision Making       # Intelligent action planning and execution
-│   ├── Session Management    # Tracks state and execution history
-│   └── Browser Integration   # Coordinates with browser controller
+Testing Agent - Test Generation & Execution System
+├── 🎯 TestAgentMain           # Main orchestrator for test workflow
+│   ├── Test Case Generation   # Generates multiple test scenarios from description
+│   ├── Sequential Execution   # Executes test cases one by one
+│   ├── Parallel Processing    # Fast execution without delays
+│   └── Error Management      # Handles execution errors and exceptions
+├── 📋 InstructionAgent        # Test case generation specialist
+│   ├── Test Description Parsing  # Analyzes test requirements
+│   ├── Scenario Generation   # Creates multiple test variations
+│   ├── Step Planning        # Generates detailed test steps
+│   └── Expected Outcomes     # Defines validation criteria
+├── 🤖 TestAgent              # Individual test execution engine
+│   ├── Test Initialization   # Sets up test environment
+│   ├── Plan Execution       # Executes test steps with browser automation
+│   ├── Outcome Validation    # Validates results against expected outcomes
+│   └── Session Cleanup      # Proper cleanup after test completion
 ├── 🔧 Tool Agent             # Specialized validation and analysis
 │   ├── LLM-Powered Analysis  # Intelligent page state validation
 │   ├── Login Verification    # Automated login success detection
 │   └── Form Validation       # Smart form submission verification
-├── 📋 Instruction Agent      # System prompts and instructions
-│   ├── Prompt Engineering    # Optimized LLM prompts
-│   ├── Context Building      # Dynamic context generation
-│   └── Response Formatting   # Structured LLM responses
 ├── 🌐 Browser Controller     # High-level browser automation
 │   ├── Multi-Tab Management  # Tab creation, switching, and closing
 │   ├── Element Interaction   # Click, input, and navigation actions
@@ -93,25 +105,59 @@ Testing Agent Multi-Agent System
 
 ## 🎯 Quick Start
 
-### Basic Usage
+### Test Case Generation and Execution
 
 ```python
-from src.agent.main_agent.agent import Agent
-from src.agent.core_utils.llm import GeminiFlashClient
-from src.controller.browser_controller import BrowserController
+from src.test_agent_main import TestAgentMain
+import os
 
-# Initialize the AI client
-llm = GeminiFlashClient(
-    api_key="your_gemini_api_key",
-    model_name="models/gemini-1.5-flash"
+# Initialize the main test orchestrator
+API_KEY = os.getenv('GEMINI_API_KEY')
+main_agent = TestAgentMain(
+    api_key=API_KEY,
+    max_actions=15,
+    debug=True
 )
 
-# Create the agent
-agent = Agent(llm, max_actions=20, debug=True)
+# Define your test scenario description
+test_description = """
+Navigate to the login form test page and test the login functionality:
+1. Go to file:///path/to/your/login_form.html
+2. Fill in the email field with 'test@example.com'
+3. Fill in the password field with 'password123'
+4. Click the login button
+5. Verify that your test is successful
+"""
 
-# Set up browser automation
-browser_controller = BrowserController()
-agent.set_browser_controller(browser_controller)
+# Generate multiple test cases from the description
+test_cases = main_agent.generate_test_cases(test_description)
+
+# Execute all generated test cases
+main_agent.execute_all_test_cases(test_cases)
+```
+
+### Individual Test Agent Usage
+
+```python
+from src.test_agent import TestAgent
+
+# For running a single test case
+test_agent = TestAgent(
+    api_key=API_KEY,
+    max_actions=15,
+    debug=True
+)
+
+# Initialize and execute
+test_agent.initialize()
+user_goal = "Navigate to login page and test login functionality"
+expected_outcome = "User successfully logs in and sees dashboard"
+
+results = test_agent.execute_plan(user_goal, expected_outcome)
+
+# Clean up
+test_agent.cleanup()
+```
 
 ## 🚀 Getting Started
 
