@@ -100,6 +100,11 @@ class TestAgentMain:
             print(f"\nExecuting Test Case {i}")
             self.execute_test_case(test_case)
             
+            # Add 40-second delay between test cases to avoid API quota limits
+            if i < len(test_cases):  # Don't wait after the last test case
+                print(f"Waiting 40 seconds before next test case to avoid API quota limits...")
+                time.sleep(40)
+            
 
 
 
