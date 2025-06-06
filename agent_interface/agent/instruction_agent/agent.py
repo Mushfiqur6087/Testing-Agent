@@ -6,8 +6,8 @@ from typing import Optional, Dict, Any
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, PROJECT_ROOT)
 
-from src.agent.core_utils.llm import GeminiFlashClient
-from src.agent.instruction_agent.instruction_prompt import prompt
+from agent.core_utils.llm import GeminiFlashClient
+from agent.instruction_agent.instruction_prompt import prompt
 
 
 class InstructionAgent:
@@ -106,9 +106,17 @@ class InstructionAgent:
                 if end != -1:
                     output = output[start:end].strip()
             
-            return json.loads(output)
-        except json.JSONDecodeError:
-            return None
+            parsed = json.loads(output)
+            if not isinstance(parsed, list):
+                raise ValueError("Output is not a list")
+            return parsed
+        except Exception as e:
+            return [{
+                "test_name": "Parsing Error",
+                "steps_or_input": "Could not parse SAIL response",
+                "expected_outcome": "Manual review required",
+                "reason_for_failure": f"Response format issue: {str(e)}"
+            }]
     
     def get_test_cases_list(self) -> list:
         """
