@@ -98,7 +98,7 @@ Testing Agent - Test Generation & Execution System
 3. **Set up environment variables**
    Create a `.env` file in the project root:
    ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
    **Important**: Never commit your `.env` file to version control. It's already included in `.gitignore`.
@@ -108,7 +108,7 @@ Testing Agent - Test Generation & Execution System
 ### Test Case Generation and Execution
 
 ```python
-from src.test_agent_main import TestAgentMain
+from agent_interface.agent.main_agent.agent import TestAgentMain
 import os
 
 # Initialize the main test orchestrator
@@ -139,7 +139,7 @@ main_agent.execute_all_test_cases(test_cases)
 ### Individual Test Agent Usage
 
 ```python
-from src.test_agent import TestAgent
+from agent_interface.agent.main_agent.agent import TestAgent
 
 # For running a single test case
 test_agent = TestAgent(
@@ -176,49 +176,7 @@ test_agent.cleanup()
 
 3. **Run your first test**
    ```bash
-   python src/test_agent.py
-   ```
-
-4. **View the results**
-   Check the `logs/` directory for detailed execution logs and session data.
-goal = """
-Navigate to example.com and:
-1. Find the search box
-2. Search for 'testing automation'
-3. Click on the first result
-4. Verify the page loaded successfully
-"""
-
-# Execute the automation plan
-execution_log = agent.execute_plan(goal)
-
-# Get results and save session
-summary = agent.get_session_summary()
-print(f"Completed: {summary['successful_steps']}/{summary['total_steps']} steps")
-agent.save_session_log()
-
-# Cleanup
-browser_controller.close()
-```
-
-## 🚀 Getting Started
-
-1. **Clone and setup the project**
-   ```bash
-   git clone https://github.com/yourusername/Testing-Agent.git
-   cd Testing-Agent
-   pip install -r requirements.txt
-   playwright install
-   ```
-
-2. **Configure your environment**
-   ```bash
-   echo "GEMINI_API_KEY=your_api_key_here" > .env
-   ```
-
-3. **Run your first test**
-   ```bash
-   python src/test_agent.py
+   python agent_interface/main.py
    ```
 
 4. **View the results**
@@ -275,37 +233,29 @@ The Tool Agent provides specialized actions for complex validation:
 
 ```
 Testing-Agent/
-├── src/                      # Source code
-│   ├── agent/               # AI agent components
-│   │   ├── core_utils/      # Core utilities
-│   │   │   ├── llm.py       # Gemini Flash LLM client
-│   │   │   └── logging_utils.py  # Logging utilities
-│   │   ├── main_agent/      # Main agent logic
-│   │   │   ├── agent.py     # Core agent class
-│   │   │   └── prompt_generator.py  # Prompt generation
-│   │   ├── tool_agent/      # Tool management
-│   │   │   └── tools.py     # Tool implementations
+├── web_interface/          # Next.js web application
+│   ├── app/               # Next.js app directory
+│   ├── components/        # React components
+│   ├── public/           # Static assets
+│   ├── styles/           # CSS and styling files
+│   └── run.bat/run.sh    # Individual run scripts
+│
+├── agent_interface/       # Python agent application
+│   ├── agent/            # AI agent components
+│   │   ├── core_utils/   # Core utilities
+│   │   ├── main_agent/   # Main agent logic
+│   │   ├── tool_agent/   # Tool management
 │   │   └── instruction_agent/  # Instruction handling
-│   │       └── initial.py   # Initial instructions
-│   ├── browser/             # Browser automation
-│   │   ├── browser_context.py     # Browser session management
-│   │   ├── dom_tree_builder.py    # DOM tree construction
-│   │   └── dom_tree_parser.py     # Element parsing
-│   └── controller/          # High-level automation
-│       └── browser_controller.py  # Main controller
-├── tests/                   # Test suite
-│   ├── browser_controller_test.py
-│   ├── dom_tree_builder_test.py
-│   ├── dom_tree_parser_test.py
-│   └── main.py             # Test runner
-├── html/                   # Test HTML files
-│   ├── login_form.html     # Login form test page
-│   ├── test_page.html      # Basic test page
-│   └── test_page2.html     # Complex test page
-├── logs/                   # Session logs and debug files
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (create this)
-└── README.md              # This file
+│   ├── browser/          # Browser automation
+│   ├── controller/       # High-level automation
+│   ├── tests/            # Test suite
+│   ├── utils/            # Utility scripts
+│   ├── main.py           # Main entry point
+│   └── run.bat/run.sh    # Individual run scripts
+│
+├── requirements.txt       # Python dependencies
+├── run.bat               # Windows run script
+└── run.sh               # Unix run script
 ```
 
 ## 🔧 Configuration
@@ -351,7 +301,7 @@ agent = Agent(llm, debug=True)
 The browser runs in headless mode by default. To see the browser:
 
 ```python
-# In src/browser/browser_context.py, modify the launch parameters
+# In agent_interface/browser/browser_context.py, modify the launch parameters
 browser = playwright.chromium.launch(headless=False)
 ```
 
@@ -389,13 +339,12 @@ print(f"Session saved to: {filename}")
 
 ```bash
 # Run the test suite
-python tests/main.py
+python agent_interface/tests/main.py
 
 # Or run individual test files
-python tests/browser_controller_test.py
-python tests/dom_tree_builder_test.py
-python tests/dom_tree_parser_test.py
-
+python agent_interface/tests/browser_controller_test.py
+python agent_interface/tests/dom_tree_builder_test.py
+python agent_interface/tests/dom_tree_parser_test.py
 ```
 
 ## 📄 License
@@ -405,3 +354,127 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Ready to automate? Start with the [Quick Start](#-quick-start) guide and build your first AI-powered browser automation!** 🚀
+
+## Running the Project
+
+### Web Interface
+```bash
+# Windows
+web_run.bat
+
+# Unix/Linux/Mac
+chmod +x web_run.sh
+./web_run.sh
+```
+
+### Agent Interface
+```bash
+# Windows
+agent_run.bat
+
+# Unix/Linux/Mac
+chmod +x agent_run.sh
+./agent_run.sh
+```
+
+### SAIL Integration
+```bash
+# Windows
+sail_run.bat
+
+# Unix/Linux/Mac
+chmod +x sail_run.sh
+./sail_run.sh
+```
+
+## SAIL Integration
+
+### Overview
+SAIL (Smart Automation for Intelligent LLM-powered Testing) is integrated with your Testing Agent framework, providing:
+- Natural language test descriptions
+- Automatic unit test case generation
+- Testing Agent compatible output
+- Real-time execution with Python framework
+- Detailed reporting and analytics
+- Export/import functionality
+
+### Quick Start
+
+1. Start SAIL:
+```bash
+# Windows
+runSAIL.bat
+
+# Unix/Linux/Mac
+chmod +x runSAIL.sh
+./runSAIL.sh
+```
+
+2. Access SAIL:
+- Open your browser to: **http://localhost:3000**
+- Enter a website URL and test description
+- Generate comprehensive test cases
+
+3. Execute Generated Tests:
+```bash
+# Download test cases from SAIL web interface as JSON
+python3 integration_bridge.py execute --test-file downloaded_test_cases.json
+```
+
+### Complete Workflow
+
+1. Generate Test Cases (Web Interface):
+   - Open SAIL at http://localhost:3000
+   - Enter URL: `file:///path/to/your/html/file.html`
+   - Describe test: "Test login form with valid and invalid inputs"
+   - Click "Generate Test Cases"
+   - Download JSON file
+
+2. Execute with Testing Agent:
+```bash
+python3 integration_bridge.py execute --test-file sail_test_cases.json
+```
+
+3. Review Results:
+   - Check console output for real-time results
+   - Review detailed report in `logs/` directory
+   - Analyze success rates and failures
+
+### Environment Setup
+Required environment variables:
+```bash
+export GEMINI_API_KEY="your_gemini_api_key"
+```
+
+### Troubleshooting
+
+#### Web Interface Won't Start
+```bash
+cd web_interface
+npm install
+npm run dev
+```
+
+#### Python Integration Issues
+- Ensure you're in the Testing-Agent root directory
+- Check that `src/` contains your Testing Agent modules
+- Verify GEMINI_API_KEY is set
+
+#### Test Execution Fails
+- Verify test case JSON format
+- Check API key permissions
+- Review logs in `logs/` directory
+
+## Environment Setup
+
+1. Create a `.env` file in the root directory with the following variables:
+```bash
+# API Keys
+GEMINI_API_KEY=your-gemini-api-key-here
+```
+
+2. Get your API keys:
+   - Gemini API key: https://makersuite.google.com/app/apikey
+   - OpenAI API key: https://platform.openai.com/account/api-keys
+
+3. The `.env` file is used by both the agent interface and web interface components.

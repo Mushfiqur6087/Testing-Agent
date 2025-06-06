@@ -2,12 +2,16 @@ import json
 import os
 import sys
 import ast
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, PROJECT_ROOT)
-from src.agent.core_utils.llm import GeminiFlashClient
-from src.agent.main_agent.prompt_generator import SystemPromptBase
-from src.agent.core_utils.logging_utils import debug_logger
-from src.agent.core_utils.memory import EnhancedMemory
+from pathlib import Path
+
+# Add the project root to Python path
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.append(str(project_root))
+
+from agent.core_utils.llm import GeminiFlashClient
+from .prompt_generator import SystemPromptBase
+from ..core_utils.logging_utils import debug_logger
+from ..core_utils.memory import EnhancedMemory
 from typing import Dict, List, Any
 from datetime import datetime
 

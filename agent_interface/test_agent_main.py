@@ -3,13 +3,18 @@ import os
 import sys
 import time
 from typing import List, Dict, Any
+from pathlib import Path
+from dotenv import load_dotenv
 
 # Add the project root to Python path so imports work
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
-from src.test_agent import TestAgent
-from src.agent.instruction_agent.agent import InstructionAgent
+# Load environment variables from root .env file
+load_dotenv(PROJECT_ROOT / '.env')
+
+from test_agent import TestAgent
+from agent.instruction_agent.agent import InstructionAgent
 
 
 class TestAgentMain:
