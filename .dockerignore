@@ -1,0 +1,33 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Environment / secrets (never bake keys into the image — pass via docker-compose)
+env/.env
+*.env
+
+# ── Logs & outputs (mounted as volumes at runtime) ───────────────────────────
+logs/
+
+# ── Dev tooling ───────────────────────────────────────────────────────────────
+.git/
+.gitignore
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.coverage
+htmlcov/
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

@@ -1,0 +1,28 @@
+services:
+  testing-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: testing-agent
+
+    # ── Environment ────────────────────────────────────────────────────────────
+    env_file:
+      - env/.env                    # Put your OPENROUTER_API_KEY in env/.env
+    environment:
+      - PYTHONUNBUFFERED=1          # Stream logs in real time
+      - PYTHONDONTWRITEBYTECODE=1
+      - MODEL=gpt-5-mini            # Change to any model name
+      - PROVIDER=openai             # Change to: openai, anthropic, gemini, openrouter
+
+    # ── Volumes ────────────────────────────────────────────────────────────────
+    volumes:
+      # Edit test_cases.json on your host — agent picks it up without rebuild
+      - ./test_cases:/app/test_cases
+
+      # Test results / debug logs written here are accessible on your host
+      - ./logs:/app/logs
+
+    # ── Resource limits (optional, tune to your machine) ──────────────────────
+    shm_size: "256mb"               # Chromium needs shared memory
+
+    restart: "no"                   # Run once, don't auto-restart
