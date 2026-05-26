@@ -45,14 +45,14 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Environments
-.env
+# Virtual environments
 .venv
-env/
 venv/
-ENV/
-env.bak/
+VENV/
 venv.bak/
+
+# API keys — ignore the real secret but track the env/ folder and its template
+env/.env
 
 # Testing Agent specific ignores
 # Log files

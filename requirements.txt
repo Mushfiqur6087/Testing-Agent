@@ -4,8 +4,8 @@
 # Browser automation
 playwright>=1.40.0
 
-# AI/LLM integration
-google-generativeai>=0.3.0
+# AI/LLM integration (LiteLLM — unified API for all providers)
+litellm>=1.40.0
 
 # Core Python libraries (usually included with Python 3.8+)
 # Listed here for completeness and version tracking
