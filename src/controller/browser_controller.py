@@ -14,9 +14,11 @@ class BrowserController:
     Controller class that wraps the BrowserSession to provide high-level browser operations.
     """
 
-    def __init__(self, llm_client=None):
+    def __init__(self, llm_client=None, headless: bool = True):
         """Initialize the BrowserController with a BrowserSession and optional LLM client."""
         self.browser_context = BrowserSession()
+        # Eagerly launch the browser so it's ready before the first state refresh
+        self.browser_context._initialize_session(headless=headless)
         self.tools_instance = Tools(llm_client)
         self.llm_client = llm_client
         # Store logging functions for tools integration

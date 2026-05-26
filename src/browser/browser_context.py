@@ -29,12 +29,15 @@ class BrowserSession:
         
         # Alert tracking
         self._recent_alerts: List[Dict[str, Any]] = []
-        self._max_alert_history: int = 2
+        self._max_alert_history: int = 10
 
-    def _initialize_session(self, headless: bool = False) -> Browser:
+    def _initialize_session(self, headless: bool = True) -> Browser:
         if self._playwright is None:
             self._playwright = sync_playwright().start()
-            self._browser = self._playwright.chromium.launch(headless=headless)
+            self._browser = self._playwright.chromium.launch(
+                headless=headless,
+                args=["--no-sandbox", "--disable-dev-shm-usage"],
+            )
         return self._browser
 
     def _create_context(self) -> BrowserContext:

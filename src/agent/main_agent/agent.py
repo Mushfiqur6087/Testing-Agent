@@ -4,7 +4,7 @@ import sys
 import ast
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, PROJECT_ROOT)
-from src.agent.core_utils.llm import GeminiFlashClient
+from src.agent.core_utils.llm import LLMClient
 from src.agent.main_agent.prompt_generator import SystemPromptBase
 from src.agent.core_utils.logging_utils import debug_logger
 from src.agent.core_utils.memory import EnhancedMemory
@@ -16,9 +16,9 @@ from datetime import datetime
 
 class Agent:
     """
-    Agent to generate JSON responses for browser automation tasks, using GeminiFlashClient for LLM evaluations.
+    Agent to generate JSON responses for browser automation tasks, using LLMClient (LiteLLM) for LLM evaluations.
     """
-    def __init__(self, llm: GeminiFlashClient, max_actions: int = 10, debug: bool = True):
+    def __init__(self, llm: LLMClient, max_actions: int = 10, debug: bool = True):
         self.llm = llm
         self.max_actions = max_actions
         self.debug = debug
@@ -29,6 +29,7 @@ class Agent:
         self.valid_actions = "No browser controller attached. Available actions will be populated when browser controller is set."
         self.system_prompt = SystemPromptBase(max_actions_per_step=max_actions)
         self.browser_controller = None
+        self.recent_alerts = []
         self.session_start_time = datetime.now()
         
         # Create debug log file if debug is enabled
@@ -185,11 +186,18 @@ Please provide your next action(s) in the required JSON format.
     def _format_browser_state(self) -> str:
         """Format current browser state for the prompt."""
         tabs_text = f"{len(self.open_tabs)} tabs open" if self.open_tabs else "No tabs"
-        
+
+        # Include any recent browser alerts/dialogs
+        alerts_text = ""
+        if self.recent_alerts:
+            alerts_text = "\n\n⚠️ Recent Browser Alerts/Dialogs:\n"
+            for i, alert in enumerate(self.recent_alerts, 1):
+                alerts_text += f"  {i}. [{alert['type'].upper()}] {alert['message']}\n"
+
         return f"""Current URL: {self.current_url or 'No URL'}
 Open Tabs: {tabs_text}
 Interactive Elements:
-{self.interactive_elements or 'No interactive elements detected'}"""
+{self.interactive_elements or 'No interactive elements detected'}{alerts_text}"""
 
     def get_next_action(self, user_goal: str) -> Dict[str, Any]:
         """
@@ -412,7 +420,11 @@ Interactive Elements:
             
             # Get available actions with detailed descriptions
             self.valid_actions = self.browser_controller.get_available_actions_description()
-            
+
+            # Capture any recent browser alerts/dialogs (JS alert, confirm, prompt)
+            self.recent_alerts = self.browser_controller.get_recent_alerts()
+            # Clear after reading so stale alerts don't persist across steps
+            self.browser_controller.clear_alerts()
             
         except Exception as e:
             print(f"Error refreshing browser state: {str(e)}")
@@ -420,6 +432,7 @@ Interactive Elements:
             self.open_tabs = ["Error: Unable to get tabs info"]
             self.interactive_elements = "Error: Unable to get interactive elements"
             self.valid_actions = "Error: Unable to get available actions"
+            self.recent_alerts = []
             
             
     def execute_plan(self, user_goal: str) -> List[Dict[str, Any]]:
