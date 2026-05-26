@@ -1,60 +1,84 @@
-# filepath: /home/mushfiqur/vscode/Testing-Agent/src/test_agent_main.py
+# filepath: /home/mushfiqur/Documents/Testing-Agent/src/test_agent_main.py
 import os
 import sys
 import time
+import json
+import argparse
 from typing import List, Dict, Any
+from dotenv import load_dotenv
+
+# Load API keys from env/.env automatically
+_ENV_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "env", ".env"
+)
+load_dotenv(_ENV_FILE)
 
 # Add the project root to Python path so imports work
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
 from src.test_agent import TestAgent
-from src.agent.instruction_agent.agent import InstructionAgent
 
 
 class TestAgentMain:
     """
-    Main agent class that orchestrates test case generation and execution.
+    Main agent class that orchestrates test execution.
     """
     
-    def __init__(self, api_key: str, max_actions: int = 15, debug: bool = False):
-        self.api_key = api_key
+    def __init__(self, model: str = "gemini-2.0-flash", provider: str = "gemini",
+                 max_actions: int = 15, debug: bool = False, headless: bool = True):
+        self.model = model
+        self.provider = provider
         self.max_actions = max_actions
         self.debug = debug
-        self.instruction_agent = None
+        self.headless = headless
         
-    def initialize(self):
-        """Initialize the instruction agent."""
-        self.instruction_agent = InstructionAgent(api_key=self.api_key)
-            
     def generate_test_cases(self, test_case_description: str) -> List[Dict[str, Any]]:
         """
-        Generate multiple test cases from a single test case description using the instruction agent.
+        Wrap a single test description as a single test case, ready for execution.
+        No LLM expansion — the description is used as-is.
         
         Args:
-            test_case_description (str): Description of the test scenario/requirements
+            test_case_description (str): Description of the test scenario
             
         Returns:
-            list: List of generated test case dictionaries
+            list: A list containing one test case dictionary
         """
-        if not self.instruction_agent:
-            self.initialize()
-            
-        try:
-            # Process the test case description to generate multiple test scenarios
-            self.instruction_agent.process_test_case(test_case_description)
-            
-            # Get the generated test cases as a list
-            test_cases = self.instruction_agent.get_test_cases_list()
-            
-            return test_cases
-            
-        except Exception as e:
-            print(f"\n❌ Error generating test cases: {e}")
-            if "quota" in str(e).lower() or "limit" in str(e).lower() or "rate" in str(e).lower():
-                print("🚨 This looks like an API rate limit or quota issue during test case generation!")
-            raise
-            
+        if not test_case_description.strip():
+            raise ValueError("Test case description cannot be empty")
+        
+        return [
+            {
+                "test_name": "test_case_1",
+                "steps_or_input": test_case_description.strip(),
+                "expected_outcome": "",
+                "reason_for_failure": "",
+            }
+        ]
+
+    def load_test_cases(self, filepath: str) -> List[Dict[str, Any]]:
+        """
+        Load test cases from a JSON file.
+
+        Args:
+            filepath (str): Path to the JSON file containing a list of test case dicts.
+
+        Returns:
+            list: List of test case dictionaries read from the file.
+        """
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"Test cases file not found: {filepath}")
+
+        with open(filepath, 'r', encoding='utf-8') as f:
+            test_cases = json.load(f)
+
+        if not isinstance(test_cases, list):
+            raise ValueError(f"Expected a JSON array in {filepath}, got {type(test_cases).__name__}")
+
+        print(f"Loaded {len(test_cases)} test case(s) from {filepath}")
+        return test_cases
+
     def execute_test_case(self, test_case: Dict[str, Any]):
         """
         Execute a single test case using TestAgent.
@@ -67,17 +91,20 @@ class TestAgentMain:
         expected_outcome = test_case.get('expected_outcome', '')
         
         # Use steps_or_input as user_goal
-        user_goal = steps_or_input+ "\n DETERMINE whether this test can be successfully executed given the current requirements and implementation, or if there are any errors, inconsistencies, or missing validations in the requirements or the form itself."
+        user_goal = steps_or_input + "\n DETERMINE whether this test can be successfully executed given the current requirements and implementation, or if there are any errors, inconsistencies, or missing validations in the requirements or the form itself."
         
         
         try:
             # Initialize a new TestAgent for this test case
             test_agent = TestAgent(
-                api_key=self.api_key,
+                model=self.model,
+                provider=self.provider,
                 max_actions=self.max_actions,
-                debug=self.debug
+                debug=self.debug,
+                headless=self.headless,
+                test_case_name=test_case.get('test_name', 'test_case'),
             )
-            # Initialize and execute the test - same as main.py
+            # Initialize and execute the test
             test_agent.initialize()
             results = test_agent.execute_plan(user_goal, expected_outcome)
             print(f"\nTest Case '{test_case.get('test_name', 'N/A')}' executed successfully.")
@@ -104,45 +131,86 @@ class TestAgentMain:
             if i < len(test_cases):  # Don't wait after the last test case
                 print(f"Waiting 40 seconds before next test case to avoid API quota limits...")
                 time.sleep(40)
-            
 
+
+def parse_args():
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Testing Agent — AI-powered browser test automation",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""\
+examples:
+  python -m src.test_agent_main --model gpt-5-mini --provider openai
+  python -m src.test_agent_main --model claude-sonnet-4-20250514 --provider anthropic
+  python -m src.test_agent_main --model gemini-2.0-flash --provider gemini
+  python -m src.test_agent_main --model google/gemini-flash-1.5 --provider openrouter
+        """,
+    )
+    parser.add_argument(
+        "--model", type=str, default="gemini-2.0-flash",
+        help="Model name (default: gemini-2.0-flash)",
+    )
+    parser.add_argument(
+        "--provider", type=str, default="gemini",
+        help="LLM provider: openai, anthropic, gemini, openrouter, etc. (default: gemini)",
+    )
+    parser.add_argument(
+        "--max-actions", type=int, default=10,
+        help="Maximum browser actions per test case (default: 10)",
+    )
+    parser.add_argument(
+        "--test-file", type=str, default=None,
+        help="Path to test_cases.json (default: test_cases/test_cases.json)",
+    )
+    parser.add_argument(
+        "--no-headless", dest="headless", action="store_false", default=True,
+        help="Show the browser window (default: headless / invisible)",
+    )
+    parser.add_argument(
+        "--debug", action="store_true", default=True,
+        help="Enable debug logging (default: True)",
+    )
+    return parser.parse_args()
 
 
 def main():
     """
-    Example usage of TestAgentMain.
+    Entry point — parses CLI args and runs the agent.
     """
-    # Configuration
-    API_KEY = os.getenv('GEMINI_API_KEY')
-    if not API_KEY:
-        raise ValueError("GEMINI_API_KEY not found in environment variables")
-    
-    # Example test case description
-    test_description = """
-Go to file:///home/mushfiqur/vscode/Testing-Agent/html/test_page.html
-Test the signup form functionality and verify that emails contain @ and password and confirm password fields match.
-If not then alert will be shown.
-"""
-    
+    args = parse_args()
+
+    # Resolve test file path
+    if args.test_file:
+        test_cases_file = args.test_file
+    else:
+        test_cases_file = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "test_cases", "test_cases.json",
+        )
+
+    print(f"🤖 Testing Agent")
+    print(f"   Provider : {args.provider}")
+    print(f"   Model    : {args.model}")
+    print(f"   Headless : {args.headless}")
+    print(f"   Test file: {test_cases_file}")
+    print()
+
     # Initialize the main agent
     main_agent = TestAgentMain(
-        api_key=API_KEY,
-        max_actions=10,
-        debug=True
+        model=args.model,
+        provider=args.provider,
+        max_actions=args.max_actions,
+        debug=args.debug,
+        headless=args.headless,
     )
-    
+
     try:
-        # Generate test cases
-        test_cases = main_agent.generate_test_cases(test_description)
-        # for i, test_case in enumerate(test_cases, 1):
-            # print(f"\nTest Case {i}:")
-            # print(f"  Name: {test_case.get('test_name', 'N/A')}")
-            # print(f"  Steps: {test_case.get('steps_or_input', 'N/A')[:100]}...")
-            # print(f"  Expected Outcome: {test_case.get('expected_outcome', 'N/A')}")
-        
+        # Load test cases from JSON file
+        test_cases = main_agent.load_test_cases(test_cases_file)
+
         # Execute all test cases
         main_agent.execute_all_test_cases(test_cases)
-        
+
     except Exception as e:
         import traceback
         traceback.print_exc()
