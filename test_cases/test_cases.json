@@ -1,0 +1,20 @@
+[
+  {
+    "test_name": "invalid_email_no_at_symbol",
+    "steps_or_input": "Go to file:///home/mushfiqur/Documents/Testing-Agent/html/test_page.html. Fill the email field with 'testexample.com' (no @ symbol). Fill the password field with 'password123'. Fill the confirm-password field with 'password123'. Click the Sign Up button. An alert dialog should appear saying 'Email must contain @ symbol'. Accept the alert. Verify the form did NOT submit successfully.",
+    "expected_outcome": "An alert dialog with the message 'Email must contain @ symbol' is shown. The form does not submit.",
+    "reason_for_failure": "Email field missing @ symbol"
+  },
+  {
+    "test_name": "password_mismatch_shows_alert",
+    "steps_or_input": "Go to file:///home/mushfiqur/Documents/Testing-Agent/html/test_page.html. Fill the email field with 'test@example.com'. Fill the password field with 'password123'. Fill the confirm-password field with 'wrongpassword'. Click the Sign Up button. An alert dialog should appear saying 'Passwords do not match'. Accept the alert. Verify the form did NOT submit successfully.",
+    "expected_outcome": "An alert dialog with the message 'Passwords do not match' is shown. The form does not submit.",
+    "reason_for_failure": "Password and confirm-password fields do not match"
+  },
+  {
+    "test_name": "valid_signup_succeeds",
+    "steps_or_input": "Go to file:///home/mushfiqur/Documents/Testing-Agent/html/test_page.html. Fill the email field with 'test@example.com'. Fill the password field with 'password123'. Fill the confirm-password field with 'password123'. Click the Sign Up button. An alert dialog should appear saying 'Account created successfully!'. Accept the alert. Verify that the success message 'Account created successfully!' is visible on the page and the form fields are cleared.",
+    "expected_outcome": "An alert dialog with 'Account created successfully!' is shown. The success message appears on the page. The form resets.",
+    "reason_for_failure": ""
+  }
+]
