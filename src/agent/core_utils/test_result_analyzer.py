@@ -6,21 +6,23 @@ import json
 import os
 from datetime import datetime
 from typing import Dict, Any
-from src.agent.core_utils.llm import GeminiFlashClient
+from src.agent.core_utils.llm import LLMClient
 from src.agent.core_utils.memory import EnhancedMemory
+from src.agent.core_utils.logging_utils import debug_logger
 
 class TestResultAnalyzer:
     """
     Simple analyzer that tells you if test passed or failed and why.
     """
     
-    def __init__(self, llm_client: GeminiFlashClient):
+    def __init__(self, llm_client: LLMClient):
         """Initialize with LLM client."""
         self.llm = llm_client
         
     def analyze_test_execution(self, memory: EnhancedMemory, 
                              original_test_goal: str,
-                             expected_outcome: str) -> Dict[str, Any]:
+                             expected_outcome: str,
+                             test_case_name: str = "test_case") -> Dict[str, Any]:
         """
         Analyze test execution and generate comprehensive summary.
         
@@ -61,8 +63,8 @@ class TestResultAnalyzer:
                 "llm_analysis": analysis
             }
             
-            # Save to logs
-            self._save_analysis_to_logs(result)
+            # Save to the test-case-specific subfolder
+            self._save_analysis_to_logs(result, test_case_name)
             
             return result
             
@@ -74,27 +76,17 @@ class TestResultAnalyzer:
             }
             
             # Save error result to logs
-            self._save_analysis_to_logs(error_result)
+            self._save_analysis_to_logs(error_result, test_case_name)
             
             return error_result
     
-    def _save_analysis_to_logs(self, analysis_result: Dict[str, Any]) -> None:
-        """Save analysis result to log file."""
+    def _save_analysis_to_logs(self, analysis_result: Dict[str, Any],
+                               test_case_name: str = "test_case") -> None:
+        """Save analysis result to the test case subfolder."""
         try:
-            # Create logs directory if it doesn't exist
-            logs_dir = "logs"
-            if not os.path.exists(logs_dir):
-                os.makedirs(logs_dir)
-            
-            # Generate filename with timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"test_analysis_{timestamp}.json"
-            filepath = os.path.join(logs_dir, filename)
-            
-            # Save to file
+            filepath = debug_logger.get_analysis_file_path(test_case_name)
             with open(filepath, 'w') as f:
                 json.dump(analysis_result, f, indent=2)
-                
         except Exception as e:
             print(f"Failed to save analysis to logs: {e}")
     

@@ -1,6 +1,13 @@
 """
 Centralized logging utilities for the Testing Agent project.
-Ensures all debug logs are stored in the logs directory.
+Ensures all debug logs are stored in a structured directory hierarchy:
+
+  logs/
+  └── test_run_YYYYMMDD_HHMMSS/          ← one folder per run
+      ├── <test_case_name>/              ← one folder per test case
+      │   ├── <test_case_name>_debug.log
+      │   └── <test_case_name>_analysis.json
+      └── ...
 """
 
 import os
@@ -20,128 +27,124 @@ class DebugLogger:
     """Centralized debug logging utility for consistent log file management."""
     
     def __init__(self):
-        # Get the project root directory using the PROJECT_ROOT variable
         self.project_root = Path(PROJECT_ROOT)
         self.logs_dir = self.project_root / "logs"
-        
-        # Ensure logs directory exists
         self.logs_dir.mkdir(exist_ok=True)
         
-    def _get_project_root(self) -> Path:
-        """Find the project root directory containing the logs folder."""
-        current = Path(__file__).resolve()
-        
-        # Go up the directory tree until we find the Testing Agent directory
-        while current.parent != current:
-            if (current / "logs").exists() and current.name == "Testing Agent":
-                return current
-            current = current.parent
-            
-        # Fallback: go up one level from agent folder
-        agent_dir = Path(__file__).resolve().parent
-        project_root = agent_dir.parent
-        
-        # Create logs directory if it doesn't exist
-        logs_dir = project_root / "logs"
-        logs_dir.mkdir(exist_ok=True)
-        
-        return project_root
-    
-    def get_debug_file_path(self, component: str, debug_file_prefix: str = None) -> str:
+        # Set once per process start — shared across all test cases in a run
+        run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self._run_dir: Path = self.logs_dir / f"test_run_{run_timestamp}"
+        self._run_dir.mkdir(exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # Public: run-level directory
+    # ------------------------------------------------------------------
+    def get_run_dir(self) -> Path:
+        """Return the top-level directory for the current test run."""
+        return self._run_dir
+
+    # ------------------------------------------------------------------
+    # Public: per-test-case directory
+    # ------------------------------------------------------------------
+    def get_test_case_dir(self, test_case_name: str) -> Path:
         """
-        Generate a debug file path in the logs directory.
-        
+        Create (if needed) and return the directory for a specific test case.
+
+        Layout:  logs/test_run_<ts>/<test_case_name>/
+        """
+        safe_name = self._safe_name(test_case_name)
+        tc_dir = self._run_dir / safe_name
+        tc_dir.mkdir(exist_ok=True)
+        return tc_dir
+
+    # ------------------------------------------------------------------
+    # Public: file paths
+    # ------------------------------------------------------------------
+    def get_debug_file_path(self, component: str,
+                            debug_file_prefix: str = None,
+                            output_dir: Path = None) -> str:
+        """
+        Generate a debug .log file path.
+
         Args:
-            component: The component name (e.g., 'agent', 'memory')
-            debug_file_prefix: Optional prefix for the debug file
-            
-        Returns:
-            Full path to the debug file in the logs directory
+            component:         component name, e.g. 'agent'
+            debug_file_prefix: test case name used as folder + filename prefix
+            output_dir:        directory to write into (defaults to run dir)
         """
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
         if debug_file_prefix:
-            filename = f"{debug_file_prefix}_{component}_{timestamp}.log"
+            # Put it inside the test case subfolder
+            directory = output_dir if output_dir is not None else self.get_test_case_dir(debug_file_prefix)
+            filename = f"{self._safe_name(debug_file_prefix)}_{component}_debug.log"
         else:
-            filename = f"{component}_debug_{timestamp}.log"
-            
-        return str(self.logs_dir / filename)
-    
-    def get_session_log_path(self, filename: str = None) -> str:
+            directory = output_dir if output_dir is not None else self._run_dir
+            filename = f"{component}_debug.log"
+
+        return str(directory / filename)
+
+    def get_analysis_file_path(self, test_case_name: str) -> str:
         """
-        Generate a session log file path in the logs directory.
-        
+        Return the path for a test case's analysis JSON file.
+
+        Layout:  logs/test_run_<ts>/<test_case_name>/<test_case_name>_analysis.json
+        """
+        tc_dir = self.get_test_case_dir(test_case_name)
+        filename = f"{self._safe_name(test_case_name)}_analysis.json"
+        return str(tc_dir / filename)
+
+    def get_session_log_path(self, filename: str = None,
+                             output_dir: Path = None) -> str:
+        """
+        Generate a session log JSON file path.
+
         Args:
-            filename: Optional custom filename
-            
-        Returns:
-            Full path to the session log file in the logs directory
+            filename:   optional custom filename
+            output_dir: directory to write into (defaults to run dir)
         """
+        directory = output_dir if output_dir is not None else self._run_dir
+
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"agent_session_{timestamp}.json"
-            
-        return str(self.logs_dir / filename)
-    
+
+        return str(directory / filename)
+
+    # ------------------------------------------------------------------
+    # Housekeeping
+    # ------------------------------------------------------------------
     def clean_old_logs(self, max_age_days: int = 7):
-        """
-        Clean up old log files older than specified days.
-        
-        Args:
-            max_age_days: Maximum age of log files to keep
-        """
+        """Clean up run directories older than *max_age_days*."""
         try:
             import time
+            import shutil
             current_time = time.time()
             max_age_seconds = max_age_days * 24 * 60 * 60
-            
-            for log_file in self.logs_dir.glob("*.log"):
-                if log_file.is_file():
-                    file_age = current_time - log_file.stat().st_mtime
-                    if file_age > max_age_seconds:
-                        log_file.unlink()
-                        logger.info(f"Cleaned up old log file: {log_file.name}")
-                        
+
+            for entry in self.logs_dir.iterdir():
+                if entry.is_dir() and entry.name.startswith("test_run_"):
+                    age = current_time - entry.stat().st_mtime
+                    if age > max_age_seconds:
+                        shutil.rmtree(entry)
+                        logger.info(f"Cleaned up old run directory: {entry.name}")
+
         except Exception as e:
             logger.error(f"Error cleaning up old logs: {e}")
-    
+
     def get_logs_directory(self) -> Path:
-        """Get the logs directory path."""
+        """Return the base logs directory."""
         return self.logs_dir
-    
-    def list_log_files(self, pattern: str = "*.log") -> list:
-        """
-        List all log files in the logs directory matching the pattern.
-        
-        Args:
-            pattern: Glob pattern to match files (default: "*.log")
-            
-        Returns:
-            List of log file paths
-        """
+
+    def list_log_files(self, pattern: str = "**/*.log") -> list:
+        """List all log files under the logs directory (recursive)."""
         return list(self.logs_dir.glob(pattern))
-    
-    def get_log_file_info(self) -> dict:
-        """
-        Get information about log files in the logs directory.
-        
-        Returns:
-            Dictionary with log file statistics
-        """
-        log_files = self.list_log_files("*.log")
-        session_files = self.list_log_files("*.json")
-        
-        total_log_size = sum(f.stat().st_size for f in log_files if f.is_file())
-        total_session_size = sum(f.stat().st_size for f in session_files if f.is_file())
-        
-        return {
-            "log_files_count": len(log_files),
-            "session_files_count": len(session_files),
-            "total_log_size_bytes": total_log_size,
-            "total_session_size_bytes": total_session_size,
-            "total_size_mb": (total_log_size + total_session_size) / (1024 * 1024),
-            "logs_directory": str(self.logs_dir)
-        }
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _safe_name(name: str) -> str:
+        """Convert a test case name to a filesystem-safe string."""
+        return "".join(c if c.isalnum() or c in "-_" else "_" for c in name)
+
 
 # Global instance for use across the project
 debug_logger = DebugLogger()
