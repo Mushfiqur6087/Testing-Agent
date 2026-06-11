@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Payments | TC-008 | Type: Negative | Priority: High]\nTitle: Payee account number and confirmation do not match\n\n\u25b6 Start URL:    http://localhost:8080/bill-pay\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"account_number_A\": \"ELC123456789\",\n  \"account_number_B\": \"GAS987654321\"\n}\n\nPreconditions:\n  All other required fields are filled with valid values (payee name/address/phone present).\n\nSteps to Execute:\n  1. Enter 'ELC123456789' in Payee Account Number.\n  2. Enter 'GAS987654321' in Confirm Account Number.\n  3. Click Pay.\n\nExpected Result:\n  Inline error \"Account numbers do not match\" is shown; form does not submit; no payment is created.\n\nNotes from prior verification:\n  Used two different seeded payee account numbers to force mismatch (Electric Company vs Gas Utility). Inline validation message is runtime and cannot be confirmed from static DOM.",
+  "expected_outcome": "Inline error \"Account numbers do not match\" is shown; form does not submit; no payment is created.",
+  "tc_metadata": {
+    "tc_id": "TC-008",
+    "module": "Payments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/bill-pay, executed all 3 step(s) for 'Payee account number and confirmation do not match'. Outcome validation confirmed: Inline error \"Account numbers do not match\" is shown; form does not submit; no payment is created.",
+    "errors": "None"
+  }
+}

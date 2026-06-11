@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Request Loan | TC-021 | Type: Edge/Boundary | Priority: Medium]\nTitle: Collateral account balance one unit below 20% of loan amount is blocked\n\n\u25b6 Start URL:    http://localhost:8080/request-loan\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"loan_type\": \"Auto\",\n  \"loan_amount\": 29242.6,\n  \"down_payment\": 5000,\n  \"collateral_account\": \"****5001 (Checking, $5,847.52)\"\n}\n\nPreconditions:\n  A collateral account exists whose balance is exactly one unit below 20% of the entered loan amount\n\nSteps to Execute:\n  1. Select 'Auto' loan type\n  2. Enter '29242.60' in Loan Amount\n  3. Enter '5000' in Down Payment\n  4. Select the under-collateralised account '****5001 (Checking, $5,847.52)'\n  5. Click 'Request Loan'\n\nExpected Result:\n  Inline error on Collateral Account: insufficient balance (< 20% of Loan Amount); request is not sent to the credit engine\n\nNotes from prior verification:\n  Calculated loan amount 29,242.60 because 20% of 29,242.60 = 5,848.52; the checking account balance is 5,847.52, i.e. exactly one unit below 20% of the loan amount, satisfying the precondition using seeded account 12345001. This allows the UI validation for insufficient collateral to be exercised. Account balances and credit engine behavior are dynamic and were not verified in the static DOM.",
+  "expected_outcome": "Inline error on Collateral Account: insufficient balance (< 20% of Loan Amount); request is not sent to the credit engine",
+  "tc_metadata": {
+    "tc_id": "TC-021",
+    "module": "Request Loan",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/request-loan, executed all 5 step(s) for 'Collateral account balance one unit below 20% of loan amount is blocked'. Outcome validation confirmed: Inline error on Collateral Account: insufficient balance (< 20% of Loan Amount); request is not sent to the credit engine",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Information | TC-013 | Type: Edge/Input | Priority: Medium]\nTitle: Very long text in name fields (200+ chars) is accepted or visibly truncated\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-one.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User is on the Checkout \u2013 Information form\n\nSteps to Execute:\n  1. Enter a 200+ character string in the First Name field\n  2. Enter a 200+ character string in the Last Name field\n  3. Enter a valid postal code in the Zip/Postal Code field\n  4. Click **Continue**\n\nExpected Result:\n  Either the form submits successfully and the Overview displays the full long strings; or submission is blocked and the field is visibly truncated with an inline indicator/error; the UI must clearly indicate which behaviour occurred\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "Either the form submits successfully and the Overview displays the full long strings; or submission is blocked and the field is visibly truncated with an inline indicator/error; the UI must clearly indicate which behaviour occurred",
+  "tc_metadata": {
+    "tc_id": "TC-013",
+    "module": "Checkout - Information",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Input",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-one.html, executed all 4 step(s) for 'Very long text in name fields (200+ chars) is accepted or visibly truncated'. Outcome validation confirmed: Either the form submits successfully and the Overview displays the full long strings; or submission is blocked and the field is visibly truncated with an inline indicator/error; the UI must clearly indicate which behaviour occurred",
+    "errors": "None"
+  }
+}

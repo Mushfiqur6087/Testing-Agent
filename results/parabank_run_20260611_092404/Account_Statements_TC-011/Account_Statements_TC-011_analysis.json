@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Account Statements | TC-011 | Type: Edge/Boundary | Priority: Medium]\nTitle: Custom range where Start Date equals End Date is accepted\n\n\u25b6 Start URL:    http://localhost:8080/statements\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"date\": \"2024-01-13\",\n  \"account\": \"****5001 (Checking)\"\n}\n\nPreconditions:\n  User is logged in; Account Statements page is open\n\nSteps to Execute:\n  1. Enter '2024-01-13' in Start Date field\n  2. Enter '2024-01-13' in End Date field\n  3. Select account '****5001 (Checking)'\n  4. Click 'Generate Statement'\n\nExpected Result:\n  \"Statement generated successfully.\" is shown; transactions for that single day are retrieved and displayed\n\nNotes from prior verification:\n  Step 1 was rewritten to enter the date directly into the Start Date field (and likewise for the End Date) because there is no Statement Period control or 'Custom date range' option in the DOM. The page provides Start/End date inputs and the Generate button, so the test uses those inputs.",
+  "expected_outcome": "\"Statement generated successfully.\" is shown; transactions for that single day are retrieved and displayed",
+  "tc_metadata": {
+    "tc_id": "TC-011",
+    "module": "Account Statements",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/statements, executed all 4 step(s) for 'Custom range where Start Date equals End Date is accepted'. Outcome validation confirmed: \"Statement generated successfully.\" is shown; transactions for that single day are retrieved and displayed",
+    "errors": "None"
+  }
+}

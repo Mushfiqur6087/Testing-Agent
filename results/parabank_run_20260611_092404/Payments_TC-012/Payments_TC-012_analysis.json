@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Payments | TC-012 | Type: Edge/Boundary | Priority: Medium]\nTitle: Payment amount exactly equals available funds succeeds\n\n\u25b6 Start URL:    http://localhost:8080/bill-pay\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"payment_amount\": \"5847.52\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\"\n}\n\nPreconditions:\n  A source account exists with available funds exactly equal to the intended payment amount (use Checking ****5001 with $5,847.52).\n\nSteps to Execute:\n  1. Enter Payment Amount '5847.52'.\n  2. Select source account '****5001 (Checking, $5,847.52)'.\n  3. Click Pay.\n\nExpected Result:\n  \"Payment submitted successfully.\" with a reference code; source account balance becomes $0.00; payment appears in transaction history.\n\nNotes from prior verification:\n  Used Checking account balance exactly as payment amount per seed data. Success and resulting balance change are dynamic and not verifiable in the static DOM.",
+  "expected_outcome": "\"Payment submitted successfully.\" with a reference code; source account balance becomes $0.00; payment appears in transaction history.",
+  "tc_metadata": {
+    "tc_id": "TC-012",
+    "module": "Payments",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/bill-pay, executed all 3 step(s) for 'Payment amount exactly equals available funds succeeds'. Outcome validation confirmed: \"Payment submitted successfully.\" with a reference code; source account balance becomes $0.00; payment appears in transaction history.",
+    "errors": "None"
+  }
+}

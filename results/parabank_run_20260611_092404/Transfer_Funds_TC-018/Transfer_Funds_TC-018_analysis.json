@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Transfer Funds | TC-018 | Type: Edge/Interaction | Priority: Medium]\nTitle: Browser Back after successful transfer does not create a duplicate\n\n\u25b6 Start URL:    http://localhost:8080/transfer-funds\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"amount\": \"2500.00\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\",\n  \"destination_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  User is logged in; source account (****5001 Checking) has at least 2\u00d7 the transfer amount available\n\nSteps to Execute:\n  1. Complete a successful transfer of '2500.00' from '****5001 (Checking, $5,847.52)' to '****5002 (Savings, $25,678.90)'; note the transaction ID displayed\n  2. Press the browser Back button\n  3. Click 'Transfer' again without changing any inputs\n\nExpected Result:\n  Second submission is blocked; only one transaction ID exists in history; no duplicate transfer occurs\n\nNotes from prior verification:\n  Precondition uses seeded balances: ****5001 has $5,847.52 which is > 2\u00d7 $2,500. Conditional/behavioral steps (browser history) are runtime checks and cannot be validated by static DOM; test relies on backend/idempotency handling.",
+  "expected_outcome": "Second submission is blocked; only one transaction ID exists in history; no duplicate transfer occurs",
+  "tc_metadata": {
+    "tc_id": "TC-018",
+    "module": "Transfer Funds",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/transfer-funds, executed all 3 step(s) for 'Browser Back after successful transfer does not create a duplicate'. Outcome validation confirmed: Second submission is blocked; only one transaction ID exists in history; no duplicate transfer occurs",
+    "errors": "None"
+  }
+}

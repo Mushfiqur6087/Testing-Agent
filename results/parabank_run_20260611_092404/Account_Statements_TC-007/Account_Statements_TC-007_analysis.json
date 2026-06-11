@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Account Statements | TC-007 | Type: Negative | Priority: High]\nTitle: Custom date range with Start Date after End Date is rejected\n\n\u25b6 Start URL:    http://localhost:8080/statements\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"start_date\": \"2024-01-15\",\n  \"end_date\": \"2024-01-10\",\n  \"account\": \"****5001 (Checking)\"\n}\n\nPreconditions:\n  User is logged in; Account Statements page is open\n\nSteps to Execute:\n  1. Enter '2024-01-15' in Start Date field\n  2. Enter '2024-01-10' in End Date field\n  3. Select account '****5001 (Checking)'\n  4. Click 'Generate Statement'\n\nExpected Result:\n  Inline error on Start Date and/or End Date: \"Start_Date must be on or before End_Date\"; no statement is generated\n\nNotes from prior verification:\n  Step 1 was rewritten to enter dates directly because the 'Custom date range' selection control referenced in the original step does not exist on the Statements page. The page provides direct Start Date and End Date inputs as confirmed by DOM verification.",
+  "expected_outcome": "Inline error on Start Date and/or End Date: \"Start_Date must be on or before End_Date\"; no statement is generated",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Account Statements",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/statements, executed all 4 step(s) for 'Custom date range with Start Date after End Date is rejected'. Outcome validation confirmed: Inline error on Start Date and/or End Date: \"Start_Date must be on or before End_Date\"; no statement is generated",
+    "errors": "None"
+  }
+}

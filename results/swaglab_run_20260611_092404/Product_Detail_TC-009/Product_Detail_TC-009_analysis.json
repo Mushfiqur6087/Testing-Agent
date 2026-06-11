@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Detail | TC-009 | Type: Edge/Interaction | Priority: Medium]\nTitle: Click Add to cart then immediately open Shopping Cart via cart icon (Edge/Interaction | Medium)\n\n\u25b6 Start URL:    https://www.saucedemo.com/product-detail.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"initial_product_state\": \"InCart\"\n}\n\nPreconditions:\n  User is on the Product Detail page for a NotInCart product; Shopping Cart does not contain this product. Verification snapshot shows product initially InCart (Remove button present).\n\nSteps to Execute:\n  1. Verify the page shows the Remove button (product is currently InCart)\n  2. Click the Remove button to set the product to NotInCart\n  3. Verify the Add to cart button is visible and the Cart icon is visible\n  4. Click the Add to cart button\n  5. Immediately click the Cart icon before waiting for a detailed UI text change\n  6. Observe Shopping Cart contents\n  7. Return to the Product Detail page for the same product\n\nExpected Result:\n  Shopping Cart opens; product appears exactly once (no duplicate from rapid navigation); returning to Product Detail shows state as InCart with Remove button visible.\n\nNotes from prior verification:\n  Step 1 and 2 were rewritten because the verification snapshot did not contain an Add to cart button (only Remove). To perform the intended interaction we first remove the product to reach NotInCart, then add it and immediately open the cart. The Cart icon was present per verification.",
+  "expected_outcome": "Shopping Cart opens; product appears exactly once (no duplicate from rapid navigation); returning to Product Detail shows state as InCart with Remove button visible.",
+  "tc_metadata": {
+    "tc_id": "TC-009",
+    "module": "Product Detail",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/product-detail.html, executed all 7 step(s) for 'Click Add to cart then immediately open Shopping Cart via cart icon (Edge/Interaction | Medium)'. Outcome validation confirmed: Shopping Cart opens; product appears exactly once (no duplicate from rapid navigation); returning to Product Detail shows state as InCart with Remove button visible.",
+    "errors": "None"
+  }
+}

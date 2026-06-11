@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Information | TC-010 | Type: Negative | Priority: High]\nTitle: Continue with all required fields empty shows all three errors\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-one.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User is on the Checkout \u2013 Information page\n\nSteps to Execute:\n  1. Ensure the First Name field is blank\n  2. Ensure the Last Name field is blank\n  3. Ensure the Zip/Postal Code field is blank\n  4. Click the **Continue** button\n\nExpected Result:\n  Visible error banners are shown for all three fields: \"Error: First Name is required\", \"Error: Last Name is required\", and \"Error: Postal Code is required\"; the form does not proceed; the page remains on Checkout \u2013 Information\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "Visible error banners are shown for all three fields: \"Error: First Name is required\", \"Error: Last Name is required\", and \"Error: Postal Code is required\"; the form does not proceed; the page remains on Checkout \u2013 Information",
+  "tc_metadata": {
+    "tc_id": "TC-010",
+    "module": "Checkout - Information",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-one.html, executed all 4 step(s) for 'Continue with all required fields empty shows all three errors'. Outcome validation confirmed: Visible error banners are shown for all three fields: \"Error: First Name is required\", \"Error: Last Name is required\", and \"Error: Postal Code is required\"; the form does not proceed; the page remains on Checkout \u2013 Information",
+    "errors": "None"
+  }
+}

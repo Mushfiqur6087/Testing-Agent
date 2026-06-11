@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Reset App State | TC-007 | Type: Edge/State | Priority: Medium]\nTitle: Rapid consecutive clicks on Reset App State apply a single reset outcome\n\n\u25b6 Start URL:    https://www.saucedemo.com/reset-app-state\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\"\n}\n\nPreconditions:\n  User is logged in; cart contains one or more items; product tiles show the Remove button (InCart state).\n\nSteps to Execute:\n  1. Open https://www.saucedemo.com/reset-app-state\n  2. Enter 'standard_user' in the Username field\n  3. Enter 'secret_sauce' in the Password field\n  4. Click the Login button\n  5. On the products page, click 'Add to cart' on the first product tile\n  6. Verify the cart badge shows '1' and the product's button now shows 'Remove'\n  7. Click the 'Reset App State' menu item\n  8. Immediately click the 'Reset App State' menu item again (within a typical double-click/double-tap interval)\n  9. Verify a single reset outcome is applied: cart is cleared (badge hidden or '0') and product buttons return to 'Add to cart'\n  10. Verify no error or duplicate adverse effect is shown and the user remains logged in\n\nExpected Result:\n  A single reset outcome is applied: cart is cleared (badge hidden or zero), product buttons return to the default 'Add to cart' state; no error or duplicate adverse effect is shown; user remains logged in.\n\nNotes from prior verification:\n  Verification run confirmed the Reset App State control is present. Outcome-related expectations are runtime behaviors (race/deduplication) and should be validated during functional/interaction testing \u2014 steps include rapid consecutive clicks to reproduce the edge condition.",
+  "expected_outcome": "A single reset outcome is applied: cart is cleared (badge hidden or zero), product buttons return to the default 'Add to cart' state; no error or duplicate adverse effect is shown; user remains logged in.",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Reset App State",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/State",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/reset-app-state, executed all 10 step(s) for 'Rapid consecutive clicks on Reset App State apply a single reset outcome'. Outcome validation confirmed: A single reset outcome is applied: cart is cleared (badge hidden or zero), product buttons return to the default 'Add to cart' state; no error or duplicate adverse effect is shown; user remains logged in.",
+    "errors": "None"
+  }
+}

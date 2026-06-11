@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Investments | TC-001 | Type: Positive | Priority: High]\nTitle: Execute Buy trade with sufficient buying power\n\n\u25b6 Start URL:    http://localhost:8080/investments\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"fund_symbol\": \"VTSAX\",\n  \"quantity\": \"10\",\n  \"funding_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  User is logged in as Investor (seeded user: admin / admin@parabank.com); funding account has sufficient buying power to cover the trade.\n\nSteps to Execute:\n  1. Navigate to Investments page (http://localhost:8080/investments)\n  2. Select 'Buy' from Action\n  3. Enter 'VTSAX' in Fund Symbol and select 'Vanguard Total Stock Market Index (VTSAX)' from the autocomplete\n  4. Enter quantity '10' in Quantity field\n  5. Select funding account '****5002 (Savings, $25,678.90)' from Funding Account dropdown\n  6. Click 'Execute Trade'\n\nExpected Result:\n  \"Trade executed successfully.\" message appears with an order ID; Portfolio Snapshot reflects updated holding quantity and market value for VTSAX (holding shares increase by 10 and market value updates accordingly).\n\nNotes from prior verification:\n  All UI elements required for a Buy were present during verification. Concrete values chosen from seeded investment funds and accounts: VTSAX and Savings account ****5002. No step rewrites required.",
+  "expected_outcome": "\"Trade executed successfully.\" message appears with an order ID; Portfolio Snapshot reflects updated holding quantity and market value for VTSAX (holding shares increase by 10 and market value updates accordingly).",
+  "tc_metadata": {
+    "tc_id": "TC-001",
+    "module": "Investments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/investments, executed all 6 step(s) for 'Execute Buy trade with sufficient buying power'. Outcome validation confirmed: \"Trade executed successfully.\" message appears with an order ID; Portfolio Snapshot reflects updated holding quantity and market value for VTSAX (holding shares increase by 10 and market value updates accordingly).",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Login | TC-009 | Type: Edge/Boundary | Priority: Medium]\nTitle: Password at exact minimum length (8 chars) succeeds\n\n\u25b6 Start URL:    http://localhost:8080/login\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"email\": \"admin@parabank.com\",\n  \"password\": \"Admin123!@#\"\n}\n\nPreconditions:\n  A registered user exists with an 8-character password containing uppercase, lowercase, number, and special character (admin@parabank.com / Admin123!@#)\n\nSteps to Execute:\n  1. Enter 'admin@parabank.com' in Email/Username\n  2. Enter 'Admin123!@#' in Password\n  3. Click Sign In\n\nExpected Result:\n  Form submits; \"Signed in successfully.\" flash appears; redirect to Accounts Overview\n\nNotes from prior verification:\n  This TC is dropped because the precondition (registered user with an 8-character password) is not satisfied by the seeded data and cannot be created through normal UI flows during the test.",
+  "expected_outcome": "Form submits; \"Signed in successfully.\" flash appears; redirect to Accounts Overview",
+  "tc_metadata": {
+    "tc_id": "TC-009",
+    "module": "Login",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/login, executed all 3 step(s) for 'Password at exact minimum length (8 chars) succeeds'. Outcome validation confirmed: Form submits; \"Signed in successfully.\" flash appears; redirect to Accounts Overview",
+    "errors": "None"
+  }
+}

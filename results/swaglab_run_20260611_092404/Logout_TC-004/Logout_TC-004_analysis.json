@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Logout | TC-004 | Type: Negative | Priority: High]\nTitle: Direct access to logout endpoint when not authenticated is blocked\n\n\u25b6 Start URL:    https://www.saucedemo.com/logout\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"logout_url\": \"https://www.saucedemo.com/logout\"\n}\n\nPreconditions:\n  User is not logged in (on the Login page).\n\nSteps to Execute:\n  1. In the browser address bar, navigate directly to https://www.saucedemo.com/logout\n\nExpected Result:\n  No logout session-change occurs (there is no active session); the browser is redirected to the Login page; protected content is not displayed; user remains unauthenticated\n\nNotes from prior verification:\n  Verification snapshot matched the Login page. This step is a direct navigation and does not reference missing UI elements.",
+  "expected_outcome": "No logout session-change occurs (there is no active session); the browser is redirected to the Login page; protected content is not displayed; user remains unauthenticated",
+  "tc_metadata": {
+    "tc_id": "TC-004",
+    "module": "Logout",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/logout, executed all 1 step(s) for 'Direct access to logout endpoint when not authenticated is blocked'. Outcome validation confirmed: No logout session-change occurs (there is no active session); the browser is redirected to the Login page; protected content is not displayed; user remains unauthenticated",
+    "errors": "None"
+  }
+}

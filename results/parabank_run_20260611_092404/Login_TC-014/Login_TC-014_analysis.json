@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Login | TC-014 | Type: Edge/State | Priority: Medium]\nTitle: Failed login clears Password but preserves Email/Username\n\n\u25b6 Start URL:    http://localhost:8080/login\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"email\": \"admin@parabank.com\",\n  \"password\": \"WrongPass1!\"\n}\n\nPreconditions:\n  A registered user exists; entered password will be incorrect (admin@parabank.com / WrongPass1!)\n\nSteps to Execute:\n  1. Enter 'admin@parabank.com' in Email/Username\n  2. Enter 'WrongPass1!' in Password\n  3. Click Sign In\n\nExpected Result:\n  Error \"Incorrect email or password.\" is shown; Password field is cleared; Email/Username retains the entered value; form allows retry\n\nNotes from prior verification:\n  Placeholders filled: using the seeded user's email and an incorrect password to exercise failed-login behavior. DOM verification confirmed required inputs and submit button exist; post-failure state must be validated at runtime.",
+  "expected_outcome": "Error \"Incorrect email or password.\" is shown; Password field is cleared; Email/Username retains the entered value; form allows retry",
+  "tc_metadata": {
+    "tc_id": "TC-014",
+    "module": "Login",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/State",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/login, executed all 3 step(s) for 'Failed login clears Password but preserves Email/Username'. Outcome validation confirmed: Error \"Incorrect email or password.\" is shown; Password field is cleared; Email/Username retains the entered value; form allows retry",
+    "errors": "None"
+  }
+}

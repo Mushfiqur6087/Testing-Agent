@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Update Contact Info | TC-012 | Type: Edge/Input | Priority: Medium]\nTitle: Entering only whitespace into Last Name is treated as missing\n\n\u25b6 Start URL:    http://localhost:8080/profile\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"last_name_whitespace\": \"   \"\n}\n\nPreconditions:\n  User is on the Customer Profile page with the form pre-filled\n\nSteps to Execute:\n  1. Clear Last Name and enter only whitespace characters (three spaces)\n  2. Click Update Profile\n\nExpected Result:\n  Submission is blocked; Last Name is highlighted with inline error indicating the field must be present (whitespace-only counts as empty)\n\nNotes from prior verification:\n  Whitespace entry specified explicitly as three spaces. The Last Name field and Update Profile button exist per DOM check; the validation behavior (whitespace-only treated as empty) is runtime and not verifiable from the static DOM.",
+  "expected_outcome": "Submission is blocked; Last Name is highlighted with inline error indicating the field must be present (whitespace-only counts as empty)",
+  "tc_metadata": {
+    "tc_id": "TC-012",
+    "module": "Update Contact Info",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Input",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/profile, executed all 2 step(s) for 'Entering only whitespace into Last Name is treated as missing'. Outcome validation confirmed: Submission is blocked; Last Name is highlighted with inline error indicating the field must be present (whitespace-only counts as empty)",
+    "errors": "None"
+  }
+}

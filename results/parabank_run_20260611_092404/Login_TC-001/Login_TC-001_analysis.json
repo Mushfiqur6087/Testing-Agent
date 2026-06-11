@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Login | TC-001 | Type: Positive | Priority: High]\nTitle: Successful sign-in with valid credentials\n\n\u25b6 Start URL:    http://localhost:8080/login\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"email\": \"admin@parabank.com\",\n  \"password\": \"Admin123!@#\"\n}\n\nPreconditions:\n  User is unauthenticated on the Login page; a registered user exists with admin@parabank.com and Admin123!@#\n\nSteps to Execute:\n  1. Enter 'admin@parabank.com' in Email/Username field\n  2. Enter 'Admin123!@#' in Password field\n  3. Click Sign In\n\nExpected Result:\n  Flash message \"Signed in successfully.\" appears; user is redirected to Accounts Overview page\n\nNotes from prior verification:\n  Placeholders filled with the seeded user's email and password. Interactive elements verified present in DOM.",
+  "expected_outcome": "Flash message \"Signed in successfully.\" appears; user is redirected to Accounts Overview page",
+  "tc_metadata": {
+    "tc_id": "TC-001",
+    "module": "Login",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/login, executed all 3 step(s) for 'Successful sign-in with valid credentials'. Outcome validation confirmed: Flash message \"Signed in successfully.\" appears; user is redirected to Accounts Overview page",
+    "errors": "None"
+  }
+}

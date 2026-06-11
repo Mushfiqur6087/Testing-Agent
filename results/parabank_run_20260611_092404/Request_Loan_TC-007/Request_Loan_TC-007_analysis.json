@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Request Loan | TC-007 | Type: Negative | Priority: High]\nTitle: Loan amount below type-specific minimum is rejected\n\n\u25b6 Start URL:    http://localhost:8080/request-loan\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"loan_type\": \"Personal\",\n  \"loan_amount\": 500,\n  \"down_payment\": 60\n}\n\nPreconditions:\n  User is on the Request Loan page\n\nSteps to Execute:\n  1. Select 'Personal' loan type\n  2. Enter '500' in Loan Amount\n  3. Enter '60' in Down Payment\n  4. Click 'Request Loan'\n\nExpected Result:\n  Inline error on Loan Amount: \"must be between 1000 and 50000\"; form does not submit; no loan is created\n\nNotes from prior verification:\n  Used a loan amount of 500 to exercise the below-minimum validation. Inline validation behavior and non-submission are dynamic and were not verified in the static DOM snapshot.",
+  "expected_outcome": "Inline error on Loan Amount: \"must be between 1000 and 50000\"; form does not submit; no loan is created",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Request Loan",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/request-loan, executed all 4 step(s) for 'Loan amount below type-specific minimum is rejected'. Outcome validation confirmed: Inline error on Loan Amount: \"must be between 1000 and 50000\"; form does not submit; no loan is created",
+    "errors": "None"
+  }
+}

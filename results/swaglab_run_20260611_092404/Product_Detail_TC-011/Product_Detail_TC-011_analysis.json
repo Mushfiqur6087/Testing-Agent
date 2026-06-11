@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Detail | TC-011 | Type: Edge/Interaction | Priority: Medium]\nTitle: Navigate Back to products immediately after clicking Add to cart persists the add (Edge/Interaction | Medium)\n\n\u25b6 Start URL:    https://www.saucedemo.com/product-detail.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"initial_product_state\": \"InCart\"\n}\n\nPreconditions:\n  User is on the Product Detail page for a NotInCart product; Shopping Cart does not contain this product. Verification snapshot shows product initially InCart (Remove button present).\n\nSteps to Execute:\n  1. Verify the page shows the Remove button (product currently InCart)\n  2. Click the Remove button to set the product to NotInCart\n  3. Click the Add to cart button\n  4. Immediately click the Back to products link before waiting for UI confirmation\n  5. From the Product Inventory, navigate back to the same Product Detail page\n\nExpected Result:\n  Navigation to Product Inventory succeeds; returning to Product Detail shows the product as InCart (Remove button visible); Shopping Cart contains exactly one instance.\n\nNotes from prior verification:\n  Step 1 was rewritten because Add to cart was not present in the verification snapshot; the product was InCart. To perform the intended flow the test now removes the product first, then adds it and immediately navigates back. Also note the verification snapshot could not fully validate multi-step navigation back to the same detail page; this remains a state-dependent check.",
+  "expected_outcome": "Navigation to Product Inventory succeeds; returning to Product Detail shows the product as InCart (Remove button visible); Shopping Cart contains exactly one instance.",
+  "tc_metadata": {
+    "tc_id": "TC-011",
+    "module": "Product Detail",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/product-detail.html, executed all 5 step(s) for 'Navigate Back to products immediately after clicking Add to cart persists the add (Edge/Interaction | Medium)'. Outcome validation confirmed: Navigation to Product Inventory succeeds; returning to Product Detail shows the product as InCart (Remove button visible); Shopping Cart contains exactly one instance.",
+    "errors": "None"
+  }
+}

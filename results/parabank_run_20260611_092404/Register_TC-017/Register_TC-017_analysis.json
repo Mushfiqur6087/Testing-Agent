@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Register | TC-017 | Type: Edge/Boundary | Priority: Medium]\nTitle: 10-digit phone auto-formats to (123) 456-7890 and registration succeeds\n\n\u25b6 Start URL:    http://localhost:8080/register\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"street_address\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zip\": \"62701\",\n  \"phone_raw\": \"5551234567\",\n  \"phone_formatted\": \"(555) 123-4567\",\n  \"ssn\": \"***-**-1234\",\n  \"username\": \"admin@parabank.com\",\n  \"password\": \"Admin123!@#\"\n}\n\nPreconditions:\n  Registration page is loaded\n\nSteps to Execute:\n  1. Enter 'John' in First Name field\n  2. Enter 'Doe' in Last Name field\n  3. Enter '123 Main Street' in Street Address field\n  4. Enter 'Springfield' in City field\n  5. Select 'IL' from State dropdown\n  6. Enter '62701' in ZIP Code field\n  7. Enter raw digits '5551234567' (no punctuation) in Phone Number field\n  8. Observe the Phone Number field updates to '(555) 123-4567'\n  9. Enter '***-**-1234' in SSN field\n  10. Enter 'admin@parabank.com' in Username/Email field\n  11. Enter 'Admin123!@#' in Password field\n  12. Enter 'Admin123!@#' in Confirm Password field\n  13. Click Register\n\nExpected Result:\n  Phone Number auto-formats to '(555) 123-4567'; form submits; \"Account created successfully \u2014 please sign in\" is shown; redirect to Login\n\nNotes from prior verification:\n  Used the seeded phone digits (5551234567) and updated the expected formatted value to match that seed ((555) 123-4567). The DOM check confirms the phone input accepts raw digits; the auto-format and submit are runtime behaviors not verified in the static snapshot.",
+  "expected_outcome": "Phone Number auto-formats to '(555) 123-4567'; form submits; \"Account created successfully \u2014 please sign in\" is shown; redirect to Login",
+  "tc_metadata": {
+    "tc_id": "TC-017",
+    "module": "Register",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/register, executed all 13 step(s) for '10-digit phone auto-formats to (123) 456-7890 and registration succeeds'. Outcome validation confirmed: Phone Number auto-formats to '(555) 123-4567'; form submits; \"Account created successfully \u2014 please sign in\" is shown; redirect to Login",
+    "errors": "None"
+  }
+}

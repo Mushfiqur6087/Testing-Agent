@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Request Loan | TC-002 | Type: Positive | Priority: High]\nTitle: Request Auto Loan with collateral and approval\n\n\u25b6 Start URL:    http://localhost:8080/request-loan\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"loan_type\": \"Auto\",\n  \"loan_amount\": 40000,\n  \"down_payment\": 5000,\n  \"collateral_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  Credit engine configured for approval; collateral account balance \u2265 20% of loan amount\n\nSteps to Execute:\n  1. Navigate to Request Loan page\n  2. Select 'Auto' loan type\n  3. Enter '40000' in Loan Amount\n  4. Enter '5000' in Down Payment\n  5. Select collateral account '****5002 (Savings, $25,678.90)'\n  6. Click 'Request Loan'\n\nExpected Result:\n  \"Loan approved and created successfully!\" with account details; Loan Details panel shows Loan Type, Amount, Down Payment, and Collateral Account\n\nNotes from prior verification:\n  Selected a loan amount of 40000 and collateral account ****5002 (Savings, $25,678.90) so the collateral balance (25,678.90) is \u2265 20% of the loan (20% of 40,000 = 8,000). Credit engine and approval behavior are dynamic and were not validated by the static DOM snapshot.",
+  "expected_outcome": "\"Loan approved and created successfully!\" with account details; Loan Details panel shows Loan Type, Amount, Down Payment, and Collateral Account",
+  "tc_metadata": {
+    "tc_id": "TC-002",
+    "module": "Request Loan",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/request-loan, executed all 6 step(s) for 'Request Auto Loan with collateral and approval'. Outcome validation confirmed: \"Loan approved and created successfully!\" with account details; Loan Details panel shows Loan Type, Amount, Down Payment, and Collateral Account",
+    "errors": "None"
+  }
+}

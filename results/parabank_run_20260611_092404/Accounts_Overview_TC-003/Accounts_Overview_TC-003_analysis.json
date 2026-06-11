@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Accounts Overview | TC-003 | Type: Positive | Priority: High]\nTitle: Account numbers are masked showing only last four digits\n\n\u25b6 Start URL:    http://localhost:8080/accounts-overview\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"last4\": \"5001\",\n  \"masked_account\": \"****5001\",\n  \"username\": \"admin\",\n  \"password\": \"Admin123!@#\"\n}\n\nPreconditions:\n  User is logged in; at least one account exists with known last 4 digits (seed includes account ****5001).\n\nSteps to Execute:\n  1. Navigate to Accounts Overview (http://localhost:8080/accounts-overview)\n  2. Inspect the Account Number column for each row\n\nExpected Result:\n  Each Account Number is displayed as '****5001' (masked), showing only the last 4 digits.\n\nNotes from prior verification:\n  No changes required. Verification confirms account numbers are masked in the DOM; used the Checking account last-4 (5001) from seed data for concrete expectation.",
+  "expected_outcome": "Each Account Number is displayed as '****5001' (masked), showing only the last 4 digits.",
+  "tc_metadata": {
+    "tc_id": "TC-003",
+    "module": "Accounts Overview",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/accounts-overview, executed all 2 step(s) for 'Account numbers are masked showing only last four digits'. Outcome validation confirmed: Each Account Number is displayed as '****5001' (masked), showing only the last 4 digits.",
+    "errors": "None"
+  }
+}

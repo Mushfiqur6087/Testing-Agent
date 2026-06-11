@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Security Settings | TC-006 | Type: Negative | Priority: High]\nTitle: Incorrect current password prevents password change\n\n\u25b6 Start URL:    http://localhost:8080/security-settings\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"admin\",\n  \"incorrect_current_password\": \"WrongPassword!1\",\n  \"new_password\": \"AdminNewPass!1\"\n}\n\nPreconditions:\n  User is on Security Settings page and signed in as admin.\n\nSteps to Execute:\n  1. Enter 'WrongPassword!1' in Current Password\n  2. Enter 'AdminNewPass!1' in New Password (meets policy)\n  3. Enter 'AdminNewPass!1' in Confirm New Password\n  4. Click Change Password\n\nExpected Result:\n  Inline error on Current Password: \"current password is incorrect\"; form does not submit; credentials are not updated\n\nNotes from prior verification:\n  Placeholders replaced with concrete values. The verification snapshot confirmed the form fields and submit control exist; the expected inline error is a runtime behavior validated at test execution.",
+  "expected_outcome": "Inline error on Current Password: \"current password is incorrect\"; form does not submit; credentials are not updated",
+  "tc_metadata": {
+    "tc_id": "TC-006",
+    "module": "Security Settings",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/security-settings, executed all 4 step(s) for 'Incorrect current password prevents password change'. Outcome validation confirmed: Inline error on Current Password: \"current password is incorrect\"; form does not submit; credentials are not updated",
+    "errors": "None"
+  }
+}

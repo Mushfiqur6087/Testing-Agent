@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Information | TC-011 | Type: Edge/Boundary | Priority: Medium]\nTitle: Whitespace-only in First Name is treated as empty and blocks submission\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-one.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User is on the Checkout \u2013 Information form\n\nSteps to Execute:\n  1. Enter a whitespace-only value (spaces or tabs) in the First Name field\n  2. Enter a valid value in the Last Name field\n  3. Enter a valid value in the Zip/Postal Code field\n  4. Click **Continue**\n\nExpected Result:\n  Submission is blocked; an error banner with the exact text \"Error: First Name is required\" is displayed; the user remains on Checkout \u2013 Information\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "Submission is blocked; an error banner with the exact text \"Error: First Name is required\" is displayed; the user remains on Checkout \u2013 Information",
+  "tc_metadata": {
+    "tc_id": "TC-011",
+    "module": "Checkout - Information",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-one.html, executed all 4 step(s) for 'Whitespace-only in First Name is treated as empty and blocks submission'. Outcome validation confirmed: Submission is blocked; an error banner with the exact text \"Error: First Name is required\" is displayed; the user remains on Checkout \u2013 Information",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Manage Cards | TC-014 | Type: Edge/Boundary | Priority: Medium]\nTitle: Travel Notice where Start Date equals End Date is accepted\n\n\u25b6 Start URL:    http://localhost:8080/manage-cards\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!@#\",\n  \"card_last4\": \"5001\",\n  \"date_D\": \"2024-06-05\"\n}\n\nPreconditions:\n  User is logged in; an existing card is selected in Card Controls (use Debit card ending 5001, card id card001).\n\nSteps to Execute:\n  1. Navigate to http://localhost:8080/manage-cards and open Card Controls for card ending in 5001\n  2. Enter 'admin' in the Username field\n  3. Enter 'Admin123!@#' in the Password field\n  4. Click 'Sign In'\n  5. Click 'Add Travel Notice' (or 'New Travel Notice')\n  6. Enter '2024-06-05' in the Start Date field\n  7. Enter '2024-06-05' in the End Date field (same date D in both fields)\n  8. Click 'Update Controls'\n\nExpected Result:\n  \"Card controls updated successfully.\" is shown; the travel notice entry reflects Start Date = End Date = 2024-06-05.\n\nNotes from prior verification:\n  Steps populated with concrete values and an existing card (****5001). DOM snapshot shows required inputs/buttons; acceptance of this edge-case must be validated during execution.",
+  "expected_outcome": "\"Card controls updated successfully.\" is shown; the travel notice entry reflects Start Date = End Date = 2024-06-05.",
+  "tc_metadata": {
+    "tc_id": "TC-014",
+    "module": "Manage Cards",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/manage-cards, executed all 8 step(s) for 'Travel Notice where Start Date equals End Date is accepted'. Outcome validation confirmed: \"Card controls updated successfully.\" is shown; the travel notice entry reflects Start Date = End Date = 2024-06-05.",
+    "errors": "None"
+  }
+}

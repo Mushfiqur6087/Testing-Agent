@@ -34,6 +34,15 @@ class Agent:
         # Carries a summary of previously completed test cases so the LLM
         # knows what has already been validated in this run.
         self.prior_context: str = ""
+
+        # Enriched test case metadata (set per-task by execute_plan)
+        # Contains: direct_link, requires_auth, test_data, preconditions,
+        # steps, expected_result, verdict, notes, module, tc_id, etc.
+        self._task_metadata: Dict[str, Any] = {}
+
+        # Before-state snapshot captured at the start of each test case
+        # for ExecutionOutcomeValidator before/after comparison
+        self._before_state: Dict[str, Any] = {}
         
         # Create debug log file if debug is enabled
         if self.debug:
@@ -304,6 +313,21 @@ Interactive Elements:
                 
         return True
         
+    def _capture_page_state(self) -> Dict[str, Any]:
+        """
+        Capture a lightweight page state snapshot via the Tools.capture_state() method.
+        Used to record the 'before' state at TC start and passed to the
+        ExecutionOutcomeValidator when tools() is called.
+        """
+        if not self.browser_controller:
+            return {}
+        try:
+            return self.browser_controller.tools_instance.capture_state(
+                self.browser_controller.browser_context
+            )
+        except Exception:
+            return {}
+
     def execute_action(self, action_item: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a single action using the browser controller."""
         if not self.browser_controller:
@@ -362,21 +386,42 @@ Interactive Elements:
                 
             elif action_name == "tools":
                 reason = action_params.get("reason", "No reason provided")
-                result = self.browser_controller.execute_command("tools", reason)
-                
-                # Save tool output to memory with request reason
+
+                # Pass expected_result and before_state to the ExecutionOutcomeValidator
+                expected_result = self._task_metadata.get("expected_result", "")
+                result = self.browser_controller.execute_command(
+                    "tools", reason,
+                    expected_result=expected_result,
+                    before_state=self._before_state,
+                )
+
+                # Persist outcome validation details to enhanced memory
+                data = result.get("data", {})
                 tool_output = {
-                    "message": result.get("message", f"Tools action executed with reason: {reason}"),
-                    "findings": result.get("data", {}).get("findings", ""),
-                    "validation_passed": result.get("data", {}).get("validation_passed", None)
+                    "message": result.get("message", f"Outcome validation: {reason}"),
+                    "findings": data.get("findings", ""),
+                    "validation_passed": data.get("validation_passed", None)
                 }
                 self.memory.save_tool_output(
                     tool_output=tool_output,
                     step_number=len(self.previous_steps) + 1,
                     request_reason=reason
                 )
-                
-                return {"success": result.get("success", True), "message": result.get("message", f"Tools action executed with reason: {reason}"), "data": result.get("data", {})}
+                # Also save to the dedicated outcome_validations store
+                self.memory.save_outcome_validation(
+                    step_number=len(self.previous_steps) + 1,
+                    validation_passed=bool(data.get("validation_passed", False)),
+                    state_changed=bool(data.get("state_changed", False)),
+                    findings=data.get("findings", ""),
+                    expected_result=expected_result,
+                    message=result.get("message", ""),
+                )
+
+                return {
+                    "success": result.get("success", True),
+                    "message": result.get("message", f"Outcome validation: {reason}"),
+                    "data": data,
+                }
                 
             elif action_name == "end":
                 reason = action_params.get("reason", "Session ended by user request")
@@ -438,16 +483,30 @@ Interactive Elements:
             self.recent_alerts = []
             
             
-    def execute_plan(self, user_goal: str) -> List[Dict[str, Any]]:
+    def execute_plan(self, user_goal: str,
+                     task_metadata: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """
         Execute a complete plan to achieve the user goal.
         Returns a list of all actions taken and their results.
         """
         if not self.browser_controller:
             return [{"error": "No browser controller available", "success": False}]
-            
+
+        # Store task metadata for use by ExecutionOutcomeValidator
+        if task_metadata:
+            self._task_metadata = task_metadata
+
+        # Capture the 'before' state at TC start (before any step runs)
+        self._before_state = self._capture_page_state()
+        if self._before_state and self._before_state.get("url"):
+            self.memory.save_state_snapshot(
+                step_number=0,
+                snapshot_type="before",
+                state=self._before_state,
+            )
+
         execution_log = []
-        
+
         while len(self.previous_steps) < self.max_actions:
             # Refresh browser state
             self.refresh_browser_state()
@@ -527,6 +586,8 @@ Interactive Elements:
         self.valid_actions = ""
         self.session_start_time = datetime.now()
         self.prior_context = ""
+        self._task_metadata = {}
+        self._before_state = {}
         self.memory = EnhancedMemory(debug_file_path=self.debug_file)
 
     def prepare_for_next_task(self, test_case_name: str, prior_context: str = "") -> None:
@@ -543,6 +604,8 @@ Interactive Elements:
         self.previous_steps = []
         self.session_start_time = datetime.now()
         self.recent_alerts = []
+        self._task_metadata = {}
+        self._before_state = {}
         self.memory = EnhancedMemory(debug_file_path=self.debug_file)
         self.prior_context = prior_context
                     

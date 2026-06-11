@@ -148,24 +148,32 @@ class BrowserController:
         except Exception as e:
             return False
 
-    def tools(self, reason: str) -> Dict[str, Any]:
+    def tools(self, reason: str, expected_result: str = "",
+              before_state: dict = None) -> Dict[str, Any]:
         """
-        Execute tools action using the Tools class.
-        
+        Execute the ExecutionOutcomeValidator via the Tools class.
+
         Args:
-            reason: The reason why tools action is needed
-            
+            reason:          The agent's description of why validation is needed
+            expected_result: The expected_result from the enriched test case
+            before_state:    State snapshot captured at TC start for before/after diff
+
         Returns:
-            Dictionary indicating success and any relevant information
+            Dictionary with validation outcome and findings
         """
         try:
-            # Use the Tools class to execute the action, passing the LLM client
-            result = self.tools_instance.execute(reason, self.browser_context, self.llm_client)
+            result = self.tools_instance.execute(
+                reason,
+                self.browser_context,
+                self.llm_client,
+                expected_result=expected_result,
+                before_state=before_state,
+            )
             return result
         except Exception as e:
             return {
                 "success": False,
-                "message": f"Tools action failed: {e}",
+                "message": f"Outcome validation failed: {e}",
                 "data": {}
             }
 

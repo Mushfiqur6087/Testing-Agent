@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Support Center | TC-016 | Type: Edge/Input | Priority: Low]\nTitle: Attachment with double extension (allowed + disallowed) is blocked\n\n\u25b6 Start URL:    http://localhost:8080/support-center\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"subject\": \"Internet Provider\",\n  \"message_body\": \"Grocery Store - Walmart\",\n  \"attachment_filename\": \"document.pdf.exe\"\n}\n\nPreconditions:\n  User is on the Support Center page; Secure Message form is visible\n\nSteps to Execute:\n  1. Enter 'Internet Provider' in Subject and 'Grocery Store - Walmart' in Message Body\n  2. Select a file with a double-extension filename (e.g., document.pdf.exe)\n  3. Click Send Message\n\nExpected Result:\n  Submission is blocked; Attachment control displays inline error that the file type is not allowed; no ticket is created\n\nNotes from prior verification:\n  Filled subject with payee name 'Internet Provider' (payee003) and message body with transaction description 'Grocery Store - Walmart' (txn006). Attachment filename used is the example 'document.pdf.exe'. Verification notes: the attachment input is present in the DOM snapshot but its file-selection and server-side validation behavior are dynamic and cannot be fully verified from static DOM.",
+  "expected_outcome": "Submission is blocked; Attachment control displays inline error that the file type is not allowed; no ticket is created",
+  "tc_metadata": {
+    "tc_id": "TC-016",
+    "module": "Support Center",
+    "verdict": "valid",
+    "priority": "Low",
+    "type": "Edge/Input",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/support-center, executed all 3 step(s) for 'Attachment with double extension (allowed + disallowed) is blocked'. Outcome validation confirmed: Submission is blocked; Attachment control displays inline error that the file type is not allowed; no ticket is created",
+    "errors": "None"
+  }
+}

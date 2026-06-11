@@ -1,4 +1,3 @@
-
 import os
 import sys
 
@@ -14,18 +13,27 @@ from src.controller.browser_controller import BrowserController
 
 class TestAgent:
     """
-    A persistent test agent that shares one browser session and one LLM client
+    Persistent test agent that shares one browser session and one LLM client
     across all test cases in a run.
 
-    Lifecycle:
-      1. initialize()                          — launch browser once
-      2. execute_plan(goal, outcome, name)     — run test case N
-         prepare_for_next_task(name, ctx)      — (called internally between cases)
-      3. execute_plan(goal, outcome, name)     — run test case N+1  ...
-      4. cleanup()                             — close browser once at the end
+    Multi-agent pipeline lifecycle:
+      1. initialize()                                 — launch browser once
+      2. execute_plan(goal, outcome, name, metadata)  — run test case N
+         prepare_for_next_task(name, ctx)             — (called between cases)
+      3. execute_plan(...)                            — run test case N+1 …
+      4. cleanup()                                    — close browser once at end
+
+    The pipeline within execute_plan():
+      ① InteractionAgent executes steps from the structured goal block
+         – direct_link + requires_auth + test_data guide navigation
+         – Indexed DOM actions drive step execution
+      ② ExecutionOutcomeValidator (tools) captures before/after state and
+         validates whether the expected_result was achieved
+      ③ TestResultAnalyzer produces the final PASSED/FAILED verdict using
+         outcome validations + state snapshots + enriched metadata
     """
 
-    def __init__(self, model: str = "gemini-2.0-flash", provider: str = "gemini",
+    def __init__(self, model: str = "openai/gpt-5-mini", provider: str = None,
                  max_actions: int = 10, debug: bool = False, headless: bool = True,
                  test_case_name: str = "test_case",
                  analyzer_model: str = None, analyzer_provider: str = None):
@@ -35,7 +43,7 @@ class TestAgent:
         self.debug = debug
         self.headless = headless
         self.test_case_name = test_case_name
-        # Optional separate model for post-task analysis (cheaper/faster)
+        # Analyzer uses same model as main agent (vision-capable, no cheaper fallback)
         self.analyzer_model = analyzer_model or model
         self.analyzer_provider = analyzer_provider or provider
 
@@ -57,7 +65,7 @@ class TestAgent:
         try:
             self.llm = LLMClient(model=self.model, provider=self.provider)
 
-            # Separate (optionally cheaper) LLM for post-task analysis
+            # Analyzer uses the same model — vision-capable, consistent with agent
             if self.analyzer_model != self.model or self.analyzer_provider != self.provider:
                 analyzer_llm = LLMClient(model=self.analyzer_model, provider=self.analyzer_provider)
             else:
@@ -108,21 +116,27 @@ class TestAgent:
         Soft-reset the agent between test cases.
         - Browser stays open on the current page
         - Debug log is redirected to the new test case's subfolder
-        - Per-task step history and memory are cleared
+        - Per-task step history, memory, task_metadata, and before_state are cleared
         - Prior test results are injected into the LLM prompt as context
         """
         self.test_case_name = test_case_name
         self.agent.prepare_for_next_task(test_case_name, prior_context)
 
-    def execute_plan(self, user_goal: str, expected_outcome: str,
-                     test_case_name: str = None) -> dict:
+    def execute_plan(
+        self,
+        user_goal: str,
+        expected_outcome: str,
+        test_case_name: str = None,
+        task_metadata: dict = None,
+    ) -> dict:
         """
-        Execute the agent plan for one test case.
+        Execute the multi-agent pipeline for one test case.
 
         Args:
-            user_goal:        Task description sent to the LLM
-            expected_outcome: Expected result (used by the analyzer)
+            user_goal:        Structured goal block (built from enriched TC fields)
+            expected_outcome: The expected_result from the enriched test case
             test_case_name:   Name used for log file routing
+            task_metadata:    Full enriched test case dict (all fields)
 
         Returns:
             Analysis dict from TestResultAnalyzer
@@ -133,8 +147,12 @@ class TestAgent:
         name = test_case_name or self.test_case_name
 
         try:
-            self.agent.execute_plan(user_goal)
+            # ① InteractionAgent executes steps
+            #    task_metadata is stored on the agent so execute_action('tools') can
+            #    read expected_result and before_state automatically
+            self.agent.execute_plan(user_goal, task_metadata=task_metadata)
 
+            # ② TestResultAnalyzer produces PASSED/FAILED verdict
             analysis: dict = {}
             if hasattr(self.agent, 'memory') and self.agent.memory:
                 analysis = self.test_analyzer.analyze_test_execution(
@@ -142,6 +160,7 @@ class TestAgent:
                     original_test_goal=user_goal,
                     expected_outcome=expected_outcome,
                     test_case_name=name,
+                    task_metadata=task_metadata,
                 )
             return analysis
 

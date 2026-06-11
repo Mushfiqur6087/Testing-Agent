@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Request Loan | TC-017 | Type: Edge/Boundary | Priority: Medium]\nTitle: Down payment exactly equals 10% of loan amount passes validation\n\n\u25b6 Start URL:    http://localhost:8080/request-loan\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"loan_type\": \"Home\",\n  \"loan_amount\": 250000,\n  \"down_payment\": 25000\n}\n\nPreconditions:\n  User is on Request Loan page\n\nSteps to Execute:\n  1. Select 'Home' loan type\n  2. Enter '250000' in Loan Amount\n  3. Enter '25000' in Down Payment\n  4. Click 'Request Loan'\n\nExpected Result:\n  No validation error on Down Payment; form proceeds to credit engine evaluation\n\nNotes from prior verification:\n  Down payment equals exactly 10% of the loan (25,000 of 250,000) to exercise the boundary. Exact approval outcome is determined by the credit engine and was not observable in the static DOM.",
+  "expected_outcome": "No validation error on Down Payment; form proceeds to credit engine evaluation",
+  "tc_metadata": {
+    "tc_id": "TC-017",
+    "module": "Request Loan",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/request-loan, executed all 4 step(s) for 'Down payment exactly equals 10% of loan amount passes validation'. Outcome validation confirmed: No validation error on Down Payment; form proceeds to credit engine evaluation",
+    "errors": "None"
+  }
+}

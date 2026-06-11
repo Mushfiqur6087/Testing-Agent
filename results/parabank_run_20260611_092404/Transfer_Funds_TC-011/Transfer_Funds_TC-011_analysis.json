@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Transfer Funds | TC-011 | Type: Negative | Priority: High]\nTitle: External account number and confirmation do not match\n\n\u25b6 Start URL:    http://localhost:8080/transfer-funds\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"amount\": \"1500.00\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\",\n  \"external_account_number_A\": \"GAS987654321\",\n  \"external_account_number_B\": \"INT555444333\"\n}\n\nPreconditions:\n  User is on Transfer Funds page and able to select External Account\n\nSteps to Execute:\n  1. Select the 'External Account' radio option\n  2. Enter '1500.00' in the Amount field and select '****5001 (Checking, $5,847.52)' as the Source Account\n  3. Enter 'GAS987654321' in External Account Number\n  4. Enter 'INT555444333' in Confirm External Account Number\n  5. Click 'Transfer'\n\nExpected Result:\n  Error \"Account numbers do not match.\" is displayed; form does not submit; no transaction is created\n\nNotes from prior verification:\n  External Account Number and Confirm fields are conditional and appear after selecting the External Account radio; used two different seeded Payees account numbers to simulate mismatch.",
+  "expected_outcome": "Error \"Account numbers do not match.\" is displayed; form does not submit; no transaction is created",
+  "tc_metadata": {
+    "tc_id": "TC-011",
+    "module": "Transfer Funds",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/transfer-funds, executed all 5 step(s) for 'External account number and confirmation do not match'. Outcome validation confirmed: Error \"Account numbers do not match.\" is displayed; form does not submit; no transaction is created",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Inventory | TC-010 | Type: Edge/Interaction | Priority: Low]\nTitle: Rapidly adding multiple distinct products reflects correct badge count\n\n\u25b6 Start URL:    https://www.saucedemo.com/inventory\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"product_a\": \"Sauce Labs Backpack\",\n  \"product_b\": \"Sauce Labs Bike Light\",\n  \"product_c\": \"Sauce Labs Bolt T-Shirt\"\n}\n\nPreconditions:\n  User is logged in; products A, B, and C are all in NotInCart state; cart badge shows current count N\n\nSteps to Execute:\n  1. Click Add to cart for product A (Sauce Labs Backpack)\n  2. Immediately click Add to cart for product B (Sauce Labs Bike Light)\n  3. Immediately click Add to cart for product C (Sauce Labs Bolt T-Shirt)\n\nExpected Result:\n  Each add action succeeds exactly once; cart badge increments by exactly 3 and shows N+3; each of products A, B, and C displays the Remove button; no missed or duplicate increments occur\n\nNotes from prior verification:\n  DOM snapshot contains multiple Add to cart buttons; runtime assertion required to validate correct badge increments under rapid interactions.",
+  "expected_outcome": "Each add action succeeds exactly once; cart badge increments by exactly 3 and shows N+3; each of products A, B, and C displays the Remove button; no missed or duplicate increments occur",
+  "tc_metadata": {
+    "tc_id": "TC-010",
+    "module": "Product Inventory",
+    "verdict": "valid",
+    "priority": "Low",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/inventory, executed all 3 step(s) for 'Rapidly adding multiple distinct products reflects correct badge count'. Outcome validation confirmed: Each add action succeeds exactly once; cart badge increments by exactly 3 and shows N+3; each of products A, B, and C displays the Remove button; no missed or duplicate increments occur",
+    "errors": "None"
+  }
+}

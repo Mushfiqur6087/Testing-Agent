@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Manage Cards | TC-008 | Type: Negative | Priority: High]\nTitle: Selected account is not in good standing\n\n\u25b6 Start URL:    http://localhost:8080/manage-cards\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!@#\",\n  \"card_type\": \"Credit\",\n  \"linked_account\": \"****5003 (Credit Card, -$1,534.67)\",\n  \"shipping_address_line1\": \"123 Main Street\",\n  \"shipping_city\": \"Springfield\",\n  \"shipping_state\": \"IL\",\n  \"shipping_zip\": \"62701\",\n  \"shipping_phone\": \"(555) 123-4567\"\n}\n\nPreconditions:\n  An account that is NOT in good standing exists and is selectable (use Credit Card account 12345003 which has a negative balance of -$1,534.67). User is logged in.\n\nSteps to Execute:\n  1. Navigate to http://localhost:8080/manage-cards (or open Manage Cards from the main menu).\n  2. Enter 'admin' in the Username field\n  3. Enter 'Admin123!@#' in the Password field\n  4. Click 'Sign In'\n  5. Select 'Credit' from the Card Type dropdown\n  6. Select '****5003 (Credit Card, -$1,534.67)' from the Account to Link dropdown\n  7. Enter '123 Main Street' in Shipping Address Line 1\n  8. Enter 'Springfield' in Shipping City\n  9. Enter 'IL' in Shipping State\n  10. Enter '62701' in Shipping Zip Code\n  11. Enter '(555) 123-4567' in Shipping Phone\n  12. Click 'Request Card'\n\nExpected Result:\n  Inline error \"selected account must be in good standing\" is displayed; the Request Card action does not submit and no support/ticket is created.\n\nNotes from prior verification:\n  Steps expanded with concrete seeded values. Verification snapshot shows the controls exist; presence of a non-good-standing account is assumed from seeded data (account 12345003 has a negative balance). Validation of the inline error is a runtime behavior.",
+  "expected_outcome": "Inline error \"selected account must be in good standing\" is displayed; the Request Card action does not submit and no support/ticket is created.",
+  "tc_metadata": {
+    "tc_id": "TC-008",
+    "module": "Manage Cards",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/manage-cards, executed all 12 step(s) for 'Selected account is not in good standing'. Outcome validation confirmed: Inline error \"selected account must be in good standing\" is displayed; the Request Card action does not submit and no support/ticket is created.",
+    "errors": "None"
+  }
+}

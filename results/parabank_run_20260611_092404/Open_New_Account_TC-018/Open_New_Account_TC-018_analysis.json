@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Open New Account | TC-018 | Type: Edge/Interaction | Priority: Medium]\nTitle: Switching Account Type invalidates a previously valid deposit amount\n\n\u25b6 Start URL:    http://localhost:8080/open-new-account\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"account_type_initial\": \"Checking\",\n  \"account_type_after\": \"Savings\",\n  \"initial_deposit\": \"25\",\n  \"funding_account\": \"****5001 (Checking)\",\n  \"funding_account_balance\": \"5847.52\",\n  \"user_email\": \"admin@parabank.com\",\n  \"username\": \"admin\"\n}\n\nPreconditions:\n  User is on the Open New Account page and logged in as 'admin' (admin@parabank.com). A funding account with balance \u2265 $25 is available (Checking ****5001 with $5,847.52).\n\nSteps to Execute:\n  1. Select 'Checking' as Account Type\n  2. Enter '25' in Initial Deposit Amount (Checking minimum)\n  3. Select a valid funding account '****5001 (Checking, $5,847.52)'\n  4. Change Account Type to 'Savings' without altering the Initial Deposit Amount\n\nExpected Result:\n  Real-time validation triggers; Initial Deposit Amount shows inline error that the amount is below the $100 Savings minimum; submission is blocked\n\nNotes from prior verification:\n  Concrete funding account and amounts were used from seed data. The step that switches the Account Type was retained and clarified to reproduce the real-time validation for Savings minimum ($100).",
+  "expected_outcome": "Real-time validation triggers; Initial Deposit Amount shows inline error that the amount is below the $100 Savings minimum; submission is blocked",
+  "tc_metadata": {
+    "tc_id": "TC-018",
+    "module": "Open New Account",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/open-new-account, executed all 4 step(s) for 'Switching Account Type invalidates a previously valid deposit amount'. Outcome validation confirmed: Real-time validation triggers; Initial Deposit Amount shows inline error that the amount is below the $100 Savings minimum; submission is blocked",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Update Contact Info | TC-007 | Type: Negative | Priority: Medium]\nTitle: Invalid phone number format\n\n\u25b6 Start URL:    http://localhost:8080/profile\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"invalid_phone\": \"***-**-1234\"\n}\n\nPreconditions:\n  Form is pre-filled; user is authenticated\n\nSteps to Execute:\n  1. Replace Phone Number with '***-**-1234'\n  2. Click Update Profile\n\nExpected Result:\n  Phone Number field highlights with inline error about invalid format; form does not submit; profile is not updated\n\nNotes from prior verification:\n  Used the seeded SSN value ('***-**-1234') as the concrete invalid phone-format string (present in mock data). The phone input and submit button exist per DOM check; inline validation is runtime behavior.",
+  "expected_outcome": "Phone Number field highlights with inline error about invalid format; form does not submit; profile is not updated",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Update Contact Info",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/profile, executed all 2 step(s) for 'Invalid phone number format'. Outcome validation confirmed: Phone Number field highlights with inline error about invalid format; form does not submit; profile is not updated",
+    "errors": "None"
+  }
+}

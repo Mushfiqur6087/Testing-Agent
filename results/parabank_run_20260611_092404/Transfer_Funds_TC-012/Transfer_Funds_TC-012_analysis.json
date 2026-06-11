@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Transfer Funds | TC-012 | Type: Edge/Boundary | Priority: Medium]\nTitle: Transfer amount exactly equals available balance succeeds\n\n\u25b6 Start URL:    http://localhost:8080/transfer-funds\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"amount\": \"5847.52\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\",\n  \"destination_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  User is logged in; source account (****5001 Checking) has known available balance $5,847.52; a different destination account exists (****5002 Savings)\n\nSteps to Execute:\n  1. Select 'My ParaBank Account' option\n  2. Select '****5001 (Checking, $5,847.52)' as the Source Account\n  3. Select '****5002 (Savings, $25,678.90)' as the Destination Account\n  4. Enter '5847.52' in the Amount field (the exact available balance)\n  5. Click 'Transfer'\n\nExpected Result:\n  \"Transfer completed successfully.\" with a transaction ID; source account balance reduced to zero\n\nNotes from prior verification:\n  Amount uses the exact seeded available balance for ****5001 to validate boundary condition.",
+  "expected_outcome": "\"Transfer completed successfully.\" with a transaction ID; source account balance reduced to zero",
+  "tc_metadata": {
+    "tc_id": "TC-012",
+    "module": "Transfer Funds",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/transfer-funds, executed all 5 step(s) for 'Transfer amount exactly equals available balance succeeds'. Outcome validation confirmed: \"Transfer completed successfully.\" with a transaction ID; source account balance reduced to zero",
+    "errors": "None"
+  }
+}

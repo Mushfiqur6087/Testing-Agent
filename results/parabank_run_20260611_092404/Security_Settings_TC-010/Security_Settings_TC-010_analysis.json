@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Security Settings | TC-010 | Type: Edge/Interaction | Priority: Medium]\nTitle: Browser Back after successful password change blocks resubmission with old password\n\n\u25b6 Start URL:    http://localhost:8080/security-settings\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"admin\",\n  \"old_password\": \"Admin123!@#\",\n  \"new_password\": \"AdminNewPass!1\"\n}\n\nPreconditions:\n  User has just successfully changed their password from Admin123!@# to AdminNewPass!1 and sees the success notification; Security Settings page is open.\n\nSteps to Execute:\n  1. After \"Password changed successfully.\" is shown, press browser Back\n  2. Without changing any fields (Current Password still contains 'Admin123!@#'), click Change Password again\n\nExpected Result:\n  Second submission is blocked; Current Password field shows verification error (old password is now incorrect); no further credential change occurs\n\nNotes from prior verification:\n  All placeholders substituted. The verification snapshot confirmed the presence of inputs and the submit button, but the browser Back/prior-success state cannot be validated from a static DOM snapshot; the runtime behavior described in the expected result must be validated during execution.",
+  "expected_outcome": "Second submission is blocked; Current Password field shows verification error (old password is now incorrect); no further credential change occurs",
+  "tc_metadata": {
+    "tc_id": "TC-010",
+    "module": "Security Settings",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/security-settings, executed all 2 step(s) for 'Browser Back after successful password change blocks resubmission with old password'. Outcome validation confirmed: Second submission is blocked; Current Password field shows verification error (old password is now incorrect); no further credential change occurs",
+    "errors": "None"
+  }
+}

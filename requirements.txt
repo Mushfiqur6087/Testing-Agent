@@ -1,5 +1,5 @@
-# Testing Agent - AI-Powered Browser Automation
-# Core dependencies for the Testing Agent project
+# Testing Agent - AI-Powered Browser Test Automation
+# Core dependencies
 
 # Browser automation
 playwright>=1.40.0

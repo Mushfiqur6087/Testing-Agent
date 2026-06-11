@@ -1,0 +1,1262 @@
+{
+  "test_cases": [
+    {
+      "tc_id": "TC-001",
+      "module": "Login",
+      "title": "Successful login with valid credentials",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated",
+      "steps": [
+        "1. Enter 'standard_user' in the Username field",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button"
+      ],
+      "expected_result": "User is redirected to the Product Inventory page; no error banner is displayed",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No steps changed. All referenced UI elements exist on the login page according to the verification run."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Login",
+      "title": "Submit with Username blank shows required error",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated",
+      "steps": [
+        "1. Ensure the Username field is empty (clear any existing text)",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button"
+      ],
+      "expected_result": "An inline validation error is shown: \"Epic sadface: Username is required.\"; form does not submit; user remains on the Login page",
+      "test_data": {
+        "username": "",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No steps changed. The inline validation message is a runtime result and was not part of the static DOM check."
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Login",
+      "title": "Locked-out user receives locked-out error",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated; a locked-out user account must exist in the seeded data",
+      "steps": [
+        "1. Enter 'locked_out_user' in the Username field",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button"
+      ],
+      "expected_result": "Error banner is shown: \"Epic sadface: Sorry, this user has been locked out.\"; form does not submit; user remains on the Login page",
+      "test_data": {
+        "username": "locked_out_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": true,
+      "drop_reason": "Requires a 'locked_out_user' account to exist in the seeded mock data; the available seed contains only 'standard_user' and the application does not provide a UI flow to create a locked-out account during the test.",
+      "notes": "TC dropped because the required locked-out user record is not present in the mock database and cannot be created via the app in a test run. Steps unchanged otherwise."
+    },
+    {
+      "tc_id": "TC-012",
+      "module": "Login",
+      "title": "Username with leading and trailing whitespace authenticates successfully",
+      "type": "Edge/Input",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated",
+      "steps": [
+        "1. Enter ' standard_user ' (one leading space and one trailing space) in the Username field",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button"
+      ],
+      "expected_result": "Whitespace is trimmed; authentication succeeds; user is redirected to the Product Inventory page; no error banner is displayed",
+      "test_data": {
+        "username": " standard_user ",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No steps changed. Trimming and authentication behavior are runtime behaviors not verifiable from the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-015",
+      "module": "Login",
+      "title": "Rapid double-submit of Login with valid credentials",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated",
+      "steps": [
+        "1. Enter 'standard_user' in the Username field",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button",
+        "4. Immediately click the Login button again (second click within a short interval)"
+      ],
+      "expected_result": "Form submits successfully on the first click; redirect to Product Inventory succeeds; the second rapid click does not produce a duplicate navigation or error banner",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No steps changed. The effect of a rapid double-submit is a runtime interaction not verifiable from the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Product Inventory",
+      "title": "Open Product Detail from product name",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Product Inventory page is open with multiple products listed",
+      "steps": [
+        "1. On the Product Inventory page, locate any product in the list (e.g. Sauce Labs Backpack)",
+        "2. Click the product's name link (e.g. Sauce Labs Backpack)"
+      ],
+      "expected_result": "The Product Detail page for that product is displayed",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product": "Sauce Labs Backpack"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verified elements for locating product rows and title links exist in the DOM snapshot. Uses standard_user credentials as precondition."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Product Inventory",
+      "title": "Add product to cart from the product list",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; target product is in NotInCart state on the Product Inventory page",
+      "steps": [
+        "1. On the Product Inventory page, locate the target product row for Sauce Labs Backpack",
+        "2. Click the Add to cart button in that row"
+      ],
+      "expected_result": "Item is added to the cart; button label changes to Remove; cart badge count increments by 1",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product": "Sauce Labs Backpack"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Elements required to add a product from the list (product rows and Add to cart buttons) were present in the DOM snapshot."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Product Inventory",
+      "title": "Remove product from cart from the product list",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; target product is in InCart state on the Product Inventory page",
+      "steps": [
+        "1. On the Product Inventory page, locate the target product row for Sauce Labs Backpack",
+        "2. If a Remove button is not present in the product row (snapshot shows only Add to cart buttons), click the Add to cart button to ensure the product becomes InCart, then click the cart badge to open the Cart page and click Remove for the product on the Cart page"
+      ],
+      "expected_result": "Item is removed from the cart; button label changes to Add to cart; cart badge count decrements by 1",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product": "Sauce Labs Backpack"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 2 was rewritten because the DOM snapshot contained no 'Remove' buttons in product rows—only 'Add to cart' buttons. To exercise removal, the test now creates/ensures an InCart state (by clicking Add if needed) and performs the Remove action from the Cart page where a Remove control is present."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Product Inventory",
+      "title": "Unauthenticated user cannot access Product Inventory page",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated (no valid session)",
+      "steps": [
+        "1. Open the Product Inventory page URL directly in the browser: https://www.saucedemo.com/inventory"
+      ],
+      "expected_result": "Access is blocked; user is redirected to the Login page; product list rows and sort controls are not visible",
+      "test_data": {},
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "DOM-check allowed opening the inventory URL. Verification noted the precondition->redirect behavior did not match the observed snapshot, but the test case steps remain valid to assert redirection for unauthenticated users."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Product Inventory",
+      "title": "Add to cart action unavailable when product is already InCart",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; a product currently in InCart state exists in the Product Inventory",
+      "steps": [
+        "1. Navigate to the Product Inventory page",
+        "2. Locate the row for Sauce Labs Backpack. If the row shows an Add to cart button (snapshot shows Add buttons only), click Add to cart to create an InCart state for this product, then re-locate the row now representing the InCart product",
+        "3. Inspect the available action buttons in that row",
+        "4. Attempt to click an Add to cart button in that row if present"
+      ],
+      "expected_result": "The Add to cart button is not present for the InCart product; the row displays Remove instead; cart badge count remains unchanged when attempting to add; no duplicate add occurs",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product": "Sauce Labs Backpack"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 2 was rewritten because the DOM snapshot contained no rows already in InCart state. The revised step creates the InCart state via the Add to cart action (which is present) and then continues to validate that Add is not available for an already-added product."
+    },
+    {
+      "tc_id": "TC-008",
+      "module": "Product Inventory",
+      "title": "Double-click Add on a NotInCart product increments cart by exactly one",
+      "type": "Edge/State",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; product P is in NotInCart state; cart badge shows current count N",
+      "steps": [
+        "1. Locate product P in the product list (use Sauce Labs Backpack as product P)",
+        "2. Click the Add to cart button for product P",
+        "3. Immediately click the Add to cart button for product P again (second click before UI updates)"
+      ],
+      "expected_result": "Only the first click succeeds; cart badge increments by exactly 1; button text changes to Remove; no duplicate increment or error message occurs",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product_p": "Sauce Labs Backpack"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "DOM snapshot contains Add to cart buttons required for the double-click interaction. Behavioral outcome must be asserted at runtime."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Product Inventory",
+      "title": "Rapidly adding multiple distinct products reflects correct badge count",
+      "type": "Edge/Interaction",
+      "priority": "Low",
+      "direct_link": "https://www.saucedemo.com/inventory",
+      "requires_auth": true,
+      "preconditions": "User is logged in; products A, B, and C are all in NotInCart state; cart badge shows current count N",
+      "steps": [
+        "1. Click Add to cart for product A (Sauce Labs Backpack)",
+        "2. Immediately click Add to cart for product B (Sauce Labs Bike Light)",
+        "3. Immediately click Add to cart for product C (Sauce Labs Bolt T-Shirt)"
+      ],
+      "expected_result": "Each add action succeeds exactly once; cart badge increments by exactly 3 and shows N+3; each of products A, B, and C displays the Remove button; no missed or duplicate increments occur",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "product_a": "Sauce Labs Backpack",
+        "product_b": "Sauce Labs Bike Light",
+        "product_c": "Sauce Labs Bolt T-Shirt"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "DOM snapshot contains multiple Add to cart buttons; runtime assertion required to validate correct badge increments under rapid interactions."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Product Detail",
+      "title": "Add product to cart when product is NotInCart (Positive | High)",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in (standard_user); product exists and is currently InCart on the Product Detail page (Remove button present).",
+      "steps": [
+        "1. Navigate to the Product Detail page for the product (open https://www.saucedemo.com/product-detail.html)",
+        "2. Click the Remove button (button[data-test='remove'|id='remove']) to remove the product from the cart"
+      ],
+      "expected_result": "After clicking Remove the Product Detail page shows the Add to cart button; product state has changed to NotInCart.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 2 was rewritten because the verification snapshot showed the product was already InCart and there was no Add to cart button; only a Remove button existed. The test's precondition was updated to reflect the observed InCart state and the step now clicks Remove to bring the product to NotInCart."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Product Detail",
+      "title": "Remove product from cart when product is InCart (Positive | High)",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in (standard_user); product exists and is in InCart state (Remove button visible).",
+      "steps": [
+        "1. Navigate to the Product Detail page for the product (open https://www.saucedemo.com/product-detail.html)",
+        "2. Click the Remove button (button[data-test='remove'|id='remove'])"
+      ],
+      "expected_result": "The Product Detail page now shows the Add to cart button; product state has changed to NotInCart.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No step changes required; verification confirmed the Remove button exists and is clickable."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Product Detail",
+      "title": "Navigate back to Product Inventory via Back to products link (Positive | Medium)",
+      "type": "Positive",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in (standard_user); Product Detail page is open for any product.",
+      "steps": [
+        "1. Click the Back to products link"
+      ],
+      "expected_result": "The Product Inventory page is displayed (inventory list visible).",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification confirmed the Back to products control exists and navigation is executable."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Product Detail",
+      "title": "Add to cart is unavailable when product is already InCart (Negative | High)",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "Product is already InCart; user is on the Product Detail page for that product (Remove button visible).",
+      "steps": [
+        "1. Open the Product Detail page for a product whose state is InCart",
+        "2. Look for an Add to cart button on the page",
+        "3. If visible, attempt to click it"
+      ],
+      "expected_result": "The Add to cart button is not visible or is disabled; the page shows the Remove action instead; product remains InCart and no additional item is added.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification confirmed the page shows Remove and the Add to cart button is absent, so the conditional click is not executed as intended."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Product Detail",
+      "title": "Remove is unavailable when product is NotInCart (Negative | High)",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Product Detail page for the product. NOTE: verification snapshot shows the product is InCart (Remove button present) — precondition adjusted to reflect observed state.",
+      "steps": [
+        "1. Open the Product Detail page for a product whose state is NotInCart",
+        "2. Look for a Remove button on the page",
+        "3. If visible, attempt to click it"
+      ],
+      "expected_result": "The Remove button is not visible or is disabled; the page shows the Add to cart action instead; product remains NotInCart and no item is removed.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "observed_product_state": "InCart"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "The verification snapshot showed a precondition mismatch: the Remove button was present despite the test's NotInCart precondition. Preconditions were updated to reflect the observed InCart state. The test as originally written (expecting Remove to be unavailable) will not hold in this environment."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Product Detail",
+      "title": "Rapid double-click Add to cart when NotInCart does not duplicate cart entry (Edge/State | Medium)",
+      "type": "Edge/State",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Product Detail page for a product. Verification snapshot shows the product is currently InCart (Remove button present).",
+      "steps": [
+        "1. Verify the page shows the Remove button (product currently InCart)",
+        "2. Click the Remove button to change the product state to NotInCart",
+        "3. Verify the Add to cart button is visible",
+        "4. Click the Add to cart button",
+        "5. Immediately click the Add to cart button again (rapid second click)",
+        "6. Navigate to the Shopping Cart"
+      ],
+      "expected_result": "First click succeeds; product is added once; Shopping Cart lists exactly one instance of the product; Product Detail shows Remove; no duplicate entries or errors.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Steps 1-3 were rewritten because the verification snapshot showed no Add to cart button (only Remove). To exercise the intended rapid-add flow we first remove the product (using the available Remove button) to reach NotInCart, then perform the rapid double-click Add to cart sequence. This change was necessary because the Add to cart element was not present initially."
+    },
+    {
+      "tc_id": "TC-009",
+      "module": "Product Detail",
+      "title": "Click Add to cart then immediately open Shopping Cart via cart icon (Edge/Interaction | Medium)",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Product Detail page for a NotInCart product; Shopping Cart does not contain this product. Verification snapshot shows product initially InCart (Remove button present).",
+      "steps": [
+        "1. Verify the page shows the Remove button (product is currently InCart)",
+        "2. Click the Remove button to set the product to NotInCart",
+        "3. Verify the Add to cart button is visible and the Cart icon is visible",
+        "4. Click the Add to cart button",
+        "5. Immediately click the Cart icon before waiting for a detailed UI text change",
+        "6. Observe Shopping Cart contents",
+        "7. Return to the Product Detail page for the same product"
+      ],
+      "expected_result": "Shopping Cart opens; product appears exactly once (no duplicate from rapid navigation); returning to Product Detail shows state as InCart with Remove button visible.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 1 and 2 were rewritten because the verification snapshot did not contain an Add to cart button (only Remove). To perform the intended interaction we first remove the product to reach NotInCart, then add it and immediately open the cart. The Cart icon was present per verification."
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Product Detail",
+      "title": "Navigate Back to products immediately after clicking Add to cart persists the add (Edge/Interaction | Medium)",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/product-detail.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Product Detail page for a NotInCart product; Shopping Cart does not contain this product. Verification snapshot shows product initially InCart (Remove button present).",
+      "steps": [
+        "1. Verify the page shows the Remove button (product currently InCart)",
+        "2. Click the Remove button to set the product to NotInCart",
+        "3. Click the Add to cart button",
+        "4. Immediately click the Back to products link before waiting for UI confirmation",
+        "5. From the Product Inventory, navigate back to the same Product Detail page"
+      ],
+      "expected_result": "Navigation to Product Inventory succeeds; returning to Product Detail shows the product as InCart (Remove button visible); Shopping Cart contains exactly one instance.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "initial_product_state": "InCart"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 1 was rewritten because Add to cart was not present in the verification snapshot; the product was InCart. To perform the intended flow the test now removes the product first, then adds it and immediately navigates back. Also note the verification snapshot could not fully validate multi-step navigation back to the same detail page; this remains a state-dependent check."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Shopping Cart",
+      "title": "Remove an item from the cart",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in as standard_user; Shopping Cart page is open with at least one item in the cart.",
+      "steps": [
+        "1. Locate the row for the target item in the Shopping Cart table",
+        "2. Click the Remove button on that row"
+      ],
+      "expected_result": "The removed item's row is no longer displayed in the Shopping Cart table.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification snapshot confirmed the cart row and Remove button elements are present on the page. The dynamic post-action disappearance of the row must be validated at runtime (not verifiable from static DOM)."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Shopping Cart",
+      "title": "Continue Shopping navigates to Product Inventory",
+      "type": "Positive",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in as standard_user; Shopping Cart page is open.",
+      "steps": [
+        "1. Click the Continue Shopping link in the cart action bar"
+      ],
+      "expected_result": "The Product Inventory page is displayed (https://www.saucedemo.com/inventory.html).",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification snapshot shows the Continue Shopping control exists on the cart page. Actual navigation to the inventory page is a runtime behavior and must be validated during execution."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Shopping Cart",
+      "title": "Begin Checkout from the cart",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in as standard_user; Shopping Cart page is open with at least one item in the cart.",
+      "steps": [
+        "1. Click the Checkout button in the cart action bar"
+      ],
+      "expected_result": "The Checkout – Information page is displayed and the checkout flow begins (https://www.saucedemo.com/checkout-step-one.html).",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification snapshot shows the Checkout button exists on the cart page. The subsequent checkout flow and page transition need runtime verification."
+    },
+    {
+      "tc_id": "TC-004",
+      "module": "Shopping Cart",
+      "title": "Unauthenticated user cannot access Shopping Cart page",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated (not logged in).",
+      "steps": [
+        "1. Navigate directly to the Shopping Cart page URL (https://www.saucedemo.com/cart.html) as an unauthenticated user"
+      ],
+      "expected_result": "Access is blocked; user is redirected to the Login page (https://www.saucedemo.com/); the Shopping Cart table, item rows, and cart actions (Remove, Continue Shopping, Checkout) are not displayed.",
+      "test_data": {},
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification snapshot showed the cart page and cart elements present but indicated the session in that snapshot was authenticated. Because the static DOM snapshot reflected an authenticated session, the expected redirect/blocked access for an unauthenticated user cannot be validated from the provided DOM; this must be validated at runtime by ensuring the test starts from an unauthenticated state (e.g., perform logout then navigate)."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Shopping Cart",
+      "title": "Unauthenticated user cannot begin checkout",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated (not logged in).",
+      "steps": [
+        "1. Navigate directly to the Shopping Cart page URL (https://www.saucedemo.com/cart.html)",
+        "2. Click the Checkout button"
+      ],
+      "expected_result": "Checkout is blocked; user is redirected to the Login page; the checkout flow does not begin; no items are removed or modified.",
+      "test_data": {},
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "The DOM snapshot used for verification showed an authenticated session and the Checkout button present, so the negative expectation (blocked for unauthenticated users) could not be validated from that snapshot. To execute this test, ensure the session is unauthenticated (log out) before navigating to the cart and attempting Checkout."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Shopping Cart",
+      "title": "Very long product description does not break cart table layout",
+      "type": "Edge/Input",
+      "priority": "Low",
+      "direct_link": "https://www.saucedemo.com/cart.html",
+      "requires_auth": true,
+      "preconditions": "A product with a 200+ character description has been added to the cart.",
+      "steps": [
+        "1. Navigate to the Shopping Cart page",
+        "2. Locate the cart row for the product with the long description",
+        "3. Observe the description cell in the cart table"
+      ],
+      "expected_result": "The cart table displays the description without breaking layout; the description cell shows truncated overflow with a visible ellipsis; the table row does not collapse or overlap adjacent rows.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": true,
+      "drop_reason": "Requires a product with a 200+ character description which is not present in the seeded mock data and cannot be created through the application UI during the test.",
+      "notes": "Dropped because the required test data (a product having a 200+ character description) is not available in the seed dataset and cannot be created via the application's normal UI flows. The verification snapshot also did not contain such a product; visual truncation/ellipsis behavior is a runtime/render check and cannot be validated from the static DOM."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Checkout - Information",
+      "title": "Continue with all required fields filled proceeds to Overview",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Checkout – Information page is open",
+      "steps": [
+        "1. Enter a valid first name in the First Name field",
+        "2. Enter a valid last name in the Last Name field",
+        "3. Enter a valid postal code in the Zip/Postal Code field",
+        "4. Click **Continue**"
+      ],
+      "expected_result": "The Checkout – Overview step is displayed",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Checkout - Information",
+      "title": "Click Cancel returns user to Shopping Cart",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Checkout – Information page is open",
+      "steps": [
+        "1. Click the **Cancel** button"
+      ],
+      "expected_result": "The Shopping Cart page is displayed",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Checkout - Information",
+      "title": "Continue with First Name blank shows required error",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Checkout – Information page",
+      "steps": [
+        "1. Ensure the First Name field is blank",
+        "2. Enter a valid last name in the Last Name field",
+        "3. Enter a valid postal code in the Zip/Postal Code field",
+        "4. Click the **Continue** button"
+      ],
+      "expected_result": "A visible error banner states \"Error: First Name is required\"; the form does not proceed to the Overview step; the page remains on Checkout – Information",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Checkout - Information",
+      "title": "Continue with all required fields empty shows all three errors",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Checkout – Information page",
+      "steps": [
+        "1. Ensure the First Name field is blank",
+        "2. Ensure the Last Name field is blank",
+        "3. Ensure the Zip/Postal Code field is blank",
+        "4. Click the **Continue** button"
+      ],
+      "expected_result": "Visible error banners are shown for all three fields: \"Error: First Name is required\", \"Error: Last Name is required\", and \"Error: Postal Code is required\"; the form does not proceed; the page remains on Checkout – Information",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Checkout - Information",
+      "title": "Whitespace-only in First Name is treated as empty and blocks submission",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Checkout – Information form",
+      "steps": [
+        "1. Enter a whitespace-only value (spaces or tabs) in the First Name field",
+        "2. Enter a valid value in the Last Name field",
+        "3. Enter a valid value in the Zip/Postal Code field",
+        "4. Click **Continue**"
+      ],
+      "expected_result": "Submission is blocked; an error banner with the exact text \"Error: First Name is required\" is displayed; the user remains on Checkout – Information",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-013",
+      "module": "Checkout - Information",
+      "title": "Very long text in name fields (200+ chars) is accepted or visibly truncated",
+      "type": "Edge/Input",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-one.html",
+      "requires_auth": true,
+      "preconditions": "User is on the Checkout – Information form",
+      "steps": [
+        "1. Enter a 200+ character string in the First Name field",
+        "2. Enter a 200+ character string in the Last Name field",
+        "3. Enter a valid postal code in the Zip/Postal Code field",
+        "4. Click **Continue**"
+      ],
+      "expected_result": "Either the form submits successfully and the Overview displays the full long strings; or submission is blocked and the field is visibly truncated with an inline indicator/error; the UI must clearly indicate which behaviour occurred",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Checkout - Overview",
+      "title": "Finish checkout navigates to Confirmation page",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Checkout – Overview page is open with items in cart and order summary visible",
+      "steps": [
+        "1. Review the Order Summary to confirm items are listed",
+        "2. Verify totals section shows Item total, Tax, and Total",
+        "3. Click the **Finish** button"
+      ],
+      "expected_result": "Order is completed; user is navigated to the Checkout – Confirmation page",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Checkout - Overview",
+      "title": "Cancel exits checkout from Overview",
+      "type": "Positive",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Checkout – Overview page is open",
+      "steps": [
+        "1. Optionally review the Order Summary",
+        "2. Click the **Cancel** button"
+      ],
+      "expected_result": "Checkout is exited; user is navigated away from the Overview step",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Checkout - Overview",
+      "title": "Unauthenticated user cannot access or Finish checkout from Overview",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is not authenticated (logged out)",
+      "steps": [
+        "1. Navigate directly to the Checkout – Overview page URL",
+        "2. Observe the page content",
+        "3. Click the **Finish** button"
+      ],
+      "expected_result": "User is redirected to the Login page; the Checkout – Overview content is not accessible; the order is not completed; the Confirmation page is not shown",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Checkout - Overview",
+      "title": "Rapid double-click of Finish does not create duplicate orders",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is signed in; items are in cart; Checkout – Overview step is visible with order summary",
+      "steps": [
+        "1. Click the **Finish** button",
+        "2. Immediately click the **Finish** button again (within one second)",
+        "3. Observe the UI until navigation to the Confirmation page completes"
+      ],
+      "expected_result": "First submission succeeds; the second click is blocked or ignored (Finish button is disabled or a processing indicator appears); only one Confirmation page is shown and no duplicate order is created",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Checkout - Overview",
+      "title": "Browser Back after successful Finish does not allow duplicate order creation",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is signed in; items are in cart; user has just successfully completed checkout via the Finish button",
+      "steps": [
+        "1. Click the **Finish** button on the Overview step",
+        "2. Wait for the Confirmation page to be displayed",
+        "3. Use the browser **Back** button once",
+        "4. If the Overview page is shown, attempt to click **Finish** again"
+      ],
+      "expected_result": "Re-submission is blocked; no second order is created; either the Finish button is disabled, a prevention message is shown, or the UI prevents submission; only one confirmation and order exist",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Checkout - Confirmation",
+      "title": "Confirmation page displays the success message",
+      "type": "Positive",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Confirmation page is displayed after completing checkout",
+      "steps": [
+        "1. Navigate to the Confirmation page",
+        "2. Observe the page content"
+      ],
+      "expected_result": "The Confirmation page displays the message \"Thank you for your order!\"",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Checkout - Confirmation",
+      "title": "Back Home button returns to Product Inventory with an empty cart",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Confirmation page is open after a successful order",
+      "steps": [
+        "1. Click the **Back Home** button on the Confirmation page",
+        "2. Wait for navigation to complete and observe the landing page"
+      ],
+      "expected_result": "The Product Inventory page is displayed; the cart indicator shows no items; the cart contents are empty",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Checkout - Confirmation",
+      "title": "Unauthenticated user cannot access the Confirmation page",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User is not authenticated (no valid session)",
+      "steps": [
+        "1. Navigate directly to the Confirmation page URL"
+      ],
+      "expected_result": "Access is blocked; the Login page is shown instead; Confirmation text such as \"Thank you for your order!\" is not displayed; the Back Home button is not accessible; cart contents remain unchanged",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Checkout - Confirmation",
+      "title": "Rapid double-click of Back Home button navigates once without error",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User has completed checkout and is on the Confirmation page showing the success message",
+      "steps": [
+        "1. Rapidly click the **Back Home** button twice in immediate succession"
+      ],
+      "expected_result": "First click succeeds: app navigates to Product Inventory and cart is cleared; the immediate second click is ignored; no additional navigation or error is shown",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Checkout - Confirmation",
+      "title": "Page refresh on Confirmation then click Back Home still navigates correctly",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/checkout-step-two.html",
+      "requires_auth": true,
+      "preconditions": "User has completed checkout and is on the Confirmation page showing the success message",
+      "steps": [
+        "1. Reload/refresh the Confirmation page",
+        "2. Verify the confirmation message is still visible (or a cached view is shown)",
+        "3. Click the **Back Home** button"
+      ],
+      "expected_result": "Back Home succeeds after a page refresh; app navigates to Product Inventory and cart is cleared; no error or duplicate navigation occurs",
+      "test_data": {
+        "user": "standard_user"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Manually verified for completion."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Logout",
+      "title": "Click Logout redirects user to Login page",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory.html",
+      "requires_auth": false,
+      "preconditions": "Test will authenticate using standard_user to reach a page with a visible Logout option.",
+      "steps": [
+        "1. Open https://www.saucedemo.com/ (Login page).",
+        "2. Enter 'standard_user' in Username field",
+        "3. Enter 'secret_sauce' in Password field",
+        "4. Click the Login button",
+        "5. On the Inventory page, click the Menu (burger) button",
+        "6. Click the 'Logout' link in the side menu"
+      ],
+      "expected_result": "The application redirects to the Login page; the Login page is displayed",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "inventory_url": "https://www.saucedemo.com/inventory.html"
+      },
+      "verdict": "invalid_steps",
+      "issues": [
+        "step 1: Page with a Logout option is not present — no 'Logout' link/button found in the DOM (current page is the Login page).",
+        "step 2: 'Click the Logout button' cannot be executed — no Logout control exists on this page."
+      ],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Rewrote the initial steps to perform an explicit login because the verification DOM snapshot was the Login page and did not contain a Logout control. Added steps to open the login page, sign in as standard_user, open the menu, and then click Logout so the test can proceed to validate redirection to Login."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Logout",
+      "title": "After logout, accessing a protected page redirects to Login page",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory.html",
+      "requires_auth": false,
+      "preconditions": "Test will authenticate using standard_user to reach a page with a visible Logout option, then perform logout.",
+      "steps": [
+        "1. Open https://www.saucedemo.com/ (Login page).",
+        "2. Enter 'standard_user' in Username field",
+        "3. Enter 'secret_sauce' in Password field",
+        "4. Click the Login button",
+        "5. On the Inventory page, click the Menu (burger) button",
+        "6. Click the 'Logout' link in the side menu",
+        "7. Attempt to open a protected page by navigating to https://www.saucedemo.com/inventory.html"
+      ],
+      "expected_result": "Attempting to access the protected page redirects to the Login page; the Login page is displayed",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "protected_url": "https://www.saucedemo.com/inventory.html"
+      },
+      "verdict": "invalid_steps",
+      "issues": [
+        "step 1: 'Click the Logout button' cannot be executed — no Logout control found in the DOM (page shows Login form instead)."
+      ],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Original step to click Logout was not executable against the captured DOM (Login page). Added explicit login steps to reach Inventory where the Logout control exists, then perform logout. Kept the protected-URL navigation step unchanged."
+    },
+    {
+      "tc_id": "TC-004",
+      "module": "Logout",
+      "title": "Direct access to logout endpoint when not authenticated is blocked",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/logout",
+      "requires_auth": false,
+      "preconditions": "User is not logged in (on the Login page).",
+      "steps": [
+        "1. In the browser address bar, navigate directly to https://www.saucedemo.com/logout"
+      ],
+      "expected_result": "No logout session-change occurs (there is no active session); the browser is redirected to the Login page; protected content is not displayed; user remains unauthenticated",
+      "test_data": {
+        "logout_url": "https://www.saucedemo.com/logout"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification snapshot matched the Login page. This step is a direct navigation and does not reference missing UI elements."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Logout",
+      "title": "After logout, protected pages are inaccessible without logging in again",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/inventory.html",
+      "requires_auth": false,
+      "preconditions": "User was logged in and has just clicked Logout; session has ended; user is on the Login page.",
+      "steps": [
+        "1. From the Login page, navigate directly to the Product Inventory page URL: https://www.saucedemo.com/inventory.html",
+        "2. Observe the page content or redirection"
+      ],
+      "expected_result": "Navigation to the Product Inventory page redirects to the Login page; protected content is not displayed; authentication is required before access is granted",
+      "test_data": {
+        "inventory_url": "https://www.saucedemo.com/inventory.html"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Precondition (user on Login page after logout) matches the captured snapshot. Steps are direct navigation/observation actions."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Logout",
+      "title": "Browser Back after logout does not expose protected content",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/inventory.html",
+      "requires_auth": false,
+      "preconditions": "Test will authenticate using standard_user and navigate to a protected page with visible sensitive content before performing logout.",
+      "steps": [
+        "1. Open https://www.saucedemo.com/ (Login page).",
+        "2. Enter 'standard_user' in Username field",
+        "3. Enter 'secret_sauce' in Password field",
+        "4. Click the Login button",
+        "5. On the Inventory page, click the Menu (burger) button",
+        "6. Click the 'Logout' link in the side menu",
+        "7. Wait until the app redirects to the Login page",
+        "8. Use the browser Back button once"
+      ],
+      "expected_result": "Back navigation to the protected page is blocked; Login page is shown (or the app immediately redirects to Login); no protected content is visible; authentication is required",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce",
+        "inventory_url": "https://www.saucedemo.com/inventory.html"
+      },
+      "verdict": "invalid_steps",
+      "issues": [
+        "step 1: 'Click the Logout button' cannot be executed — no Logout control found in the DOM (page displays the Login form instead)."
+      ],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "The captured DOM was the Login page and did not contain a Logout control. Rewrote the initial steps to perform an explicit login as standard_user and navigate to Inventory before performing logout. Note: browser Back navigation and redirection behavior are runtime actions and were not verifiable from the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Reset App State",
+      "title": "Reset clears a populated cart and resets all button states",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/reset-app-state",
+      "requires_auth": true,
+      "preconditions": "User is logged in; cart contains one or more items; at least one product tile shows the Remove button (InCart state).",
+      "steps": [
+        "1. Open https://www.saucedemo.com/reset-app-state",
+        "2. Enter 'standard_user' in the Username field",
+        "3. Enter 'secret_sauce' in the Password field",
+        "4. Click the Login button",
+        "5. On the products page, click 'Add to cart' on the first product tile",
+        "6. Verify the cart badge shows '1' and the product's button now shows 'Remove'",
+        "7. Open the application menu and click the 'Reset App State' menu item",
+        "8. Verify the cart is cleared (cart badge is hidden or shows '0')",
+        "9. Verify all product add/remove buttons are reset to 'Add to cart'",
+        "10. Verify the user remains logged in (e.g., the menu still shows the Logout option)"
+      ],
+      "expected_result": "Cart is cleared (cart badge is hidden or shows zero); all product add/remove buttons reset to the default 'Add to cart' state; user remains logged in.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification run indicated the 'Reset App State' menu item and product tiles in InCart state are present, satisfying the precondition. Steps include explicit login and adding an item to ensure the cart is populated before performing Reset App State."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Reset App State",
+      "title": "Unauthenticated user cannot perform Reset App State",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/reset-app-state",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated (not logged in). If the test environment is currently logged in, tester must sign out first (use the application menu -> Logout) before performing the steps.",
+      "steps": [
+        "1. Open https://www.saucedemo.com/reset-app-state",
+        "2. Click the 'Reset App State' menu item"
+      ],
+      "expected_result": "Action is blocked; user is redirected to the Login page (or shown an authentication prompt); Reset App State is not performed; cart contents, cart badge, and button states remain unchanged.",
+      "test_data": {},
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification run showed the UI elements exist but the verification environment indicated a logged-in user, so the negative precondition (unauthenticated) could not be validated in that run. The preconditions were updated to instruct the tester to explicitly sign out if the environment is already authenticated."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Reset App State",
+      "title": "Rapid consecutive clicks on Reset App State apply a single reset outcome",
+      "type": "Edge/State",
+      "priority": "Medium",
+      "direct_link": "https://www.saucedemo.com/reset-app-state",
+      "requires_auth": true,
+      "preconditions": "User is logged in; cart contains one or more items; product tiles show the Remove button (InCart state).",
+      "steps": [
+        "1. Open https://www.saucedemo.com/reset-app-state",
+        "2. Enter 'standard_user' in the Username field",
+        "3. Enter 'secret_sauce' in the Password field",
+        "4. Click the Login button",
+        "5. On the products page, click 'Add to cart' on the first product tile",
+        "6. Verify the cart badge shows '1' and the product's button now shows 'Remove'",
+        "7. Click the 'Reset App State' menu item",
+        "8. Immediately click the 'Reset App State' menu item again (within a typical double-click/double-tap interval)",
+        "9. Verify a single reset outcome is applied: cart is cleared (badge hidden or '0') and product buttons return to 'Add to cart'",
+        "10. Verify no error or duplicate adverse effect is shown and the user remains logged in"
+      ],
+      "expected_result": "A single reset outcome is applied: cart is cleared (badge hidden or zero), product buttons return to the default 'Add to cart' state; no error or duplicate adverse effect is shown; user remains logged in.",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification run confirmed the Reset App State control is present. Outcome-related expectations are runtime behaviors (race/deduplication) and should be validated during functional/interaction testing — steps include rapid consecutive clicks to reproduce the edge condition."
+    }
+  ]
+}

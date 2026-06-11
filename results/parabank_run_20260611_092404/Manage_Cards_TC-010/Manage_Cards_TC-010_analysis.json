@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Manage Cards | TC-010 | Type: Negative | Priority: Medium]\nTitle: Travel Notice with Start Date after End Date is rejected\n\n\u25b6 Start URL:    http://localhost:8080/manage-cards\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!@#\",\n  \"card_last4\": \"5001\",\n  \"start_date\": \"2024-06-10\",\n  \"end_date\": \"2024-06-05\"\n}\n\nPreconditions:\n  User is logged in; an existing card is selected in Card Controls (use Debit card ending 5001, card id card001).\n\nSteps to Execute:\n  1. Navigate to http://localhost:8080/manage-cards and open Card Controls for card ending in 5001\n  2. Enter 'admin' in the Username field\n  3. Enter 'Admin123!@#' in the Password field\n  4. Click 'Sign In'\n  5. Click 'Add Travel Notice' (or 'New Travel Notice')\n  6. Enter '2024-06-10' in the Start Date field\n  7. Enter '2024-06-05' in the End Date field (Start Date is later than End Date)\n  8. Click 'Update Controls'\n\nExpected Result:\n  Inline error \"Start_Date \u2264 End_Date when both provided\" is displayed; Update Controls does not submit and the travel notice is not saved.\n\nNotes from prior verification:\n  Steps populated with a concrete existing card (****5001) and explicit dates. DOM snapshot confirmed Start/End inputs and Update Controls button exist; the rejection behavior must be validated at runtime.",
+  "expected_outcome": "Inline error \"Start_Date \u2264 End_Date when both provided\" is displayed; Update Controls does not submit and the travel notice is not saved.",
+  "tc_metadata": {
+    "tc_id": "TC-010",
+    "module": "Manage Cards",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/manage-cards, executed all 8 step(s) for 'Travel Notice with Start Date after End Date is rejected'. Outcome validation confirmed: Inline error \"Start_Date \u2264 End_Date when both provided\" is displayed; Update Controls does not submit and the travel notice is not saved.",
+    "errors": "None"
+  }
+}

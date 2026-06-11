@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Inventory | TC-007 | Type: Negative | Priority: High]\nTitle: Add to cart action unavailable when product is already InCart\n\n\u25b6 Start URL:    https://www.saucedemo.com/inventory\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"product\": \"Sauce Labs Backpack\"\n}\n\nPreconditions:\n  User is logged in; a product currently in InCart state exists in the Product Inventory\n\nSteps to Execute:\n  1. Navigate to the Product Inventory page\n  2. Locate the row for Sauce Labs Backpack. If the row shows an Add to cart button (snapshot shows Add buttons only), click Add to cart to create an InCart state for this product, then re-locate the row now representing the InCart product\n  3. Inspect the available action buttons in that row\n  4. Attempt to click an Add to cart button in that row if present\n\nExpected Result:\n  The Add to cart button is not present for the InCart product; the row displays Remove instead; cart badge count remains unchanged when attempting to add; no duplicate add occurs\n\nNotes from prior verification:\n  Step 2 was rewritten because the DOM snapshot contained no rows already in InCart state. The revised step creates the InCart state via the Add to cart action (which is present) and then continues to validate that Add is not available for an already-added product.",
+  "expected_outcome": "The Add to cart button is not present for the InCart product; the row displays Remove instead; cart badge count remains unchanged when attempting to add; no duplicate add occurs",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Product Inventory",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/inventory, executed all 4 step(s) for 'Add to cart action unavailable when product is already InCart'. Outcome validation confirmed: The Add to cart button is not present for the InCart product; the row displays Remove instead; cart badge count remains unchanged when attempting to add; no duplicate add occurs",
+    "errors": "None"
+  }
+}

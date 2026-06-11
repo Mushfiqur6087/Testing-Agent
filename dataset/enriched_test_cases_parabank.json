@@ -1,0 +1,1448 @@
+{
+  "test_cases": [
+    {
+      "tc_id": "TC-001",
+      "module": "Login",
+      "title": "Successful sign-in with valid credentials",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/login",
+      "requires_auth": false,
+      "preconditions": "User is unauthenticated on the Login page; a registered user exists with admin@parabank.com and Admin123!@#",
+      "steps": [
+        "1. Enter 'admin@parabank.com' in Email/Username field",
+        "2. Enter 'Admin123!@#' in Password field",
+        "3. Click Sign In"
+      ],
+      "expected_result": "Flash message \"Signed in successfully.\" appears; user is redirected to Accounts Overview page",
+      "test_data": {
+        "email": "admin@parabank.com",
+        "password": "Admin123!@#"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Placeholders filled with the seeded user's email and password. Interactive elements verified present in DOM."
+    },
+    {
+      "tc_id": "TC-008",
+      "module": "Login",
+      "title": "Authentication failure with unregistered credentials",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; the credentials entered (unregistered@example.com / Password1!) are not present in the database",
+      "steps": [
+        "1. Enter 'unregistered@example.com' in Email/Username",
+        "2. Enter 'Password1!' in Password",
+        "3. Click Sign In"
+      ],
+      "expected_result": "Page displays \"Incorrect email or password. Please try again.\"; Password field is cleared; user stays on Login page; retry is allowed",
+      "test_data": {
+        "email": "unregistered@example.com",
+        "password": "Password1!"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Placeholders filled. 'unregistered@example.com' and 'Password1!' are chosen to be absent from seeded data to exercise the negative path."
+    },
+    {
+      "tc_id": "TC-009",
+      "module": "Login",
+      "title": "Password at exact minimum length (8 chars) succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/login",
+      "requires_auth": false,
+      "preconditions": "A registered user exists with an 8-character password containing uppercase, lowercase, number, and special character (admin@parabank.com / Admin123!@#)",
+      "steps": [
+        "1. Enter 'admin@parabank.com' in Email/Username",
+        "2. Enter 'Admin123!@#' in Password",
+        "3. Click Sign In"
+      ],
+      "expected_result": "Form submits; \"Signed in successfully.\" flash appears; redirect to Accounts Overview",
+      "test_data": {
+        "email": "admin@parabank.com",
+        "password": "Admin123!@#"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": true,
+      "drop_reason": "Requires a registered user whose password is exactly 8 characters meeting the specified composition. Seeded user password is Admin123!@# (12 characters); no user in the seed has an 8-character password and such a user cannot be created via the UI within this test flow. Test cannot be executed against current seed data.",
+      "notes": "This TC is dropped because the precondition (registered user with an 8-character password) is not satisfied by the seeded data and cannot be created through normal UI flows during the test."
+    },
+    {
+      "tc_id": "TC-014",
+      "module": "Login",
+      "title": "Failed login clears Password but preserves Email/Username",
+      "type": "Edge/State",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/login",
+      "requires_auth": false,
+      "preconditions": "A registered user exists; entered password will be incorrect (admin@parabank.com / WrongPass1!)",
+      "steps": [
+        "1. Enter 'admin@parabank.com' in Email/Username",
+        "2. Enter 'WrongPass1!' in Password",
+        "3. Click Sign In"
+      ],
+      "expected_result": "Error \"Incorrect email or password.\" is shown; Password field is cleared; Email/Username retains the entered value; form allows retry",
+      "test_data": {
+        "email": "admin@parabank.com",
+        "password": "WrongPass1!"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Placeholders filled: using the seeded user's email and an incorrect password to exercise failed-login behavior. DOM verification confirmed required inputs and submit button exist; post-failure state must be validated at runtime."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Register",
+      "title": "Complete registration happy path",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/register",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated; Registration page is open",
+      "steps": [
+        "1. Enter 'John' in First Name field",
+        "2. Enter 'Doe' in Last Name field",
+        "3. Enter '123 Main Street' in Street Address field",
+        "4. Enter 'Springfield' in City field",
+        "5. Select 'IL' from State dropdown",
+        "6. Enter '62701' in ZIP Code field",
+        "7. Enter '(555) 123-4567' in Phone Number field",
+        "8. Enter '***-**-1234' in SSN field",
+        "9. Enter 'admin@parabank.com' in Username/Email field",
+        "10. Enter 'Admin123!@#' in Password field",
+        "11. Enter 'Admin123!@#' in Confirm Password field",
+        "12. Click Register"
+      ],
+      "expected_result": "\"Account created successfully — please sign in\" is shown; user is redirected to the Login page",
+      "test_data": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "street_address": "123 Main Street",
+        "city": "Springfield",
+        "state": "IL",
+        "zip": "62701",
+        "phone": "(555) 123-4567",
+        "ssn": "***-**-1234",
+        "username": "admin@parabank.com",
+        "password": "Admin123!@#"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All input values come from seeded mock data. Verification noted that dynamic post-submit outcomes (success message / redirect) are not checked in the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Register",
+      "title": "Submit with ALL required fields empty",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/register",
+      "requires_auth": false,
+      "preconditions": "User is on the Registration page",
+      "steps": [
+        "1. Leave all fields blank",
+        "2. Click Register"
+      ],
+      "expected_result": "Every required field (First Name, Last Name, Street Address, City, State, ZIP, Phone, SSN, Username, Password, Confirm Password) displays an inline \"required\" validation error; form does not submit; no account is created",
+      "test_data": {},
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All referenced form fields and the Register button exist per the DOM check. Inline validation behavior is runtime and not verifiable from the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Register",
+      "title": "Confirm Password does not match Password",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/register",
+      "requires_auth": false,
+      "preconditions": "User is on the Registration page",
+      "steps": [
+        "1. Enter 'Admin123!@#' in Password field",
+        "2. Enter 'Admin123!@#X' in Confirm Password field (a different value)",
+        "3. Enter 'John' in First Name field",
+        "4. Enter 'Doe' in Last Name field",
+        "5. Enter '123 Main Street' in Street Address field",
+        "6. Enter 'Springfield' in City field",
+        "7. Select 'IL' from State dropdown",
+        "8. Enter '62701' in ZIP Code field",
+        "9. Enter '(555) 123-4567' in Phone Number field",
+        "10. Enter '***-**-1234' in SSN field",
+        "11. Enter 'admin@parabank.com' in Username/Email field",
+        "12. Click Register"
+      ],
+      "expected_result": "Confirm Password displays inline error \"must match Password\"; form does not submit; account is not created",
+      "test_data": {
+        "password": "Admin123!@#",
+        "confirm_password": "Admin123!@#X",
+        "first_name": "John",
+        "last_name": "Doe",
+        "street_address": "123 Main Street",
+        "city": "Springfield",
+        "state": "IL",
+        "zip": "62701",
+        "phone": "(555) 123-4567",
+        "ssn": "***-**-1234",
+        "username": "admin@parabank.com"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Password and Confirm Password fields exist per the DOM check. The test uses a mismatched confirm value to trigger the inline validation; runtime validation behavior is not verified by the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-017",
+      "module": "Register",
+      "title": "10-digit phone auto-formats to (123) 456-7890 and registration succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/register",
+      "requires_auth": false,
+      "preconditions": "Registration page is loaded",
+      "steps": [
+        "1. Enter 'John' in First Name field",
+        "2. Enter 'Doe' in Last Name field",
+        "3. Enter '123 Main Street' in Street Address field",
+        "4. Enter 'Springfield' in City field",
+        "5. Select 'IL' from State dropdown",
+        "6. Enter '62701' in ZIP Code field",
+        "7. Enter raw digits '5551234567' (no punctuation) in Phone Number field",
+        "8. Observe the Phone Number field updates to '(555) 123-4567'",
+        "9. Enter '***-**-1234' in SSN field",
+        "10. Enter 'admin@parabank.com' in Username/Email field",
+        "11. Enter 'Admin123!@#' in Password field",
+        "12. Enter 'Admin123!@#' in Confirm Password field",
+        "13. Click Register"
+      ],
+      "expected_result": "Phone Number auto-formats to '(555) 123-4567'; form submits; \"Account created successfully — please sign in\" is shown; redirect to Login",
+      "test_data": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "street_address": "123 Main Street",
+        "city": "Springfield",
+        "state": "IL",
+        "zip": "62701",
+        "phone_raw": "5551234567",
+        "phone_formatted": "(555) 123-4567",
+        "ssn": "***-**-1234",
+        "username": "admin@parabank.com",
+        "password": "Admin123!@#"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used the seeded phone digits (5551234567) and updated the expected formatted value to match that seed ((555) 123-4567). The DOM check confirms the phone input accepts raw digits; the auto-format and submit are runtime behaviors not verified in the static snapshot."
+    },
+    {
+      "tc_id": "TC-003",
+      "module": "Accounts Overview",
+      "title": "Account numbers are masked showing only last four digits",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/accounts-overview",
+      "requires_auth": true,
+      "preconditions": "User is logged in; at least one account exists with known last 4 digits (seed includes account ****5001).",
+      "steps": [
+        "1. Navigate to Accounts Overview (http://localhost:8080/accounts-overview)",
+        "2. Inspect the Account Number column for each row"
+      ],
+      "expected_result": "Each Account Number is displayed as '****5001' (masked), showing only the last 4 digits.",
+      "test_data": {
+        "last4": "5001",
+        "masked_account": "****5001",
+        "username": "admin",
+        "password": "Admin123!@#"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No changes required. Verification confirms account numbers are masked in the DOM; used the Checking account last-4 (5001) from seed data for concrete expectation."
+    },
+    {
+      "tc_id": "TC-008",
+      "module": "Accounts Overview",
+      "title": "Unauthenticated access to Accounts Overview redirects to Login",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/accounts-overview",
+      "requires_auth": false,
+      "preconditions": "User is not authenticated. If the user is currently signed in, sign out before starting the test.",
+      "steps": [
+        "1. If currently signed in, click 'Sign Out' to log out",
+        "2. Navigate directly to the Accounts Overview URL: http://localhost:8080/accounts-overview",
+        "3. Observe whether the user is redirected to the Login page (http://localhost:8080/login) and confirm the Accounts Table and Welcome message are not visible"
+      ],
+      "expected_result": "Access is blocked; user is redirected to the Login page (http://localhost:8080/login); Accounts Table and Welcome message are not visible.",
+      "test_data": {
+        "accounts_url": "http://localhost:8080/accounts-overview",
+        "login_url": "http://localhost:8080/login",
+        "username": "admin"
+      },
+      "verdict": "invalid",
+      "issues": [
+        "Precondition not met on live page: the session used for the DOM snapshot was authenticated, so the expected redirect could not be verified."
+      ],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Added an explicit Sign Out step to ensure the precondition (unauthenticated user) is satisfied before navigating to the Accounts Overview. The verification snapshot indicated the session was authenticated, so this step is required to make the test reproducible."
+    },
+    {
+      "tc_id": "TC-012",
+      "module": "Accounts Overview",
+      "title": "Zero and negative Current Balance values displayed and summed correctly",
+      "type": "Edge/Data",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/accounts-overview",
+      "requires_auth": true,
+      "preconditions": "At least one account has Current_Balance = 0 and at least one account has Current_Balance < 0.",
+      "steps": [
+        "1. Navigate to Accounts Overview",
+        "2. Locate rows with zero and negative balances",
+        "3. Observe each row's display and the Total Balance footer"
+      ],
+      "expected_result": "Zero and negative balances are shown with their sign clearly visible; Total Balance footer reflects the algebraic sum of all rows (including negatives).",
+      "test_data": {},
+      "verdict": "invalid_steps",
+      "issues": [
+        "step 2: Row with zero balance not found anywhere in the DOM — no account with a zero Current Balance is present in the snapshot"
+      ],
+      "dropped": true,
+      "drop_reason": "Requires an account with Current_Balance = 0 which does not exist in the seeded data and cannot be created via normal UI flows; therefore the test cannot be executed as written.",
+      "notes": "Dropped the test because the seed data contains no zero-balance account. The DOM snapshot did show negative balances and a Total Balance footer, but the specific precondition (zero balance) is unmet and cannot be fulfilled through the application during the test."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Open New Account",
+      "title": "Open a Checking account at minimum deposit",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/open-new-account",
+      "requires_auth": true,
+      "preconditions": "User 'admin' (admin@parabank.com) is logged in; a funding account exists with balance ≥ $25 (use Checking ****5001 with $5,847.52).",
+      "steps": [
+        "1. Navigate to http://localhost:8080/open-new-account (Open New Account page)",
+        "2. Select 'Checking' as Account Type",
+        "3. Enter '25' in Initial Deposit Amount",
+        "4. Select funding account '****5001 (Checking, $5,847.52)' from the Funding Source dropdown",
+        "5. Click 'Open Account'"
+      ],
+      "expected_result": "\"Account opened successfully!\" is shown; user is redirected to Accounts Overview",
+      "test_data": {
+        "account_type": "Checking",
+        "initial_deposit": "25",
+        "funding_account": "****5001 (Checking)",
+        "funding_account_balance": "5847.52",
+        "user_email": "admin@parabank.com",
+        "username": "admin"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Concrete funding account and deposit amount were selected from seeded data: Checking ****5001 with $5,847.52. Preconditions updated to name the logged-in user and funding account."
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Open New Account",
+      "title": "Funding account has insufficient balance for requested deposit",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/open-new-account",
+      "requires_auth": true,
+      "preconditions": "User is on the Open New Account page and logged in as 'admin' (admin@parabank.com). A funding account exists (Checking ****5001 with $5,847.52).",
+      "steps": [
+        "1. Select 'Checking' as Account Type",
+        "2. Enter '6000' in Initial Deposit Amount (amount exceeding the selected funding account balance)",
+        "3. Select the under-funded account '****5001 (Checking, $5,847.52)' from the Funding Source dropdown",
+        "4. Click 'Open Account'"
+      ],
+      "expected_result": "Funding Source Account dropdown shows inline error about insufficient balance; form does not submit; no account is created",
+      "test_data": {
+        "account_type": "Checking",
+        "initial_deposit": "6000",
+        "funding_account": "****5001 (Checking)",
+        "funding_account_balance": "5847.52",
+        "user_email": "admin@parabank.com",
+        "username": "admin"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Selected an amount (6000) that exceeds the seeded Checking account balance ($5,847.52) to trigger the insufficient-funds path. All steps reference concrete seeded data."
+    },
+    {
+      "tc_id": "TC-016",
+      "module": "Open New Account",
+      "title": "Funding account balance exactly equals deposit amount — boundary succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/open-new-account",
+      "requires_auth": true,
+      "preconditions": "A funding account exists whose balance exactly equals the intended deposit amount (Checking ****5001 has balance $5,847.52). User is logged in as 'admin' (admin@parabank.com).",
+      "steps": [
+        "1. Select 'Checking' as Account Type (meets Checking minimum of $25)",
+        "2. Enter '5847.52' in Initial Deposit Amount (X)",
+        "3. Select the funding account '****5001 (Checking, $5,847.52)' which has balance = 5847.52",
+        "4. Click 'Open Account'"
+      ],
+      "expected_result": "Form submits; \"Account opened successfully!\" is shown; redirect to Accounts Overview",
+      "test_data": {
+        "account_type": "Checking",
+        "initial_deposit": "5847.52",
+        "funding_account": "****5001 (Checking)",
+        "funding_account_balance": "5847.52",
+        "user_email": "admin@parabank.com",
+        "username": "admin"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used the exact seeded Checking account balance (5,847.52) as the deposit amount to exercise the boundary condition. Verification note: existence of exact-balance account is an external data precondition but is satisfied by seed data."
+    },
+    {
+      "tc_id": "TC-018",
+      "module": "Open New Account",
+      "title": "Switching Account Type invalidates a previously valid deposit amount",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/open-new-account",
+      "requires_auth": true,
+      "preconditions": "User is on the Open New Account page and logged in as 'admin' (admin@parabank.com). A funding account with balance ≥ $25 is available (Checking ****5001 with $5,847.52).",
+      "steps": [
+        "1. Select 'Checking' as Account Type",
+        "2. Enter '25' in Initial Deposit Amount (Checking minimum)",
+        "3. Select a valid funding account '****5001 (Checking, $5,847.52)'",
+        "4. Change Account Type to 'Savings' without altering the Initial Deposit Amount"
+      ],
+      "expected_result": "Real-time validation triggers; Initial Deposit Amount shows inline error that the amount is below the $100 Savings minimum; submission is blocked",
+      "test_data": {
+        "account_type_initial": "Checking",
+        "account_type_after": "Savings",
+        "initial_deposit": "25",
+        "funding_account": "****5001 (Checking)",
+        "funding_account_balance": "5847.52",
+        "user_email": "admin@parabank.com",
+        "username": "admin"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Concrete funding account and amounts were used from seed data. The step that switches the Account Type was retained and clarified to reproduce the real-time validation for Savings minimum ($100)."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Transfer Funds",
+      "title": "External transfer with matching account numbers succeeds",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/transfer-funds",
+      "requires_auth": true,
+      "preconditions": "User is logged in; source account (****5001 Checking) has sufficient funds",
+      "steps": [
+        "1. Navigate to Transfer Funds page",
+        "2. Select the 'External Account' radio option",
+        "3. Enter '500.00' in the Amount field",
+        "4. Select '****5001 (Checking, $5,847.52)' as the Source Account",
+        "5. Enter 'ELC123456789' in External Account Number and 'ELC123456789' in Confirm External Account Number",
+        "6. Click 'Transfer'"
+      ],
+      "expected_result": "\"Transfer completed successfully.\" with a transaction ID is displayed",
+      "test_data": {
+        "amount": "500.00",
+        "source_account": "****5001 (Checking, $5,847.52)",
+        "external_account_number": "ELC123456789"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "External Account Number and Confirm fields are conditional and appear after selecting the External Account radio; used payee account number 'ELC123456789' from seeded Payees as the external account."
+    },
+    {
+      "tc_id": "TC-009",
+      "module": "Transfer Funds",
+      "title": "Transfer amount exceeds available balance",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/transfer-funds",
+      "requires_auth": true,
+      "preconditions": "User is logged in; source account balance is known (****5001 Checking has $5,847.52)",
+      "steps": [
+        "1. Select 'My ParaBank Account' option",
+        "2. Enter '10000.00' in the Amount field (exceeding the source account balance)",
+        "3. Select '****5001 (Checking, $5,847.52)' as the Source Account",
+        "4. Select '****5002 (Savings, $25,678.90)' as the Destination Account",
+        "5. Click 'Transfer'"
+      ],
+      "expected_result": "Page displays \"Insufficient funds\"; form does not submit; no transaction is created",
+      "test_data": {
+        "amount": "10000.00",
+        "source_account": "****5001 (Checking, $5,847.52)",
+        "destination_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": ""
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Transfer Funds",
+      "title": "External account number and confirmation do not match",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/transfer-funds",
+      "requires_auth": true,
+      "preconditions": "User is on Transfer Funds page and able to select External Account",
+      "steps": [
+        "1. Select the 'External Account' radio option",
+        "2. Enter '1500.00' in the Amount field and select '****5001 (Checking, $5,847.52)' as the Source Account",
+        "3. Enter 'GAS987654321' in External Account Number",
+        "4. Enter 'INT555444333' in Confirm External Account Number",
+        "5. Click 'Transfer'"
+      ],
+      "expected_result": "Error \"Account numbers do not match.\" is displayed; form does not submit; no transaction is created",
+      "test_data": {
+        "amount": "1500.00",
+        "source_account": "****5001 (Checking, $5,847.52)",
+        "external_account_number_A": "GAS987654321",
+        "external_account_number_B": "INT555444333"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "External Account Number and Confirm fields are conditional and appear after selecting the External Account radio; used two different seeded Payees account numbers to simulate mismatch."
+    },
+    {
+      "tc_id": "TC-012",
+      "module": "Transfer Funds",
+      "title": "Transfer amount exactly equals available balance succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/transfer-funds",
+      "requires_auth": true,
+      "preconditions": "User is logged in; source account (****5001 Checking) has known available balance $5,847.52; a different destination account exists (****5002 Savings)",
+      "steps": [
+        "1. Select 'My ParaBank Account' option",
+        "2. Select '****5001 (Checking, $5,847.52)' as the Source Account",
+        "3. Select '****5002 (Savings, $25,678.90)' as the Destination Account",
+        "4. Enter '5847.52' in the Amount field (the exact available balance)",
+        "5. Click 'Transfer'"
+      ],
+      "expected_result": "\"Transfer completed successfully.\" with a transaction ID; source account balance reduced to zero",
+      "test_data": {
+        "amount": "5847.52",
+        "source_account": "****5001 (Checking, $5,847.52)",
+        "destination_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Amount uses the exact seeded available balance for ****5001 to validate boundary condition."
+    },
+    {
+      "tc_id": "TC-018",
+      "module": "Transfer Funds",
+      "title": "Browser Back after successful transfer does not create a duplicate",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/transfer-funds",
+      "requires_auth": true,
+      "preconditions": "User is logged in; source account (****5001 Checking) has at least 2× the transfer amount available",
+      "steps": [
+        "1. Complete a successful transfer of '2500.00' from '****5001 (Checking, $5,847.52)' to '****5002 (Savings, $25,678.90)'; note the transaction ID displayed",
+        "2. Press the browser Back button",
+        "3. Click 'Transfer' again without changing any inputs"
+      ],
+      "expected_result": "Second submission is blocked; only one transaction ID exists in history; no duplicate transfer occurs",
+      "test_data": {
+        "amount": "2500.00",
+        "source_account": "****5001 (Checking, $5,847.52)",
+        "destination_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Precondition uses seeded balances: ****5001 has $5,847.52 which is > 2× $2,500. Conditional/behavioral steps (browser history) are runtime checks and cannot be validated by static DOM; test relies on backend/idempotency handling."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Payments",
+      "title": "Submit bill payment happy path",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/bill-pay",
+      "requires_auth": true,
+      "preconditions": "User is logged in; source account has funds ≥ payment amount (use Checking ****5001 with $5,847.52).",
+      "steps": [
+        "1. Navigate to Bill Payment (http://localhost:8080/bill-pay).",
+        "2. Fill in Payee Name with 'Electric Company'.",
+        "3. Fill in Street Address with '456 Power Street'.",
+        "4. Fill in City with 'Springfield'.",
+        "5. Fill in State with 'IL'.",
+        "6. Fill in ZIP with '62701'.",
+        "7. Fill in Phone with '(555) 987-6543'.",
+        "8. Enter payee account number 'ELC123456789' in Payee Account Number.",
+        "9. Enter 'ELC123456789' in Confirm Account Number.",
+        "10. Enter Payment Amount '200.00'.",
+        "11. Select source account '****5001 (Checking, $5,847.52)'.",
+        "12. Click Pay."
+      ],
+      "expected_result": "\"Payment submitted successfully.\" with a reference code is shown; source account (****5001) balance is debited by $200.00 and transaction appears in history.",
+      "test_data": {
+        "payee_name": "Electric Company",
+        "payee_street": "456 Power Street",
+        "payee_city": "Springfield",
+        "payee_state": "IL",
+        "payee_zip": "62701",
+        "payee_phone": "(555) 987-6543",
+        "payee_account": "ELC123456789",
+        "payment_amount": "200.00",
+        "source_account": "****5001 (Checking, $5,847.52)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used seeded Payee 'Electric Company' and Checking account ****5001 which has sufficient funds. Success message and balance update are dynamic and cannot be statically verified."
+    },
+    {
+      "tc_id": "TC-008",
+      "module": "Payments",
+      "title": "Payee account number and confirmation do not match",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/bill-pay",
+      "requires_auth": true,
+      "preconditions": "All other required fields are filled with valid values (payee name/address/phone present).",
+      "steps": [
+        "1. Enter 'ELC123456789' in Payee Account Number.",
+        "2. Enter 'GAS987654321' in Confirm Account Number.",
+        "3. Click Pay."
+      ],
+      "expected_result": "Inline error \"Account numbers do not match\" is shown; form does not submit; no payment is created.",
+      "test_data": {
+        "account_number_A": "ELC123456789",
+        "account_number_B": "GAS987654321"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used two different seeded payee account numbers to force mismatch (Electric Company vs Gas Utility). Inline validation message is runtime and cannot be confirmed from static DOM."
+    },
+    {
+      "tc_id": "TC-009",
+      "module": "Payments",
+      "title": "Insufficient funds in selected source account",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/bill-pay",
+      "requires_auth": true,
+      "preconditions": "Selected source account balance is less than the entered payment amount (use Credit Card ****5003 with balance -$1,534.67).",
+      "steps": [
+        "1. Select the under-funded source account '****5003 (Credit Card, -$1,534.67)'.",
+        "2. Enter a payment amount '100.00' (greater than the account's available balance).",
+        "3. Click Pay."
+      ],
+      "expected_result": "Inline error \"Insufficient funds\" is shown; form does not submit; no payment is created; balances unchanged.",
+      "test_data": {
+        "source_account": "****5003 (Credit Card, -$1,534.67)",
+        "payment_amount": "100.00"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used seeded Credit Card account with negative balance to trigger insufficient-funds validation. The error is produced at runtime and cannot be checked in the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-012",
+      "module": "Payments",
+      "title": "Payment amount exactly equals available funds succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/bill-pay",
+      "requires_auth": true,
+      "preconditions": "A source account exists with available funds exactly equal to the intended payment amount (use Checking ****5001 with $5,847.52).",
+      "steps": [
+        "1. Enter Payment Amount '5847.52'.",
+        "2. Select source account '****5001 (Checking, $5,847.52)'.",
+        "3. Click Pay."
+      ],
+      "expected_result": "\"Payment submitted successfully.\" with a reference code; source account balance becomes $0.00; payment appears in transaction history.",
+      "test_data": {
+        "payment_amount": "5847.52",
+        "source_account": "****5001 (Checking, $5,847.52)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used Checking account balance exactly as payment amount per seed data. Success and resulting balance change are dynamic and not verifiable in the static DOM."
+    },
+    {
+      "tc_id": "TC-016",
+      "module": "Payments",
+      "title": "Browser Back after successful payment does not create duplicate",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/bill-pay",
+      "requires_auth": true,
+      "preconditions": "Source account has at least 2× the payment amount available (use Savings ****5002 with $25,678.90).",
+      "steps": [
+        "1. Submit a valid payment of '10000.00' to payee 'Internet Provider' (account 'INT555444333') using source account '****5002 (Savings, $25,678.90)'; confirm success and note reference code.",
+        "2. Press browser Back to return to the Bill Pay form.",
+        "3. Click Pay again on the returned form."
+      ],
+      "expected_result": "Second submission is blocked; only one payment appears in transaction history; account balance reflects a single deduction of $10,000.00.",
+      "test_data": {
+        "payment_amount": "10000.00",
+        "payee_name": "Internet Provider",
+        "payee_account": "INT555444333",
+        "source_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used seeded Savings account to satisfy 2× requirement. The multi-step browser flow (submit -> back -> re-submit) and duplicate-prevention behavior are runtime/browser behaviors and cannot be validated from the static DOM snapshot; test should be run in a real browser to observe server-side idempotency."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Request Loan",
+      "title": "Request Auto Loan with collateral and approval",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/request-loan",
+      "requires_auth": true,
+      "preconditions": "Credit engine configured for approval; collateral account balance ≥ 20% of loan amount",
+      "steps": [
+        "1. Navigate to Request Loan page",
+        "2. Select 'Auto' loan type",
+        "3. Enter '40000' in Loan Amount",
+        "4. Enter '5000' in Down Payment",
+        "5. Select collateral account '****5002 (Savings, $25,678.90)'",
+        "6. Click 'Request Loan'"
+      ],
+      "expected_result": "\"Loan approved and created successfully!\" with account details; Loan Details panel shows Loan Type, Amount, Down Payment, and Collateral Account",
+      "test_data": {
+        "loan_type": "Auto",
+        "loan_amount": 40000,
+        "down_payment": 5000,
+        "collateral_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Selected a loan amount of 40000 and collateral account ****5002 (Savings, $25,678.90) so the collateral balance (25,678.90) is ≥ 20% of the loan (20% of 40,000 = 8,000). Credit engine and approval behavior are dynamic and were not validated by the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Request Loan",
+      "title": "Loan amount below type-specific minimum is rejected",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/request-loan",
+      "requires_auth": true,
+      "preconditions": "User is on the Request Loan page",
+      "steps": [
+        "1. Select 'Personal' loan type",
+        "2. Enter '500' in Loan Amount",
+        "3. Enter '60' in Down Payment",
+        "4. Click 'Request Loan'"
+      ],
+      "expected_result": "Inline error on Loan Amount: \"must be between 1000 and 50000\"; form does not submit; no loan is created",
+      "test_data": {
+        "loan_type": "Personal",
+        "loan_amount": 500,
+        "down_payment": 60
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used a loan amount of 500 to exercise the below-minimum validation. Inline validation behavior and non-submission are dynamic and were not verified in the static DOM snapshot."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Request Loan",
+      "title": "Down payment below 10% of loan amount is rejected",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/request-loan",
+      "requires_auth": true,
+      "preconditions": "User is on the Request Loan page; Loan Type is selected",
+      "steps": [
+        "1. Enter '10000' in Loan Amount",
+        "2. Enter '500' in Down Payment",
+        "3. Click 'Request Loan'"
+      ],
+      "expected_result": "Inline error on Down Payment: \"must be ≥ 10% of Loan Amount\"; form does not submit; no loan is created",
+      "test_data": {
+        "loan_amount": 10000,
+        "down_payment": 500
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Down payment of 500 is intentionally less than 10% of 10000 (should be ≥1000) to validate client-side/server-side rejection. The radio control for loan type is present per DOM but selection was assumed per precondition."
+    },
+    {
+      "tc_id": "TC-017",
+      "module": "Request Loan",
+      "title": "Down payment exactly equals 10% of loan amount passes validation",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/request-loan",
+      "requires_auth": true,
+      "preconditions": "User is on Request Loan page",
+      "steps": [
+        "1. Select 'Home' loan type",
+        "2. Enter '250000' in Loan Amount",
+        "3. Enter '25000' in Down Payment",
+        "4. Click 'Request Loan'"
+      ],
+      "expected_result": "No validation error on Down Payment; form proceeds to credit engine evaluation",
+      "test_data": {
+        "loan_type": "Home",
+        "loan_amount": 250000,
+        "down_payment": 25000
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Down payment equals exactly 10% of the loan (25,000 of 250,000) to exercise the boundary. Exact approval outcome is determined by the credit engine and was not observable in the static DOM."
+    },
+    {
+      "tc_id": "TC-021",
+      "module": "Request Loan",
+      "title": "Collateral account balance one unit below 20% of loan amount is blocked",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/request-loan",
+      "requires_auth": true,
+      "preconditions": "A collateral account exists whose balance is exactly one unit below 20% of the entered loan amount",
+      "steps": [
+        "1. Select 'Auto' loan type",
+        "2. Enter '29242.60' in Loan Amount",
+        "3. Enter '5000' in Down Payment",
+        "4. Select the under-collateralised account '****5001 (Checking, $5,847.52)'",
+        "5. Click 'Request Loan'"
+      ],
+      "expected_result": "Inline error on Collateral Account: insufficient balance (< 20% of Loan Amount); request is not sent to the credit engine",
+      "test_data": {
+        "loan_type": "Auto",
+        "loan_amount": 29242.6,
+        "down_payment": 5000,
+        "collateral_account": "****5001 (Checking, $5,847.52)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Calculated loan amount 29,242.60 because 20% of 29,242.60 = 5,848.52; the checking account balance is 5,847.52, i.e. exactly one unit below 20% of the loan amount, satisfying the precondition using seeded account 12345001. This allows the UI validation for insufficient collateral to be exercised. Account balances and credit engine behavior are dynamic and were not verified in the static DOM."
+    },
+    {
+      "tc_id": "TC-004",
+      "module": "Update Contact Info",
+      "title": "Update First and Last Name and save successfully",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/profile",
+      "requires_auth": true,
+      "preconditions": "User is logged in and on the Customer Profile page",
+      "steps": [
+        "1. Enter 'John' in First Name",
+        "2. Enter 'Doe' in Last Name",
+        "3. Click Update Profile"
+      ],
+      "expected_result": "\"Profile updated successfully.\" is shown; form displays the new First Name and Last Name values",
+      "test_data": {
+        "first_name": "John",
+        "last_name": "Doe"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used the seeded user's First Name and Last Name (John Doe) as the concrete values. The post-submit success message is dynamic and cannot be verified from the static DOM."
+    },
+    {
+      "tc_id": "TC-005",
+      "module": "Update Contact Info",
+      "title": "Leave required field (First Name) blank and submit",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/profile",
+      "requires_auth": true,
+      "preconditions": "Form is pre-filled; user is authenticated",
+      "steps": [
+        "1. Clear the First Name field",
+        "2. Leave all other fields unchanged",
+        "3. Click Update Profile"
+      ],
+      "expected_result": "Inline error on First Name: \"required\"; form does not submit; \"Profile updated successfully.\" is not shown",
+      "test_data": {
+        "original_first_name": "John",
+        "original_last_name": "Doe"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "No placeholder values required to be replaced. The form controls exist per DOM check; inline validation behavior is runtime and not verifiable from static DOM."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Update Contact Info",
+      "title": "Invalid phone number format",
+      "type": "Negative",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/profile",
+      "requires_auth": true,
+      "preconditions": "Form is pre-filled; user is authenticated",
+      "steps": [
+        "1. Replace Phone Number with '***-**-1234'",
+        "2. Click Update Profile"
+      ],
+      "expected_result": "Phone Number field highlights with inline error about invalid format; form does not submit; profile is not updated",
+      "test_data": {
+        "invalid_phone": "***-**-1234"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Used the seeded SSN value ('***-**-1234') as the concrete invalid phone-format string (present in mock data). The phone input and submit button exist per DOM check; inline validation is runtime behavior."
+    },
+    {
+      "tc_id": "TC-012",
+      "module": "Update Contact Info",
+      "title": "Entering only whitespace into Last Name is treated as missing",
+      "type": "Edge/Input",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/profile",
+      "requires_auth": true,
+      "preconditions": "User is on the Customer Profile page with the form pre-filled",
+      "steps": [
+        "1. Clear Last Name and enter only whitespace characters (three spaces)",
+        "2. Click Update Profile"
+      ],
+      "expected_result": "Submission is blocked; Last Name is highlighted with inline error indicating the field must be present (whitespace-only counts as empty)",
+      "test_data": {
+        "last_name_whitespace": "   "
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Whitespace entry specified explicitly as three spaces. The Last Name field and Update Profile button exist per DOM check; the validation behavior (whitespace-only treated as empty) is runtime and not verifiable from the static DOM."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Manage Cards",
+      "title": "Submit card request with complete address and account in good standing",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/manage-cards",
+      "requires_auth": true,
+      "preconditions": "User is logged in; an account in good standing is available (use Checking account 12345001 which is Active with $5,847.52).",
+      "steps": [
+        "1. Navigate to http://localhost:8080/manage-cards (or open Manage Cards from the main menu).",
+        "2. Enter 'admin' in the Username field",
+        "3. Enter 'Admin123!@#' in the Password field",
+        "4. Click 'Sign In'",
+        "5. Select 'Debit' from the Card Type dropdown",
+        "6. Select '****5001 (Checking, $5,847.52)' from the Account to Link dropdown",
+        "7. Enter '123 Main Street' in Shipping Address Line 1",
+        "8. Enter 'Springfield' in Shipping City",
+        "9. Enter 'IL' in Shipping State",
+        "10. Enter '62701' in Shipping Zip Code",
+        "11. Enter '(555) 123-4567' in Shipping Phone",
+        "12. Click 'Request Card'"
+      ],
+      "expected_result": "\"Card request submitted successfully.\" is shown and a visible tracking ID is displayed on the confirmation.",
+      "test_data": {
+        "username": "admin",
+        "password": "Admin123!@#",
+        "card_type": "Debit",
+        "linked_account": "****5001 (Checking, $5,847.52)",
+        "shipping_address_line1": "123 Main Street",
+        "shipping_city": "Springfield",
+        "shipping_state": "IL",
+        "shipping_zip": "62701",
+        "shipping_phone": "(555) 123-4567"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Steps expanded with concrete values from seeded user and account data. Verification snapshot confirmed required UI elements are present; the 'good standing' status cannot be validated from the static DOM and must be confirmed at runtime."
+    },
+    {
+      "tc_id": "TC-008",
+      "module": "Manage Cards",
+      "title": "Selected account is not in good standing",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/manage-cards",
+      "requires_auth": true,
+      "preconditions": "An account that is NOT in good standing exists and is selectable (use Credit Card account 12345003 which has a negative balance of -$1,534.67). User is logged in.",
+      "steps": [
+        "1. Navigate to http://localhost:8080/manage-cards (or open Manage Cards from the main menu).",
+        "2. Enter 'admin' in the Username field",
+        "3. Enter 'Admin123!@#' in the Password field",
+        "4. Click 'Sign In'",
+        "5. Select 'Credit' from the Card Type dropdown",
+        "6. Select '****5003 (Credit Card, -$1,534.67)' from the Account to Link dropdown",
+        "7. Enter '123 Main Street' in Shipping Address Line 1",
+        "8. Enter 'Springfield' in Shipping City",
+        "9. Enter 'IL' in Shipping State",
+        "10. Enter '62701' in Shipping Zip Code",
+        "11. Enter '(555) 123-4567' in Shipping Phone",
+        "12. Click 'Request Card'"
+      ],
+      "expected_result": "Inline error \"selected account must be in good standing\" is displayed; the Request Card action does not submit and no support/ticket is created.",
+      "test_data": {
+        "username": "admin",
+        "password": "Admin123!@#",
+        "card_type": "Credit",
+        "linked_account": "****5003 (Credit Card, -$1,534.67)",
+        "shipping_address_line1": "123 Main Street",
+        "shipping_city": "Springfield",
+        "shipping_state": "IL",
+        "shipping_zip": "62701",
+        "shipping_phone": "(555) 123-4567"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Steps expanded with concrete seeded values. Verification snapshot shows the controls exist; presence of a non-good-standing account is assumed from seeded data (account 12345003 has a negative balance). Validation of the inline error is a runtime behavior."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Manage Cards",
+      "title": "Travel Notice with Start Date after End Date is rejected",
+      "type": "Negative",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/manage-cards",
+      "requires_auth": true,
+      "preconditions": "User is logged in; an existing card is selected in Card Controls (use Debit card ending 5001, card id card001).",
+      "steps": [
+        "1. Navigate to http://localhost:8080/manage-cards and open Card Controls for card ending in 5001",
+        "2. Enter 'admin' in the Username field",
+        "3. Enter 'Admin123!@#' in the Password field",
+        "4. Click 'Sign In'",
+        "5. Click 'Add Travel Notice' (or 'New Travel Notice')",
+        "6. Enter '2024-06-10' in the Start Date field",
+        "7. Enter '2024-06-05' in the End Date field (Start Date is later than End Date)",
+        "8. Click 'Update Controls'"
+      ],
+      "expected_result": "Inline error \"Start_Date ≤ End_Date when both provided\" is displayed; Update Controls does not submit and the travel notice is not saved.",
+      "test_data": {
+        "username": "admin",
+        "password": "Admin123!@#",
+        "card_last4": "5001",
+        "start_date": "2024-06-10",
+        "end_date": "2024-06-05"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Steps populated with a concrete existing card (****5001) and explicit dates. DOM snapshot confirmed Start/End inputs and Update Controls button exist; the rejection behavior must be validated at runtime."
+    },
+    {
+      "tc_id": "TC-014",
+      "module": "Manage Cards",
+      "title": "Travel Notice where Start Date equals End Date is accepted",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/manage-cards",
+      "requires_auth": true,
+      "preconditions": "User is logged in; an existing card is selected in Card Controls (use Debit card ending 5001, card id card001).",
+      "steps": [
+        "1. Navigate to http://localhost:8080/manage-cards and open Card Controls for card ending in 5001",
+        "2. Enter 'admin' in the Username field",
+        "3. Enter 'Admin123!@#' in the Password field",
+        "4. Click 'Sign In'",
+        "5. Click 'Add Travel Notice' (or 'New Travel Notice')",
+        "6. Enter '2024-06-05' in the Start Date field",
+        "7. Enter '2024-06-05' in the End Date field (same date D in both fields)",
+        "8. Click 'Update Controls'"
+      ],
+      "expected_result": "\"Card controls updated successfully.\" is shown; the travel notice entry reflects Start Date = End Date = 2024-06-05.",
+      "test_data": {
+        "username": "admin",
+        "password": "Admin123!@#",
+        "card_last4": "5001",
+        "date_D": "2024-06-05"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Steps populated with concrete values and an existing card (****5001). DOM snapshot shows required inputs/buttons; acceptance of this edge-case must be validated during execution."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Investments",
+      "title": "Execute Buy trade with sufficient buying power",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/investments",
+      "requires_auth": true,
+      "preconditions": "User is logged in as Investor (seeded user: admin / admin@parabank.com); funding account has sufficient buying power to cover the trade.",
+      "steps": [
+        "1. Navigate to Investments page (http://localhost:8080/investments)",
+        "2. Select 'Buy' from Action",
+        "3. Enter 'VTSAX' in Fund Symbol and select 'Vanguard Total Stock Market Index (VTSAX)' from the autocomplete",
+        "4. Enter quantity '10' in Quantity field",
+        "5. Select funding account '****5002 (Savings, $25,678.90)' from Funding Account dropdown",
+        "6. Click 'Execute Trade'"
+      ],
+      "expected_result": "\"Trade executed successfully.\" message appears with an order ID; Portfolio Snapshot reflects updated holding quantity and market value for VTSAX (holding shares increase by 10 and market value updates accordingly).",
+      "test_data": {
+        "fund_symbol": "VTSAX",
+        "quantity": "10",
+        "funding_account": "****5002 (Savings, $25,678.90)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All UI elements required for a Buy were present during verification. Concrete values chosen from seeded investment funds and accounts: VTSAX and Savings account ****5002. No step rewrites required."
+    },
+    {
+      "tc_id": "TC-013",
+      "module": "Investments",
+      "title": "Sell with quantity exceeding share balance is blocked",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/investments",
+      "requires_auth": true,
+      "preconditions": "User is logged in; user holds VTSAX with 150.5 shares in Portfolio Holdings.",
+      "steps": [
+        "1. Navigate to Investments page (http://localhost:8080/investments)",
+        "2. Select 'Sell' from Action",
+        "3. Enter 'VTSAX' in Fund Symbol",
+        "4. Enter quantity '151' (greater than current holding of 150.5) in Quantity field",
+        "5. Select destination account '****5001 (Checking, $5,847.52)' from Destination Account dropdown",
+        "6. Click 'Execute Trade'"
+      ],
+      "expected_result": "Inline error indicating insufficient share balance for the Sell (e.g. \"Insufficient shares to complete this sale\"); form does not submit; holdings remain unchanged (VTSAX stays at 150.5 shares).",
+      "test_data": {
+        "fund_symbol": "VTSAX",
+        "quantity": "151",
+        "destination_account": "****5001 (Checking, $5,847.52)",
+        "current_shares": "150.5"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All necessary form controls were present in the DOM. Concrete values chosen from seeded portfolio holdings (VTSAX with 150.5 shares) and accounts. No step rewrites required."
+    },
+    {
+      "tc_id": "TC-014",
+      "module": "Investments",
+      "title": "Recurring plan with Start Date in the past is rejected",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/investments",
+      "requires_auth": true,
+      "preconditions": "User is on the Investments page and Recurring Investment Plan form is visible; user is logged in.",
+      "steps": [
+        "1. Enter 'VTIAX' in Fund Symbol and select 'Vanguard Total International Stock Index (VTIAX)' from autocomplete",
+        "2. Enter contribution amount '1000.00' in Contribution Amount",
+        "3. Select 'Monthly' from Frequency",
+        "4. Enter start date '2024-01-15' (a date in the past) in Start Date field",
+        "5. Select funding account '****5001 (Checking, $5,847.52)' from Funding Account dropdown",
+        "6. Click 'Create Plan'"
+      ],
+      "expected_result": "Inline error on Start Date: \"Start date must be in the future\" (or equivalent); the recurring plan is not created.",
+      "test_data": {
+        "fund_symbol": "VTIAX",
+        "contribution_amount": "1000.00",
+        "frequency": "Monthly",
+        "start_date": "2024-01-15",
+        "funding_account": "****5001 (Checking, $5,847.52)"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All UI elements for creating a recurring plan were present in the verification. Chose VTIAX and a contribution amount equal to a seeded transaction amount ($1,000.00) and a past start date drawn from seeded transaction dates to ensure the date is clearly in the past. No step rewrites required."
+    },
+    {
+      "tc_id": "TC-023",
+      "module": "Investments",
+      "title": "Buy trade with funding account having exactly sufficient buying power succeeds",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/investments",
+      "requires_auth": true,
+      "preconditions": "A funding account exists whose available buying power equals the total cost of the intended trade (test must ensure this precondition in test setup); user is logged in.",
+      "steps": [
+        "1. Navigate to Investments page (http://localhost:8080/investments)",
+        "2. Select 'Buy' from Action",
+        "3. Enter 'VTSAX' in Fund Symbol and select 'Vanguard Total Stock Market Index (VTSAX)' from autocomplete",
+        "4. Enter quantity '52.001067' in Quantity field (calculated so total cost ≈ $5,847.52, matching the funding account buying power)",
+        "5. Select funding account '****5001 (Checking, $5,847.52)' from Funding Account dropdown",
+        "6. Click 'Execute Trade'"
+      ],
+      "expected_result": "\"Trade executed successfully.\" message appears with an order ID; holdings update accordingly (VTSAX holdings increase by the purchased quantity) and funding account balance reduces to zero or reflects the trade cost.",
+      "test_data": {
+        "fund_symbol": "VTSAX",
+        "quantity": "52.001067",
+        "funding_account": "****5001 (Checking, $5,847.52)",
+        "calculated_total_cost": "5847.52",
+        "fund_price_used": "112.45"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Verification showed the necessary controls are present. To satisfy the boundary condition, the test uses a fractional quantity (52.001067) computed from seeded Checking balance ($5,847.52) divided by the seeded VTSAX price ($112.45) so the total cost matches the account buying power. Fractional shares are allowed per seeded portfolio holdings (e.g., 150.5 shares). Test setup must ensure the account's available buying power equals the calculated cost."
+    },
+    {
+      "tc_id": "TC-002",
+      "module": "Account Statements",
+      "title": "Generate statement for a custom date range",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/statements",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Account Statements page is open",
+      "steps": [
+        "1. Enter '2024-01-11' in Start Date field",
+        "2. Enter '2024-01-14' in End Date field",
+        "3. Select account '****5001 (Checking)'",
+        "4. Click 'Generate Statement'"
+      ],
+      "expected_result": "Transactions table shows only transactions within the date range; \"Statement generated successfully.\" is shown",
+      "test_data": {
+        "start_date": "2024-01-11",
+        "end_date": "2024-01-14",
+        "account": "****5001 (Checking)"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 1 was rewritten because the previous step instructed selecting a 'Custom date range' from a Statement Period control which does not exist on the page. The page exposes Start Date and End Date inputs directly, so the test now enters dates into those fields and proceeds. Verification result indicated 'Select Custom date range' control is absent."
+    },
+    {
+      "tc_id": "TC-007",
+      "module": "Account Statements",
+      "title": "Custom date range with Start Date after End Date is rejected",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/statements",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Account Statements page is open",
+      "steps": [
+        "1. Enter '2024-01-15' in Start Date field",
+        "2. Enter '2024-01-10' in End Date field",
+        "3. Select account '****5001 (Checking)'",
+        "4. Click 'Generate Statement'"
+      ],
+      "expected_result": "Inline error on Start Date and/or End Date: \"Start_Date must be on or before End_Date\"; no statement is generated",
+      "test_data": {
+        "start_date": "2024-01-15",
+        "end_date": "2024-01-10",
+        "account": "****5001 (Checking)"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 1 was rewritten to enter dates directly because the 'Custom date range' selection control referenced in the original step does not exist on the Statements page. The page provides direct Start Date and End Date inputs as confirmed by DOM verification."
+    },
+    {
+      "tc_id": "TC-011",
+      "module": "Account Statements",
+      "title": "Custom range where Start Date equals End Date is accepted",
+      "type": "Edge/Boundary",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/statements",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Account Statements page is open",
+      "steps": [
+        "1. Enter '2024-01-13' in Start Date field",
+        "2. Enter '2024-01-13' in End Date field",
+        "3. Select account '****5001 (Checking)'",
+        "4. Click 'Generate Statement'"
+      ],
+      "expected_result": "\"Statement generated successfully.\" is shown; transactions for that single day are retrieved and displayed",
+      "test_data": {
+        "date": "2024-01-13",
+        "account": "****5001 (Checking)"
+      },
+      "verdict": "invalid_steps",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Step 1 was rewritten to enter the date directly into the Start Date field (and likewise for the End Date) because there is no Statement Period control or 'Custom date range' option in the DOM. The page provides Start/End date inputs and the Generate button, so the test uses those inputs."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Security Settings",
+      "title": "Change password with valid current password and strong new password",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/security-settings",
+      "requires_auth": true,
+      "preconditions": "User is logged in as admin (username: 'admin') and Security Settings page is open. Current password is known (Admin123!@#).",
+      "steps": [
+        "1. Expand the Change Password panel",
+        "2. Enter 'Admin123!@#' in Current Password",
+        "3. Enter 'AdminNewPass!1' in New Password (meets policy)",
+        "4. Enter 'AdminNewPass!1' in Confirm New Password",
+        "5. Click Change Password"
+      ],
+      "expected_result": "\"Password changed successfully.\" success notification is displayed",
+      "test_data": {
+        "username": "admin",
+        "current_password": "Admin123!@#",
+        "new_password": "AdminNewPass!1"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All placeholders replaced with concrete values. The current password uses the seeded user's password. The new strong password was provided as a concrete value for the test. Verification snapshot confirmed required elements are present on the Security Settings page."
+    },
+    {
+      "tc_id": "TC-006",
+      "module": "Security Settings",
+      "title": "Incorrect current password prevents password change",
+      "type": "Negative",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/security-settings",
+      "requires_auth": true,
+      "preconditions": "User is on Security Settings page and signed in as admin.",
+      "steps": [
+        "1. Enter 'WrongPassword!1' in Current Password",
+        "2. Enter 'AdminNewPass!1' in New Password (meets policy)",
+        "3. Enter 'AdminNewPass!1' in Confirm New Password",
+        "4. Click Change Password"
+      ],
+      "expected_result": "Inline error on Current Password: \"current password is incorrect\"; form does not submit; credentials are not updated",
+      "test_data": {
+        "username": "admin",
+        "incorrect_current_password": "WrongPassword!1",
+        "new_password": "AdminNewPass!1"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Placeholders replaced with concrete values. The verification snapshot confirmed the form fields and submit control exist; the expected inline error is a runtime behavior validated at test execution."
+    },
+    {
+      "tc_id": "TC-010",
+      "module": "Security Settings",
+      "title": "Browser Back after successful password change blocks resubmission with old password",
+      "type": "Edge/Interaction",
+      "priority": "Medium",
+      "direct_link": "http://localhost:8080/security-settings",
+      "requires_auth": true,
+      "preconditions": "User has just successfully changed their password from Admin123!@# to AdminNewPass!1 and sees the success notification; Security Settings page is open.",
+      "steps": [
+        "1. After \"Password changed successfully.\" is shown, press browser Back",
+        "2. Without changing any fields (Current Password still contains 'Admin123!@#'), click Change Password again"
+      ],
+      "expected_result": "Second submission is blocked; Current Password field shows verification error (old password is now incorrect); no further credential change occurs",
+      "test_data": {
+        "username": "admin",
+        "old_password": "Admin123!@#",
+        "new_password": "AdminNewPass!1"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All placeholders substituted. The verification snapshot confirmed the presence of inputs and the submit button, but the browser Back/prior-success state cannot be validated from a static DOM snapshot; the runtime behavior described in the expected result must be validated during execution."
+    },
+    {
+      "tc_id": "TC-001",
+      "module": "Support Center",
+      "title": "Send secure message with required Message Body only",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "http://localhost:8080/support-center",
+      "requires_auth": true,
+      "preconditions": "User is logged in; Support Center page is open",
+      "steps": [
+        "1. Enter 'Online Purchase - Amazon' in Message Body",
+        "2. Click Send Message"
+      ],
+      "expected_result": "\"Message sent successfully.\" with a visible ticket ID is shown",
+      "test_data": {
+        "message_body": "Online Purchase - Amazon"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Replaced <valid message body> with the seeded transaction description 'Online Purchase - Amazon' (txn002). Verification result indicates the relevant UI elements exist; the post-submit ticket ID is dynamic and cannot be statically verified."
+    },
+    {
+      "tc_id": "TC-016",
+      "module": "Support Center",
+      "title": "Attachment with double extension (allowed + disallowed) is blocked",
+      "type": "Edge/Input",
+      "priority": "Low",
+      "direct_link": "http://localhost:8080/support-center",
+      "requires_auth": true,
+      "preconditions": "User is on the Support Center page; Secure Message form is visible",
+      "steps": [
+        "1. Enter 'Internet Provider' in Subject and 'Grocery Store - Walmart' in Message Body",
+        "2. Select a file with a double-extension filename (e.g., document.pdf.exe)",
+        "3. Click Send Message"
+      ],
+      "expected_result": "Submission is blocked; Attachment control displays inline error that the file type is not allowed; no ticket is created",
+      "test_data": {
+        "subject": "Internet Provider",
+        "message_body": "Grocery Store - Walmart",
+        "attachment_filename": "document.pdf.exe"
+      },
+      "verdict": "valid",
+      "issues": [],
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "Filled subject with payee name 'Internet Provider' (payee003) and message body with transaction description 'Grocery Store - Walmart' (txn006). Attachment filename used is the example 'document.pdf.exe'. Verification notes: the attachment input is present in the DOM snapshot but its file-selection and server-side validation behavior are dynamic and cannot be fully verified from static DOM."
+    }
+  ]
+}

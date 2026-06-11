@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Logout | TC-002 | Type: Positive | Priority: High]\nTitle: After logout, accessing a protected page redirects to Login page\n\n\u25b6 Start URL:    https://www.saucedemo.com/inventory.html\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"protected_url\": \"https://www.saucedemo.com/inventory.html\"\n}\n\nPreconditions:\n  Test will authenticate using standard_user to reach a page with a visible Logout option, then perform logout.\n\nSteps to Execute:\n  1. Open https://www.saucedemo.com/ (Login page).\n  2. Enter 'standard_user' in Username field\n  3. Enter 'secret_sauce' in Password field\n  4. Click the Login button\n  5. On the Inventory page, click the Menu (burger) button\n  6. Click the 'Logout' link in the side menu\n  7. Attempt to open a protected page by navigating to https://www.saucedemo.com/inventory.html\n\nExpected Result:\n  Attempting to access the protected page redirects to the Login page; the Login page is displayed\n\nNotes from prior verification:\n  Original step to click Logout was not executable against the captured DOM (Login page). Added explicit login steps to reach Inventory where the Logout control exists, then perform logout. Kept the protected-URL navigation step unchanged.",
+  "expected_outcome": "Attempting to access the protected page redirects to the Login page; the Login page is displayed",
+  "tc_metadata": {
+    "tc_id": "TC-002",
+    "module": "Logout",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/inventory.html, executed all 7 step(s) for 'After logout, accessing a protected page redirects to Login page'. Outcome validation confirmed: Attempting to access the protected page redirects to the Login page; the Login page is displayed",
+    "errors": "None"
+  }
+}

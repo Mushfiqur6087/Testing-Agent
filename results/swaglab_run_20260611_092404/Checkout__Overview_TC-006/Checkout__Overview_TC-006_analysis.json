@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Overview | TC-006 | Type: Edge/Interaction | Priority: Medium]\nTitle: Browser Back after successful Finish does not allow duplicate order creation\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-two.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User is signed in; items are in cart; user has just successfully completed checkout via the Finish button\n\nSteps to Execute:\n  1. Click the **Finish** button on the Overview step\n  2. Wait for the Confirmation page to be displayed\n  3. Use the browser **Back** button once\n  4. If the Overview page is shown, attempt to click **Finish** again\n\nExpected Result:\n  Re-submission is blocked; no second order is created; either the Finish button is disabled, a prevention message is shown, or the UI prevents submission; only one confirmation and order exist\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "Re-submission is blocked; no second order is created; either the Finish button is disabled, a prevention message is shown, or the UI prevents submission; only one confirmation and order exist",
+  "tc_metadata": {
+    "tc_id": "TC-006",
+    "module": "Checkout - Overview",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-two.html, executed all 4 step(s) for 'Browser Back after successful Finish does not allow duplicate order creation'. Outcome validation confirmed: Re-submission is blocked; no second order is created; either the Finish button is disabled, a prevention message is shown, or the UI prevents submission; only one confirmation and order exist",
+    "errors": "None"
+  }
+}

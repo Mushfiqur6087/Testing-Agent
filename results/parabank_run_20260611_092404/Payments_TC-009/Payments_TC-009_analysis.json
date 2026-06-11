@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Payments | TC-009 | Type: Negative | Priority: High]\nTitle: Insufficient funds in selected source account\n\n\u25b6 Start URL:    http://localhost:8080/bill-pay\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"source_account\": \"****5003 (Credit Card, -$1,534.67)\",\n  \"payment_amount\": \"100.00\"\n}\n\nPreconditions:\n  Selected source account balance is less than the entered payment amount (use Credit Card ****5003 with balance -$1,534.67).\n\nSteps to Execute:\n  1. Select the under-funded source account '****5003 (Credit Card, -$1,534.67)'.\n  2. Enter a payment amount '100.00' (greater than the account's available balance).\n  3. Click Pay.\n\nExpected Result:\n  Inline error \"Insufficient funds\" is shown; form does not submit; no payment is created; balances unchanged.\n\nNotes from prior verification:\n  Used seeded Credit Card account with negative balance to trigger insufficient-funds validation. The error is produced at runtime and cannot be checked in the static DOM snapshot.",
+  "expected_outcome": "Inline error \"Insufficient funds\" is shown; form does not submit; no payment is created; balances unchanged.",
+  "tc_metadata": {
+    "tc_id": "TC-009",
+    "module": "Payments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/bill-pay, executed all 3 step(s) for 'Insufficient funds in selected source account'. Outcome validation confirmed: Inline error \"Insufficient funds\" is shown; form does not submit; no payment is created; balances unchanged.",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Login | TC-008 | Type: Negative | Priority: High]\nTitle: Authentication failure with unregistered credentials\n\n\u25b6 Start URL:    http://localhost:8080/login\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"email\": \"unregistered@example.com\",\n  \"password\": \"Password1!\"\n}\n\nPreconditions:\n  User is on the Login page; the credentials entered (unregistered@example.com / Password1!) are not present in the database\n\nSteps to Execute:\n  1. Enter 'unregistered@example.com' in Email/Username\n  2. Enter 'Password1!' in Password\n  3. Click Sign In\n\nExpected Result:\n  Page displays \"Incorrect email or password. Please try again.\"; Password field is cleared; user stays on Login page; retry is allowed\n\nNotes from prior verification:\n  Placeholders filled. 'unregistered@example.com' and 'Password1!' are chosen to be absent from seeded data to exercise the negative path.",
+  "expected_outcome": "Page displays \"Incorrect email or password. Please try again.\"; Password field is cleared; user stays on Login page; retry is allowed",
+  "tc_metadata": {
+    "tc_id": "TC-008",
+    "module": "Login",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/login, executed all 3 step(s) for 'Authentication failure with unregistered credentials'. Outcome validation confirmed: Page displays \"Incorrect email or password. Please try again.\"; Password field is cleared; user stays on Login page; retry is allowed",
+    "errors": "None"
+  }
+}

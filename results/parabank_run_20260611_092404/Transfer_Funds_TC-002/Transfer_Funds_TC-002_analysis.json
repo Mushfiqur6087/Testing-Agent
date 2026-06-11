@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Transfer Funds | TC-002 | Type: Positive | Priority: High]\nTitle: External transfer with matching account numbers succeeds\n\n\u25b6 Start URL:    http://localhost:8080/transfer-funds\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"amount\": \"500.00\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\",\n  \"external_account_number\": \"ELC123456789\"\n}\n\nPreconditions:\n  User is logged in; source account (****5001 Checking) has sufficient funds\n\nSteps to Execute:\n  1. Navigate to Transfer Funds page\n  2. Select the 'External Account' radio option\n  3. Enter '500.00' in the Amount field\n  4. Select '****5001 (Checking, $5,847.52)' as the Source Account\n  5. Enter 'ELC123456789' in External Account Number and 'ELC123456789' in Confirm External Account Number\n  6. Click 'Transfer'\n\nExpected Result:\n  \"Transfer completed successfully.\" with a transaction ID is displayed\n\nNotes from prior verification:\n  External Account Number and Confirm fields are conditional and appear after selecting the External Account radio; used payee account number 'ELC123456789' from seeded Payees as the external account.",
+  "expected_outcome": "\"Transfer completed successfully.\" with a transaction ID is displayed",
+  "tc_metadata": {
+    "tc_id": "TC-002",
+    "module": "Transfer Funds",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/transfer-funds, executed all 6 step(s) for 'External transfer with matching account numbers succeeds'. Outcome validation confirmed: \"Transfer completed successfully.\" with a transaction ID is displayed",
+    "errors": "None"
+  }
+}

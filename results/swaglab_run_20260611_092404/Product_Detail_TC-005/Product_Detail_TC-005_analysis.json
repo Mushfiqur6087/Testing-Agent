@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Detail | TC-005 | Type: Negative | Priority: High]\nTitle: Add to cart is unavailable when product is already InCart (Negative | High)\n\n\u25b6 Start URL:    https://www.saucedemo.com/product-detail.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"initial_product_state\": \"InCart\"\n}\n\nPreconditions:\n  Product is already InCart; user is on the Product Detail page for that product (Remove button visible).\n\nSteps to Execute:\n  1. Open the Product Detail page for a product whose state is InCart\n  2. Look for an Add to cart button on the page\n  3. If visible, attempt to click it\n\nExpected Result:\n  The Add to cart button is not visible or is disabled; the page shows the Remove action instead; product remains InCart and no additional item is added.\n\nNotes from prior verification:\n  Verification confirmed the page shows Remove and the Add to cart button is absent, so the conditional click is not executed as intended.",
+  "expected_outcome": "The Add to cart button is not visible or is disabled; the page shows the Remove action instead; product remains InCart and no additional item is added.",
+  "tc_metadata": {
+    "tc_id": "TC-005",
+    "module": "Product Detail",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/product-detail.html, executed all 3 step(s) for 'Add to cart is unavailable when product is already InCart (Negative | High)'. Outcome validation confirmed: The Add to cart button is not visible or is disabled; the page shows the Remove action instead; product remains InCart and no additional item is added.",
+    "errors": "None"
+  }
+}

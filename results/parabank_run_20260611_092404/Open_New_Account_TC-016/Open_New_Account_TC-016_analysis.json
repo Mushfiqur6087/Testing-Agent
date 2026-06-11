@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Open New Account | TC-016 | Type: Edge/Boundary | Priority: Medium]\nTitle: Funding account balance exactly equals deposit amount \u2014 boundary succeeds\n\n\u25b6 Start URL:    http://localhost:8080/open-new-account\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"account_type\": \"Checking\",\n  \"initial_deposit\": \"5847.52\",\n  \"funding_account\": \"****5001 (Checking)\",\n  \"funding_account_balance\": \"5847.52\",\n  \"user_email\": \"admin@parabank.com\",\n  \"username\": \"admin\"\n}\n\nPreconditions:\n  A funding account exists whose balance exactly equals the intended deposit amount (Checking ****5001 has balance $5,847.52). User is logged in as 'admin' (admin@parabank.com).\n\nSteps to Execute:\n  1. Select 'Checking' as Account Type (meets Checking minimum of $25)\n  2. Enter '5847.52' in Initial Deposit Amount (X)\n  3. Select the funding account '****5001 (Checking, $5,847.52)' which has balance = 5847.52\n  4. Click 'Open Account'\n\nExpected Result:\n  Form submits; \"Account opened successfully!\" is shown; redirect to Accounts Overview\n\nNotes from prior verification:\n  Used the exact seeded Checking account balance (5,847.52) as the deposit amount to exercise the boundary condition. Verification note: existence of exact-balance account is an external data precondition but is satisfied by seed data.",
+  "expected_outcome": "Form submits; \"Account opened successfully!\" is shown; redirect to Accounts Overview",
+  "tc_metadata": {
+    "tc_id": "TC-016",
+    "module": "Open New Account",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Boundary",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/open-new-account, executed all 4 step(s) for 'Funding account balance exactly equals deposit amount \u2014 boundary succeeds'. Outcome validation confirmed: Form submits; \"Account opened successfully!\" is shown; redirect to Accounts Overview",
+    "errors": "None"
+  }
+}

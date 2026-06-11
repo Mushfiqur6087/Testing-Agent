@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Investments | TC-013 | Type: Negative | Priority: High]\nTitle: Sell with quantity exceeding share balance is blocked\n\n\u25b6 Start URL:    http://localhost:8080/investments\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"fund_symbol\": \"VTSAX\",\n  \"quantity\": \"151\",\n  \"destination_account\": \"****5001 (Checking, $5,847.52)\",\n  \"current_shares\": \"150.5\"\n}\n\nPreconditions:\n  User is logged in; user holds VTSAX with 150.5 shares in Portfolio Holdings.\n\nSteps to Execute:\n  1. Navigate to Investments page (http://localhost:8080/investments)\n  2. Select 'Sell' from Action\n  3. Enter 'VTSAX' in Fund Symbol\n  4. Enter quantity '151' (greater than current holding of 150.5) in Quantity field\n  5. Select destination account '****5001 (Checking, $5,847.52)' from Destination Account dropdown\n  6. Click 'Execute Trade'\n\nExpected Result:\n  Inline error indicating insufficient share balance for the Sell (e.g. \"Insufficient shares to complete this sale\"); form does not submit; holdings remain unchanged (VTSAX stays at 150.5 shares).\n\nNotes from prior verification:\n  All necessary form controls were present in the DOM. Concrete values chosen from seeded portfolio holdings (VTSAX with 150.5 shares) and accounts. No step rewrites required.",
+  "expected_outcome": "Inline error indicating insufficient share balance for the Sell (e.g. \"Insufficient shares to complete this sale\"); form does not submit; holdings remain unchanged (VTSAX stays at 150.5 shares).",
+  "tc_metadata": {
+    "tc_id": "TC-013",
+    "module": "Investments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/investments, executed all 6 step(s) for 'Sell with quantity exceeding share balance is blocked'. Outcome validation confirmed: Inline error indicating insufficient share balance for the Sell (e.g. \"Insufficient shares to complete this sale\"); form does not submit; holdings remain unchanged (VTSAX stays at 150.5 shares).",
+    "errors": "None"
+  }
+}

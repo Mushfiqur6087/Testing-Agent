@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Login | TC-007 | Type: Negative | Priority: High]\nTitle: Submit with Username blank shows required error\n\n\u25b6 Start URL:    https://www.saucedemo.com/login\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"username\": \"\",\n  \"password\": \"secret_sauce\"\n}\n\nPreconditions:\n  User is on the Login page; user is not authenticated\n\nSteps to Execute:\n  1. Ensure the Username field is empty (clear any existing text)\n  2. Enter 'secret_sauce' in the Password field\n  3. Click the Login button\n\nExpected Result:\n  An inline validation error is shown: \"Epic sadface: Username is required.\"; form does not submit; user remains on the Login page\n\nNotes from prior verification:\n  No steps changed. The inline validation message is a runtime result and was not part of the static DOM check.",
+  "expected_outcome": "An inline validation error is shown: \"Epic sadface: Username is required.\"; form does not submit; user remains on the Login page",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Login",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/login, executed all 3 step(s) for 'Submit with Username blank shows required error'. Outcome validation confirmed: An inline validation error is shown: \"Epic sadface: Username is required.\"; form does not submit; user remains on the Login page",
+    "errors": "None"
+  }
+}

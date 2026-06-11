@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Request Loan | TC-010 | Type: Negative | Priority: High]\nTitle: Down payment below 10% of loan amount is rejected\n\n\u25b6 Start URL:    http://localhost:8080/request-loan\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"loan_amount\": 10000,\n  \"down_payment\": 500\n}\n\nPreconditions:\n  User is on the Request Loan page; Loan Type is selected\n\nSteps to Execute:\n  1. Enter '10000' in Loan Amount\n  2. Enter '500' in Down Payment\n  3. Click 'Request Loan'\n\nExpected Result:\n  Inline error on Down Payment: \"must be \u2265 10% of Loan Amount\"; form does not submit; no loan is created\n\nNotes from prior verification:\n  Down payment of 500 is intentionally less than 10% of 10000 (should be \u22651000) to validate client-side/server-side rejection. The radio control for loan type is present per DOM but selection was assumed per precondition.",
+  "expected_outcome": "Inline error on Down Payment: \"must be \u2265 10% of Loan Amount\"; form does not submit; no loan is created",
+  "tc_metadata": {
+    "tc_id": "TC-010",
+    "module": "Request Loan",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/request-loan, executed all 3 step(s) for 'Down payment below 10% of loan amount is rejected'. Outcome validation confirmed: Inline error on Down Payment: \"must be \u2265 10% of Loan Amount\"; form does not submit; no loan is created",
+    "errors": "None"
+  }
+}

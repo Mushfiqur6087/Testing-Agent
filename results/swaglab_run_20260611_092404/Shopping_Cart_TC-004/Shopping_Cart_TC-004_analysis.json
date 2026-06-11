@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Shopping Cart | TC-004 | Type: Negative | Priority: High]\nTitle: Unauthenticated user cannot access Shopping Cart page\n\n\u25b6 Start URL:    https://www.saucedemo.com/cart.html\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{}\n\nPreconditions:\n  User is not authenticated (not logged in).\n\nSteps to Execute:\n  1. Navigate directly to the Shopping Cart page URL (https://www.saucedemo.com/cart.html) as an unauthenticated user\n\nExpected Result:\n  Access is blocked; user is redirected to the Login page (https://www.saucedemo.com/); the Shopping Cart table, item rows, and cart actions (Remove, Continue Shopping, Checkout) are not displayed.\n\nNotes from prior verification:\n  Verification snapshot showed the cart page and cart elements present but indicated the session in that snapshot was authenticated. Because the static DOM snapshot reflected an authenticated session, the expected redirect/blocked access for an unauthenticated user cannot be validated from the provided DOM; this must be validated at runtime by ensuring the test starts from an unauthenticated state (e.g., perform logout then navigate).",
+  "expected_outcome": "Access is blocked; user is redirected to the Login page (https://www.saucedemo.com/); the Shopping Cart table, item rows, and cart actions (Remove, Continue Shopping, Checkout) are not displayed.",
+  "tc_metadata": {
+    "tc_id": "TC-004",
+    "module": "Shopping Cart",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/cart.html, executed all 1 step(s) for 'Unauthenticated user cannot access Shopping Cart page'. Outcome validation confirmed: Access is blocked; user is redirected to the Login page (https://www.saucedemo.com/); the Shopping Cart table, item rows, and cart actions (Remove, Continue Shopping, Checkout) are not displayed.",
+    "errors": "None"
+  }
+}

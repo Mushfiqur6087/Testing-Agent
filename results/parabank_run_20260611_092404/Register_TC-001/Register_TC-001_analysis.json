@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Register | TC-001 | Type: Positive | Priority: High]\nTitle: Complete registration happy path\n\n\u25b6 Start URL:    http://localhost:8080/register\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"street_address\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zip\": \"62701\",\n  \"phone\": \"(555) 123-4567\",\n  \"ssn\": \"***-**-1234\",\n  \"username\": \"admin@parabank.com\",\n  \"password\": \"Admin123!@#\"\n}\n\nPreconditions:\n  User is not authenticated; Registration page is open\n\nSteps to Execute:\n  1. Enter 'John' in First Name field\n  2. Enter 'Doe' in Last Name field\n  3. Enter '123 Main Street' in Street Address field\n  4. Enter 'Springfield' in City field\n  5. Select 'IL' from State dropdown\n  6. Enter '62701' in ZIP Code field\n  7. Enter '(555) 123-4567' in Phone Number field\n  8. Enter '***-**-1234' in SSN field\n  9. Enter 'admin@parabank.com' in Username/Email field\n  10. Enter 'Admin123!@#' in Password field\n  11. Enter 'Admin123!@#' in Confirm Password field\n  12. Click Register\n\nExpected Result:\n  \"Account created successfully \u2014 please sign in\" is shown; user is redirected to the Login page\n\nNotes from prior verification:\n  All input values come from seeded mock data. Verification noted that dynamic post-submit outcomes (success message / redirect) are not checked in the static DOM snapshot.",
+  "expected_outcome": "\"Account created successfully \u2014 please sign in\" is shown; user is redirected to the Login page",
+  "tc_metadata": {
+    "tc_id": "TC-001",
+    "module": "Register",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/register, executed all 12 step(s) for 'Complete registration happy path'. Outcome validation confirmed: \"Account created successfully \u2014 please sign in\" is shown; user is redirected to the Login page",
+    "errors": "None"
+  }
+}

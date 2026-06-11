@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Transfer Funds | TC-009 | Type: Negative | Priority: High]\nTitle: Transfer amount exceeds available balance\n\n\u25b6 Start URL:    http://localhost:8080/transfer-funds\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"amount\": \"10000.00\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\",\n  \"destination_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  User is logged in; source account balance is known (****5001 Checking has $5,847.52)\n\nSteps to Execute:\n  1. Select 'My ParaBank Account' option\n  2. Enter '10000.00' in the Amount field (exceeding the source account balance)\n  3. Select '****5001 (Checking, $5,847.52)' as the Source Account\n  4. Select '****5002 (Savings, $25,678.90)' as the Destination Account\n  5. Click 'Transfer'\n\nExpected Result:\n  Page displays \"Insufficient funds\"; form does not submit; no transaction is created\n\nNotes from prior verification:\n  ",
+  "expected_outcome": "Page displays \"Insufficient funds\"; form does not submit; no transaction is created",
+  "tc_metadata": {
+    "tc_id": "TC-009",
+    "module": "Transfer Funds",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/transfer-funds, executed all 5 step(s) for 'Transfer amount exceeds available balance'. Outcome validation confirmed: Page displays \"Insufficient funds\"; form does not submit; no transaction is created",
+    "errors": "None"
+  }
+}

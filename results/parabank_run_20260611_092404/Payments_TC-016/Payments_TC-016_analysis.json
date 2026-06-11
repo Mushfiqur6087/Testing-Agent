@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Payments | TC-016 | Type: Edge/Interaction | Priority: Medium]\nTitle: Browser Back after successful payment does not create duplicate\n\n\u25b6 Start URL:    http://localhost:8080/bill-pay\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"payment_amount\": \"10000.00\",\n  \"payee_name\": \"Internet Provider\",\n  \"payee_account\": \"INT555444333\",\n  \"source_account\": \"****5002 (Savings, $25,678.90)\"\n}\n\nPreconditions:\n  Source account has at least 2\u00d7 the payment amount available (use Savings ****5002 with $25,678.90).\n\nSteps to Execute:\n  1. Submit a valid payment of '10000.00' to payee 'Internet Provider' (account 'INT555444333') using source account '****5002 (Savings, $25,678.90)'; confirm success and note reference code.\n  2. Press browser Back to return to the Bill Pay form.\n  3. Click Pay again on the returned form.\n\nExpected Result:\n  Second submission is blocked; only one payment appears in transaction history; account balance reflects a single deduction of $10,000.00.\n\nNotes from prior verification:\n  Used seeded Savings account to satisfy 2\u00d7 requirement. The multi-step browser flow (submit -> back -> re-submit) and duplicate-prevention behavior are runtime/browser behaviors and cannot be validated from the static DOM snapshot; test should be run in a real browser to observe server-side idempotency.",
+  "expected_outcome": "Second submission is blocked; only one payment appears in transaction history; account balance reflects a single deduction of $10,000.00.",
+  "tc_metadata": {
+    "tc_id": "TC-016",
+    "module": "Payments",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/bill-pay, executed all 3 step(s) for 'Browser Back after successful payment does not create duplicate'. Outcome validation confirmed: Second submission is blocked; only one payment appears in transaction history; account balance reflects a single deduction of $10,000.00.",
+    "errors": "None"
+  }
+}

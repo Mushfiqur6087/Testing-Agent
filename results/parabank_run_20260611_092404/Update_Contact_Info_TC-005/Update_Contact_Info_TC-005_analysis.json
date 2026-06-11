@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Update Contact Info | TC-005 | Type: Negative | Priority: High]\nTitle: Leave required field (First Name) blank and submit\n\n\u25b6 Start URL:    http://localhost:8080/profile\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"original_first_name\": \"John\",\n  \"original_last_name\": \"Doe\"\n}\n\nPreconditions:\n  Form is pre-filled; user is authenticated\n\nSteps to Execute:\n  1. Clear the First Name field\n  2. Leave all other fields unchanged\n  3. Click Update Profile\n\nExpected Result:\n  Inline error on First Name: \"required\"; form does not submit; \"Profile updated successfully.\" is not shown\n\nNotes from prior verification:\n  No placeholder values required to be replaced. The form controls exist per DOM check; inline validation behavior is runtime and not verifiable from static DOM.",
+  "expected_outcome": "Inline error on First Name: \"required\"; form does not submit; \"Profile updated successfully.\" is not shown",
+  "tc_metadata": {
+    "tc_id": "TC-005",
+    "module": "Update Contact Info",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/profile, executed all 3 step(s) for 'Leave required field (First Name) blank and submit'. Outcome validation confirmed: Inline error on First Name: \"required\"; form does not submit; \"Profile updated successfully.\" is not shown",
+    "errors": "None"
+  }
+}

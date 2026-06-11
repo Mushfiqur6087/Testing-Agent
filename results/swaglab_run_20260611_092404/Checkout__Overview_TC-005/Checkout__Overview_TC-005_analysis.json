@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Overview | TC-005 | Type: Edge/Interaction | Priority: Medium]\nTitle: Rapid double-click of Finish does not create duplicate orders\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-two.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User is signed in; items are in cart; Checkout \u2013 Overview step is visible with order summary\n\nSteps to Execute:\n  1. Click the **Finish** button\n  2. Immediately click the **Finish** button again (within one second)\n  3. Observe the UI until navigation to the Confirmation page completes\n\nExpected Result:\n  First submission succeeds; the second click is blocked or ignored (Finish button is disabled or a processing indicator appears); only one Confirmation page is shown and no duplicate order is created\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "First submission succeeds; the second click is blocked or ignored (Finish button is disabled or a processing indicator appears); only one Confirmation page is shown and no duplicate order is created",
+  "tc_metadata": {
+    "tc_id": "TC-005",
+    "module": "Checkout - Overview",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-two.html, executed all 3 step(s) for 'Rapid double-click of Finish does not create duplicate orders'. Outcome validation confirmed: First submission succeeds; the second click is blocked or ignored (Finish button is disabled or a processing indicator appears); only one Confirmation page is shown and no duplicate order is created",
+    "errors": "None"
+  }
+}

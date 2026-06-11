@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Product Detail | TC-007 | Type: Edge/State | Priority: Medium]\nTitle: Rapid double-click Add to cart when NotInCart does not duplicate cart entry (Edge/State | Medium)\n\n\u25b6 Start URL:    https://www.saucedemo.com/product-detail.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"initial_product_state\": \"InCart\"\n}\n\nPreconditions:\n  User is on the Product Detail page for a product. Verification snapshot shows the product is currently InCart (Remove button present).\n\nSteps to Execute:\n  1. Verify the page shows the Remove button (product currently InCart)\n  2. Click the Remove button to change the product state to NotInCart\n  3. Verify the Add to cart button is visible\n  4. Click the Add to cart button\n  5. Immediately click the Add to cart button again (rapid second click)\n  6. Navigate to the Shopping Cart\n\nExpected Result:\n  First click succeeds; product is added once; Shopping Cart lists exactly one instance of the product; Product Detail shows Remove; no duplicate entries or errors.\n\nNotes from prior verification:\n  Steps 1-3 were rewritten because the verification snapshot showed no Add to cart button (only Remove). To exercise the intended rapid-add flow we first remove the product (using the available Remove button) to reach NotInCart, then perform the rapid double-click Add to cart sequence. This change was necessary because the Add to cart element was not present initially.",
+  "expected_outcome": "First click succeeds; product is added once; Shopping Cart lists exactly one instance of the product; Product Detail shows Remove; no duplicate entries or errors.",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Product Detail",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/State",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/product-detail.html, executed all 6 step(s) for 'Rapid double-click Add to cart when NotInCart does not duplicate cart entry (Edge/State | Medium)'. Outcome validation confirmed: First click succeeds; product is added once; Shopping Cart lists exactly one instance of the product; Product Detail shows Remove; no duplicate entries or errors.",
+    "errors": "None"
+  }
+}

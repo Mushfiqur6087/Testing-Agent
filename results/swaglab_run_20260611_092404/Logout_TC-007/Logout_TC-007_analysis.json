@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Logout | TC-007 | Type: Edge/Interaction | Priority: Medium]\nTitle: Browser Back after logout does not expose protected content\n\n\u25b6 Start URL:    https://www.saucedemo.com/inventory.html\n\u25b6 Requires Auth: No\n\u25b6 Test Data:\n{\n  \"username\": \"standard_user\",\n  \"password\": \"secret_sauce\",\n  \"inventory_url\": \"https://www.saucedemo.com/inventory.html\"\n}\n\nPreconditions:\n  Test will authenticate using standard_user and navigate to a protected page with visible sensitive content before performing logout.\n\nSteps to Execute:\n  1. Open https://www.saucedemo.com/ (Login page).\n  2. Enter 'standard_user' in Username field\n  3. Enter 'secret_sauce' in Password field\n  4. Click the Login button\n  5. On the Inventory page, click the Menu (burger) button\n  6. Click the 'Logout' link in the side menu\n  7. Wait until the app redirects to the Login page\n  8. Use the browser Back button once\n\nExpected Result:\n  Back navigation to the protected page is blocked; Login page is shown (or the app immediately redirects to Login); no protected content is visible; authentication is required\n\nNotes from prior verification:\n  The captured DOM was the Login page and did not contain a Logout control. Rewrote the initial steps to perform an explicit login as standard_user and navigate to Inventory before performing logout. Note: browser Back navigation and redirection behavior are runtime actions and were not verifiable from the static DOM snapshot.",
+  "expected_outcome": "Back navigation to the protected page is blocked; Login page is shown (or the app immediately redirects to Login); no protected content is visible; authentication is required",
+  "tc_metadata": {
+    "tc_id": "TC-007",
+    "module": "Logout",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/inventory.html, executed all 8 step(s) for 'Browser Back after logout does not expose protected content'. Outcome validation confirmed: Back navigation to the protected page is blocked; Login page is shown (or the app immediately redirects to Login); no protected content is visible; authentication is required",
+    "errors": "None"
+  }
+}

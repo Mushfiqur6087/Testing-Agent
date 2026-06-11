@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Open New Account | TC-001 | Type: Positive | Priority: High]\nTitle: Open a Checking account at minimum deposit\n\n\u25b6 Start URL:    http://localhost:8080/open-new-account\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"account_type\": \"Checking\",\n  \"initial_deposit\": \"25\",\n  \"funding_account\": \"****5001 (Checking)\",\n  \"funding_account_balance\": \"5847.52\",\n  \"user_email\": \"admin@parabank.com\",\n  \"username\": \"admin\"\n}\n\nPreconditions:\n  User 'admin' (admin@parabank.com) is logged in; a funding account exists with balance \u2265 $25 (use Checking ****5001 with $5,847.52).\n\nSteps to Execute:\n  1. Navigate to http://localhost:8080/open-new-account (Open New Account page)\n  2. Select 'Checking' as Account Type\n  3. Enter '25' in Initial Deposit Amount\n  4. Select funding account '****5001 (Checking, $5,847.52)' from the Funding Source dropdown\n  5. Click 'Open Account'\n\nExpected Result:\n  \"Account opened successfully!\" is shown; user is redirected to Accounts Overview\n\nNotes from prior verification:\n  Concrete funding account and deposit amount were selected from seeded data: Checking ****5001 with $5,847.52. Preconditions updated to name the logged-in user and funding account.",
+  "expected_outcome": "\"Account opened successfully!\" is shown; user is redirected to Accounts Overview",
+  "tc_metadata": {
+    "tc_id": "TC-001",
+    "module": "Open New Account",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/open-new-account, executed all 5 step(s) for 'Open a Checking account at minimum deposit'. Outcome validation confirmed: \"Account opened successfully!\" is shown; user is redirected to Accounts Overview",
+    "errors": "None"
+  }
+}

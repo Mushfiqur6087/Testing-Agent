@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Checkout - Confirmation | TC-005 | Type: Edge/Interaction | Priority: Medium]\nTitle: Rapid double-click of Back Home button navigates once without error\n\n\u25b6 Start URL:    https://www.saucedemo.com/checkout-step-two.html\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"user\": \"standard_user\"\n}\n\nPreconditions:\n  User has completed checkout and is on the Confirmation page showing the success message\n\nSteps to Execute:\n  1. Rapidly click the **Back Home** button twice in immediate succession\n\nExpected Result:\n  First click succeeds: app navigates to Product Inventory and cart is cleared; the immediate second click is ignored; no additional navigation or error is shown\n\nNotes from prior verification:\n  Manually verified for completion.",
+  "expected_outcome": "First click succeeds: app navigates to Product Inventory and cart is cleared; the immediate second click is ignored; no additional navigation or error is shown",
+  "tc_metadata": {
+    "tc_id": "TC-005",
+    "module": "Checkout - Confirmation",
+    "verdict": "valid",
+    "priority": "Medium",
+    "type": "Edge/Interaction",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to https://www.saucedemo.com/checkout-step-two.html, executed all 1 step(s) for 'Rapid double-click of Back Home button navigates once without error'. Outcome validation confirmed: First click succeeds: app navigates to Product Inventory and cart is cleared; the immediate second click is ignored; no additional navigation or error is shown",
+    "errors": "None"
+  }
+}

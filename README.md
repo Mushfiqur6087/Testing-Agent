@@ -1,407 +1,383 @@
-<!-- # 🤖 Testing Agent - AI-Powered Intelligent Test Case Generation and Execution
+# Testing Agent
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![Playwright](https://img.shields.io/badge/Playwright-Supported-green.svg)](https://playwright.dev)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-An intelligent test automation framework that automatically generates and executes multiple test cases from a single test description. The Testing Agent uses Large Language Models (LLM) to intelligently create comprehensive test scenarios and execute them with robust browser automation through a sophisticated multi-agent architecture.
-
-## 🚀 Features
-
-### 🧠 **Intelligent Test Case Generation**
-- **Test Case Generation**: Automatically generates multiple comprehensive test cases from a single test description
-- **TestAgentMain Orchestrator**: Central coordinator that manages test generation and execution workflow
-- **InstructionAgent**: Specialized agent for parsing test descriptions and generating varied test scenarios
-- **Smart Test Planning**: Creates detailed test steps with expected outcomes for thorough validation
-
-### 🎯 **Automated Test Execution**
-- **TestAgent Execution**: Individual test agent instances for isolated test case execution
-- **Sequential Processing**: Executes test cases one by one for thorough testing
-- **Result Validation**: Validates expected outcomes using AI-powered tools during execution
-- **Error Handling**: Robust error handling with comprehensive error detection and recovery
-- **Session Management**: Proper initialization and cleanup for each test execution
-
-### 🌐 **Advanced Browser Automation**
-- **Multi-Tab Management**: Create, switch, and manage multiple browser tabs
-- **Smart Element Detection**: Automatically identifies interactive elements (buttons, inputs, links)
-- **Intelligent Selectors**: Uses both CSS selectors and XPath with fallback strategies
-- **Cross-Browser Support**: Built on Playwright for reliable automation
-- **Real-time DOM Analysis**: Dynamic page analysis and element mapping
-
-### 🔍 **Intelligent Validation & Testing**
-- **LLM-Powered Validation**: Uses AI to validate login success, form submissions, and page states
-- **Smart Error Detection**: Automatically detects and reports validation failures
-- **Context-Aware Testing**: Understands the intent behind tests and validates accordingly
-- **Visual DOM Parsing**: Extracts only visible and interactive elements
-- **Real-time State Tracking**: Maintains up-to-date page state and element maps
-
-### 📝 **Comprehensive Logging & Memory**
-- **Multi-Agent Logging**: Separate logging for each agent with synchronized debug files
-- **Session Persistence**: Saves complete automation sessions with detailed logs
-- **Memory System**: Remembers successful patterns and learns from failures
-- **Debug Mode**: Detailed logging for development and troubleshooting
-- **Execution History**: Complete audit trail of all actions and results across agents
-
-## 🏗️ Test Execution Architecture
-
-```
-Testing Agent - Test Generation & Execution System
-├── 🎯 TestAgentMain           # Main orchestrator for test workflow
-│   ├── Test Case Generation   # Generates multiple test scenarios from description
-│   ├── Sequential Execution   # Executes test cases one by one
-│   ├── Parallel Processing    # Fast execution without delays
-│   └── Error Management      # Handles execution errors and exceptions
-├── 📋 InstructionAgent        # Test case generation specialist
-│   ├── Test Description Parsing  # Analyzes test requirements
-│   ├── Scenario Generation   # Creates multiple test variations
-│   ├── Step Planning        # Generates detailed test steps
-│   └── Expected Outcomes     # Defines validation criteria
-├── 🤖 TestAgent              # Individual test execution engine
-│   ├── Test Initialization   # Sets up test environment
-│   ├── Plan Execution       # Executes test steps with browser automation
-│   ├── Outcome Validation    # Validates results against expected outcomes
-│   └── Session Cleanup      # Proper cleanup after test completion
-├── 🔧 Tool Agent             # Specialized validation and analysis
-│   ├── LLM-Powered Analysis  # Intelligent page state validation
-│   ├── Login Verification    # Automated login success detection
-│   └── Form Validation       # Smart form submission verification
-├── 🌐 Browser Controller     # High-level browser automation
-│   ├── Multi-Tab Management  # Tab creation, switching, and closing
-│   ├── Element Interaction   # Click, input, and navigation actions
-│   └── DOM Tree Parsing      # Real-time page structure analysis
-└── 📊 Shared Components      # Common utilities and logging
-    ├── LLM Client           # Gemini Flash integration
-    ├── Logging System      # Multi-agent synchronized logging
-    └── Debug Tools          # Development and troubleshooting
-```
-
-## 🛠️ Installation
-
-### Prerequisites
-- Python 3.8 or higher
-- Google Gemini API key
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/mushfiqur-rahman/Testing-Agent.git
-   cd Testing-Agent
-   ```
-
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   playwright install
-   ```
-
-3. **Set up environment variables**
-   Create a `.env` file in the project root:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-
-   **Important**: Never commit your `.env` file to version control. It's already included in `.gitignore`.
-
-## 🎯 Quick Start
-
-### Test Case Generation and Execution
-
-```python
-from src.test_agent_main import TestAgentMain
-import os
-
-# Initialize the main test orchestrator
-API_KEY = os.getenv('GEMINI_API_KEY')
-main_agent = TestAgentMain(
-    api_key=API_KEY,
-    max_actions=15,
-    debug=True
-)
-
-# Define your test scenario description
-test_description = """
-Navigate to the login form test page and test the login functionality:
-1. Go to file:///path/to/your/login_form.html
-2. Fill in the email field with 'test@example.com'
-3. Fill in the password field with 'password123'
-4. Click the login button
-5. Verify that your test is successful
-"""
-
-# Generate multiple test cases from the description
-test_cases = main_agent.generate_test_cases(test_description)
-
-# Execute all generated test cases
-main_agent.execute_all_test_cases(test_cases)
-```
-
-### Individual Test Agent Usage
-
-```python
-from src.test_agent import TestAgent
-
-# For running a single test case
-test_agent = TestAgent(
-    api_key=API_KEY,
-    max_actions=15,
-    debug=True
-)
-
-# Initialize and execute
-test_agent.initialize()
-user_goal = "Navigate to login page and test login functionality"
-expected_outcome = "User successfully logs in and sees dashboard"
-
-results = test_agent.execute_plan(user_goal, expected_outcome)
-
-# Clean up
-test_agent.cleanup()
-```
-
-## 🚀 Getting Started
-
-1. **Clone and setup the project**
-   ```bash
-   git clone https://github.com/yourusername/Testing-Agent.git
-   cd Testing-Agent
-   pip install -r requirements.txt
-   playwright install
-   ```
-
-2. **Configure your environment**
-   ```bash
-   echo "GEMINI_API_KEY=your_api_key_here" > .env
-   ```
-
-3. **Run your first test**
-   ```bash
-   python src/test_agent.py
-   ```
-
-4. **View the results**
-   Check the `logs/` directory for detailed execution logs and session data.
-goal = """
-Navigate to example.com and:
-1. Find the search box
-2. Search for 'testing automation'
-3. Click on the first result
-4. Verify the page loaded successfully
-"""
-
-# Execute the automation plan
-execution_log = agent.execute_plan(goal)
-
-# Get results and save session
-summary = agent.get_session_summary()
-print(f"Completed: {summary['successful_steps']}/{summary['total_steps']} steps")
-agent.save_session_log()
-
-# Cleanup
-browser_controller.close()
-```
-
-## 🚀 Getting Started
-
-1. **Clone and setup the project**
-   ```bash
-   git clone https://github.com/yourusername/Testing-Agent.git
-   cd Testing-Agent
-   pip install -r requirements.txt
-   playwright install
-   ```
-
-2. **Configure your environment**
-   ```bash
-   echo "GEMINI_API_KEY=your_api_key_here" > .env
-   ```
-
-3. **Run your first test**
-   ```bash
-   python src/test_agent.py
-   ```
-
-4. **View the results**
-   Check the `logs/` directory for detailed execution logs and session data.
-
-### Login Form Testing Example
-
-```python
-# Test a login form with multi-agent validation
-login_goal = """
-Test the login functionality:
-1. Go to the login page
-2. Fill in email field with 'test@example.com'
-3. Fill in password field with 'password123'
-4. Click the login button
-5. Use tools to verify successful login
-"""
-
-execution_log = agent.execute_plan(login_goal)
-
-# The Tool Agent will automatically:
-# - Analyze the page state after login
-# - Detect success/failure messages
-# - Validate the user's email presence
-# - Provide detailed validation results
-```
-
-## 🎮 Available Actions
-
-The multi-agent system supports these browser actions:
-
-| Action | Description | Agent | Parameters |
-|--------|-------------|--------|------------|
-| `navigate_to` | Navigate to a URL | Main Agent | `url` |
-| `click_element` | Click an element by index | Main Agent | `index` |
-| `input_text` | Input text into form fields | Main Agent | `index`, `text` |
-| `switch_tab` | Switch between tabs | Main Agent | `index` |
-| `open_tab` | Open new tab | Main Agent | `url` (optional) |
-| `close_tab` | Close a tab | Main Agent | `index` |
-| `go_back` | Navigate back in history | Main Agent | None |
-| `tools` | Execute intelligent validation | Tool Agent | `reason` |
-| `end` | Terminate the session | Main Agent | `reason` |
-
-### 🔧 Tool Agent Capabilities
-
-The Tool Agent provides specialized actions for complex validation:
-- **Login Verification**: Automatically detects successful/failed logins
-- **Form Validation**: Validates form submissions and error states
-- **Page State Analysis**: Analyzes current page state and content
-- **Error Detection**: Identifies and reports page errors or issues
-- **Content Verification**: Validates expected content presence
-
-## 📁 Project Structure
-
-```
-Testing-Agent/
-├── src/                      # Source code
-│   ├── agent/               # AI agent components
-│   │   ├── core_utils/      # Core utilities
-│   │   │   ├── llm.py       # Gemini Flash LLM client
-│   │   │   └── logging_utils.py  # Logging utilities
-│   │   ├── main_agent/      # Main agent logic
-│   │   │   ├── agent.py     # Core agent class
-│   │   │   └── prompt_generator.py  # Prompt generation
-│   │   ├── tool_agent/      # Tool management
-│   │   │   └── tools.py     # Tool implementations
-│   │   └── instruction_agent/  # Instruction handling
-│   │       └── initial.py   # Initial instructions
-│   ├── browser/             # Browser automation
-│   │   ├── browser_context.py     # Browser session management
-│   │   ├── dom_tree_builder.py    # DOM tree construction
-│   │   └── dom_tree_parser.py     # Element parsing
-│   └── controller/          # High-level automation
-│       └── browser_controller.py  # Main controller
-├── tests/                   # Test suite
-│   ├── browser_controller_test.py
-│   ├── dom_tree_builder_test.py
-│   ├── dom_tree_parser_test.py
-│   └── main.py             # Test runner
-├── html/                   # Test HTML files
-│   ├── login_form.html     # Login form test page
-│   ├── test_page.html      # Basic test page
-│   └── test_page2.html     # Complex test page
-├── logs/                   # Session logs and debug files
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (create this)
-└── README.md              # This file
-```
-
-## 🔧 Configuration
-
-### Multi-Agent Configuration
-
-```python
-# Initialize with custom settings
-agent = Agent(
-    llm=llm_client,
-    max_actions=30,        # Max actions per plan
-    debug=True            # Enable detailed logging for all agents
-)
-
-# The main agent automatically coordinates with:
-# - Tool Agent for validation tasks
-# - Instruction Agent for prompt optimization
-# - Browser Controller for automation
-```
-
-### Tool Agent Configuration
-
-```python
-# Tool Agent is automatically initialized with LLM client
-# and provides intelligent validation capabilities
-# No manual configuration required
-```
-
-### Debug Mode for Multi-Agent System
-
-```python
-# Enable comprehensive logging across all agents
-agent = Agent(llm, debug=True)
-
-# This creates synchronized log files:
-# - agent_debug_YYYYMMDD_HHMMSS.log (Main Agent decisions)
-# - tools_debug_YYYYMMDD_HHMMSS.log (Tool Agent validations)
-# - agent_session_YYYYMMDD_HHMMSS.json (Complete session data)
-```
-
-### Browser Configuration
-
-The browser runs in headless mode by default. To see the browser:
-
-```python
-# In src/browser/browser_context.py, modify the launch parameters
-browser = playwright.chromium.launch(headless=False)
-```
-
-## 📊 Logging and Debugging
-
-### Debug Mode
-
-Enable comprehensive logging:
-
-```python
-agent = Agent(llm, debug=True)
-```
-
-This creates timestamped log files in the `logs/` directory:
-- `agent_debug_YYYYMMDD_HHMMSS.log` - Agent decision making
-- `memory_debug_YYYYMMDD_HHMMSS.log` - Memory operations
-- `agent_session_YYYYMMDD_HHMMSS.json` - Complete session data
-
-### Session Analysis
-
-```python
-# Get detailed session summary
-summary = agent.get_session_summary()
-print(f"Duration: {summary['session_duration_seconds']:.2f} seconds")
-print(f"Success Rate: {summary['successful_steps']}/{summary['total_steps']}")
-
-# Save session for later analysis
-filename = agent.save_session_log()
-print(f"Session saved to: {filename}")
-```
-
-## 🧪 Testing
-
-### Run the included tests:
-
-```bash
-# Run the test suite
-python tests/main.py
-
-# Or run individual test files
-python tests/browser_controller_test.py
-python tests/dom_tree_builder_test.py
-python tests/dom_tree_parser_test.py
-
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+An autonomous, AI-powered browser test execution engine for web applications. Built as the execution counterpart to the **AutoTestGenX** test generation framework, the Testing Agent physically runs enriched test cases against a live application and produces structured, evidence-backed pass/fail verdicts.
 
 ---
 
-**Ready to automate? Start with the [Quick Start](#-quick-start) guide and build your first AI-powered browser automation!** 🚀 -->
+## Overview
+
+The Testing Agent implements a **multi-agent pipeline** inspired by the AutoTestGenX Phase 3 (Live-Validation and Refinement) architecture. Rather than a single monolithic agent, it coordinates five specialized agents to plan, execute, validate, and self-heal across an entire test suite.
+
+```
+TraversalPlanner → InteractionAgent → ExecutionOutcomeValidator → AdaptivePlanner
+```
+
+### Key capabilities
+
+| Feature | Description |
+|---|---|
+| 🧭 **Traversal Planning** | Automatically orders test cases: public → authenticated → destructive (logout/reset last) |
+| 🌐 **Structured Execution** | Agent reads `direct_link`, `requires_auth`, `test_data`, and `steps` from enriched test cases |
+| 📸 **Before/After State Capture** | DOM snapshot + screenshot captured at TC start; compared after execution against `expected_result` |
+| ✅ **Execution Outcome Validation** | LLM+vision verifies whether the application state actually changed as expected |
+| 🔄 **Adaptive Replanning** | Between test cases, checks if the next TC's prerequisites are still met; navigates to recover if not |
+| 📊 **Rich Run Summary** | `test_run_summary.json` with PASSED / FAILED / ERROR / SKIPPED per TC and `phase3_note` for adjusted steps |
+| 🔌 **LiteLLM — Any Provider** | Works with OpenAI, Anthropic, Google Gemini, OpenRouter, Azure, and 100+ more via a single flag |
+
+---
+
+## Architecture
+
+```
+src/
+├── test_agent_main.py              # CLI entry point & orchestrator
+├── test_agent.py                   # TestAgent — pipeline coordinator
+└── agent/
+    ├── planning_agent/
+    │   ├── traversal_planner.py    # Phase A/B/C ordering (no LLM call)
+    │   └── adaptive_planner.py     # Inter-test prerequisite check (LLM)
+    ├── main_agent/
+    │   ├── agent.py                # InteractionAgent — browser execution loop
+    │   └── prompt_generator.py     # System prompt with structured task block
+    ├── tool_agent/
+    │   └── tools.py                # ExecutionOutcomeValidator (before/after diff)
+    └── core_utils/
+        ├── llm.py                  # Unified LiteLLM client (any provider)
+        ├── memory.py               # Per-TC state: steps, snapshots, validations
+        ├── test_result_analyzer.py # Post-execution PASSED/FAILED verdict
+        └── logging_utils.py        # Structured debug log routing
+```
+
+### Multi-Agent Pipeline
+
+```
+dataset/enriched_test_cases_*.json
+        │
+        ▼
+ load_test_cases()
+   • Auto-detect enriched {"test_cases":[...]} vs legacy [...] format
+   • Filter dropped=true → SKIPPED entries in run summary
+        │
+        ▼
+ TraversalPlanner.plan()                    [heuristic, no LLM call]
+   • Phase A: requires_auth=False, non-destructive
+   • Phase B: requires_auth=True,  non-destructive
+   • Phase C: Logout / Reset App State (always last)
+   • Within each phase: High → Medium → Low priority
+        │
+        ▼  (for each TC in planned order)
+ AdaptivePlanner.evaluate_next()            [1 LLM call between TCs]
+   • Are the next TC's prerequisites still met?
+   • If session drifted (e.g. prior logout): navigate to recovery URL
+        │
+        ▼
+ InteractionAgent (Agent.execute_plan)      [browser execution loop]
+   • Reads structured goal block:
+       direct_link   → first navigation (with auth if requires_auth=Yes)
+       test_data     → exact credentials / form inputs
+       steps         → numbered steps executed via indexed DOM actions
+   • Indexed DOM map (not raw HTML) → LLM uses numeric element references
+   • Multimodal vision screenshots for spatial awareness
+   • Before-state captured automatically at TC start
+        │
+   [tools call — ExecutionOutcomeValidator]
+   • Before-state (TC start) vs After-state (now)
+   • LLM+vision: does current state match expected_result?
+   • Returns: {validation_passed, state_changed, findings}
+        │
+        ▼
+ TestResultAnalyzer.analyze_test_execution()
+   • Enriched prompt: outcome validations + state diff + Phase 3 metadata
+   • Final PASSED / FAILED verdict
+        │
+        ▼
+ test_run_summary.json
+```
+
+---
+
+## Dataset Format
+
+The Testing Agent is designed to consume the **enriched test case format** produced by AutoTestGenX Phase 3.
+
+### Enriched format (recommended)
+
+```json
+{
+  "test_cases": [
+    {
+      "tc_id": "TC-001",
+      "module": "Login",
+      "title": "Successful login with valid credentials",
+      "type": "Positive",
+      "priority": "High",
+      "direct_link": "https://www.saucedemo.com/login",
+      "requires_auth": false,
+      "preconditions": "User is on the Login page; user is not authenticated",
+      "steps": [
+        "1. Enter 'standard_user' in the Username field",
+        "2. Enter 'secret_sauce' in the Password field",
+        "3. Click the Login button"
+      ],
+      "expected_result": "User is redirected to the Product Inventory page; no error banner is displayed",
+      "test_data": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+      },
+      "verdict": "valid",
+      "dropped": false,
+      "drop_reason": "",
+      "notes": "All referenced UI elements confirmed present in live DOM."
+    }
+  ]
+}
+```
+
+| Field | Used by | Purpose |
+|---|---|---|
+| `direct_link` | InteractionAgent | First URL to navigate to |
+| `requires_auth` | InteractionAgent | Whether to log in first using `test_data` credentials |
+| `test_data` | InteractionAgent | Exact values for form inputs — never hallucinated |
+| `preconditions` | AdaptivePlanner | Pre-flight state check before step execution |
+| `steps` | InteractionAgent | Numbered steps to execute in order |
+| `expected_result` | ExecutionOutcomeValidator | Ground truth for before/after validation |
+| `verdict` | TestResultAnalyzer | Phase 3 pre-audit context (flagged if `invalid_steps`) |
+| `dropped` | Loader | If `true`, TC is recorded as SKIPPED and not executed |
+
+### Legacy format (backward compatible)
+
+```json
+[
+  {
+    "test_name": "my_test",
+    "steps_or_input": "Go to https://example.com and fill the form...",
+    "expected_outcome": "Form submits successfully"
+  }
+]
+```
+
+---
+
+## Setup
+
+### 1. Prerequisites
+
+- Python 3.9+
+- A supported LLM API key (OpenAI, Anthropic, Gemini, OpenRouter, etc.)
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+playwright install chromium
+```
+
+### 3. Configure API keys
+
+Copy the example env file and add your key:
+
+```bash
+cp env/.env.example env/.env
+```
+
+Edit `env/.env`:
+
+```env
+# Add the key for whichever provider you use — only one required
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=AIza...
+OPENROUTER_API_KEY=sk-or-...
+```
+
+---
+
+## Usage
+
+### Running against an enriched dataset
+
+```bash
+# OpenAI GPT-4o (default)
+python -m src.test_agent_main \
+  --dataset dataset/enriched_test_cases_swaglab.json \
+  --model openai/gpt-5-mini
+
+# Anthropic Claude
+python -m src.test_agent_main \
+  --dataset dataset/enriched_test_cases_swaglab.json \
+  --model anthropic/claude-sonnet-4-5
+
+# Google Gemini
+python -m src.test_agent_main \
+  --dataset dataset/enriched_test_cases_swaglab.json \
+  --model gemini/gemini-2.0-flash
+
+# OpenRouter (any open-source model)
+python -m src.test_agent_main \
+  --dataset dataset/enriched_test_cases_swaglab.json \
+  --model openrouter/meta-llama/llama-3.1-8b-instruct
+
+# Show the browser window while running
+python -m src.test_agent_main \
+  --dataset dataset/enriched_test_cases_swaglab.json \
+  --model openai/gpt-5-mini \
+  --no-headless
+```
+
+### All CLI flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--model` | `openai/gpt-5-mini` | LiteLLM model string (`provider/model-name`) |
+| `--provider` | _(none)_ | Optional provider prefix if model string has no `/` |
+| `--dataset` | `dataset/enriched_test_cases_swaglab.json` | Path to enriched JSON dataset |
+| `--test-file` | _(none)_ | Path to legacy flat JSON (overrides `--dataset`) |
+| `--max-actions` | `15` | Max browser actions per test case |
+| `--no-headless` | _(headless)_ | Show the browser window |
+| `--test-timeout` | `300` | Seconds per test case before it is killed |
+| `--debug` | `True` | Enable detailed per-step debug logs |
+
+### Supported model strings (LiteLLM)
+
+```bash
+# OpenAI
+openai/gpt-5-mini
+openai/gpt-5-mini
+
+# Anthropic
+anthropic/claude-sonnet-4-5
+anthropic/claude-haiku-3-5
+
+# Google
+gemini/gemini-2.0-flash
+gemini/gemini-1.5-pro
+
+# OpenRouter (access to 200+ models via one key)
+openrouter/meta-llama/llama-3.1-8b-instruct
+openrouter/mistralai/mixtral-8x7b-instruct
+
+# Azure OpenAI
+azure/<your-deployment-name>
+```
+
+Full list: [docs.litellm.ai/docs/providers](https://docs.litellm.ai/docs/providers)
+
+---
+
+## Output
+
+After a run, logs are written to `logs/<run-id>/`:
+
+```
+logs/
+└── run_20260611_082213/
+    ├── test_run_summary.json          # Top-level pass/fail summary
+    ├── Login_TC-001/
+    │   ├── agent_debug.log            # Full LLM request/response trace
+    │   ├── analysis_result.json       # TestResultAnalyzer verdict + evidence
+    │   └── memory_export.json         # State snapshots + outcome validations
+    └── Shopping_Cart_TC-001/
+        └── ...
+```
+
+### `test_run_summary.json` example
+
+```json
+{
+  "run_id": "run_20260611_082213",
+  "model": "openai/gpt-5-mini",
+  "total": 12,
+  "passed": 9,
+  "failed": 2,
+  "error": 0,
+  "skipped": 1,
+  "test_cases": [
+    {
+      "test_name": "Login_TC-001",
+      "result": "PASSED",
+      "llm_verdict": "PASSED",
+      "summary": "Agent navigated to login page, entered credentials, and was redirected to the inventory page as expected."
+    },
+    {
+      "test_name": "Shopping_Cart_TC-006",
+      "result": "SKIPPED",
+      "skip_reason": "Requires a product with 200+ character description not in seed data."
+    },
+    {
+      "test_name": "Product_Detail_TC-007",
+      "result": "PASSED",
+      "phase3_note": "⚠ Steps were adjusted during Phase 3 verification (verdict: invalid_steps). Execution used the adjusted steps."
+    }
+  ]
+}
+```
+
+---
+
+## How the Validation Works
+
+The `ExecutionOutcomeValidator` (`tools` action) validates execution outcomes — **not** step correctness. Steps are already verified by AutoTestGenX Phase 3. The validator answers:
+
+> *"After the agent executed the steps, did the application state change as `expected_result` describes?"*
+
+**Before-state** is captured automatically at the start of every test case (URL, DOM snapshot, screenshot).
+
+When the agent calls `tools` (after completing a critical step or the full test sequence), the validator:
+1. Captures the **after-state** (current URL, DOM, screenshot)
+2. Builds a before→after comparison prompt with the `expected_result` as ground truth
+3. Uses LLM + vision to determine `validation_passed` and `state_changed`
+4. Stores the result in memory for the `TestResultAnalyzer`
+
+---
+
+## Development
+
+### Project structure
+
+```
+Testing-Agent/
+├── dataset/                        # Enriched test case datasets
+│   ├── enriched_test_cases_swaglab.json
+│   └── enriched_test_cases_parabank.json
+├── src/
+│   ├── test_agent_main.py
+│   ├── test_agent.py
+│   ├── agent/
+│   │   ├── planning_agent/         # TraversalPlanner, AdaptivePlanner
+│   │   ├── main_agent/             # InteractionAgent, prompt
+│   │   ├── tool_agent/             # ExecutionOutcomeValidator
+│   │   └── core_utils/             # LLMClient, Memory, Analyzer, Logging
+│   ├── browser/                    # BrowserSession, DOM parser
+│   └── controller/                 # BrowserController
+├── test_cases/                     # Legacy test case files
+├── env/
+│   └── .env                        # API keys (not committed)
+├── logs/                           # Run output (auto-created)
+├── requirements.txt
+└── README.md
+```
+
+### Adding a new dataset
+
+1. Place your enriched JSON in `dataset/`
+2. Run with `--dataset dataset/your_file.json`
+
+The `TraversalPlanner` automatically handles ordering based on `requires_auth`, `module`, and `priority` fields.
+
+---
+
+## Research Context
+
+This agent is the execution component of the **AutoTestGenX** framework, developed as part of a thesis on autonomous AI-driven software testing. The framework implements a two-phase pipeline:
+
+- **Phase 1–2 (Generation):** LLM-based test case generation from functional requirements
+- **Phase 3 (Validation):** AutoTestGenX audits theoretical test cases against the live application → produces enriched dataset
+- **Phase 4 (Execution — this agent):** Runs the enriched test suite and validates execution outcomes
+
+The enriched dataset fields (`direct_link`, `test_data`, `verdict`, `notes`) are the direct output of Phase 3 and serve as structured, hallucination-free inputs for the Testing Agent.
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.

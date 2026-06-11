@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Investments | TC-014 | Type: Negative | Priority: High]\nTitle: Recurring plan with Start Date in the past is rejected\n\n\u25b6 Start URL:    http://localhost:8080/investments\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"fund_symbol\": \"VTIAX\",\n  \"contribution_amount\": \"1000.00\",\n  \"frequency\": \"Monthly\",\n  \"start_date\": \"2024-01-15\",\n  \"funding_account\": \"****5001 (Checking, $5,847.52)\"\n}\n\nPreconditions:\n  User is on the Investments page and Recurring Investment Plan form is visible; user is logged in.\n\nSteps to Execute:\n  1. Enter 'VTIAX' in Fund Symbol and select 'Vanguard Total International Stock Index (VTIAX)' from autocomplete\n  2. Enter contribution amount '1000.00' in Contribution Amount\n  3. Select 'Monthly' from Frequency\n  4. Enter start date '2024-01-15' (a date in the past) in Start Date field\n  5. Select funding account '****5001 (Checking, $5,847.52)' from Funding Account dropdown\n  6. Click 'Create Plan'\n\nExpected Result:\n  Inline error on Start Date: \"Start date must be in the future\" (or equivalent); the recurring plan is not created.\n\nNotes from prior verification:\n  All UI elements for creating a recurring plan were present in the verification. Chose VTIAX and a contribution amount equal to a seeded transaction amount ($1,000.00) and a past start date drawn from seeded transaction dates to ensure the date is clearly in the past. No step rewrites required.",
+  "expected_outcome": "Inline error on Start Date: \"Start date must be in the future\" (or equivalent); the recurring plan is not created.",
+  "tc_metadata": {
+    "tc_id": "TC-014",
+    "module": "Investments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/investments, executed all 6 step(s) for 'Recurring plan with Start Date in the past is rejected'. Outcome validation confirmed: Inline error on Start Date: \"Start date must be in the future\" (or equivalent); the recurring plan is not created.",
+    "errors": "None"
+  }
+}

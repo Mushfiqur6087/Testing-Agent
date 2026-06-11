@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Payments | TC-001 | Type: Positive | Priority: High]\nTitle: Submit bill payment happy path\n\n\u25b6 Start URL:    http://localhost:8080/bill-pay\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"payee_name\": \"Electric Company\",\n  \"payee_street\": \"456 Power Street\",\n  \"payee_city\": \"Springfield\",\n  \"payee_state\": \"IL\",\n  \"payee_zip\": \"62701\",\n  \"payee_phone\": \"(555) 987-6543\",\n  \"payee_account\": \"ELC123456789\",\n  \"payment_amount\": \"200.00\",\n  \"source_account\": \"****5001 (Checking, $5,847.52)\"\n}\n\nPreconditions:\n  User is logged in; source account has funds \u2265 payment amount (use Checking ****5001 with $5,847.52).\n\nSteps to Execute:\n  1. Navigate to Bill Payment (http://localhost:8080/bill-pay).\n  2. Fill in Payee Name with 'Electric Company'.\n  3. Fill in Street Address with '456 Power Street'.\n  4. Fill in City with 'Springfield'.\n  5. Fill in State with 'IL'.\n  6. Fill in ZIP with '62701'.\n  7. Fill in Phone with '(555) 987-6543'.\n  8. Enter payee account number 'ELC123456789' in Payee Account Number.\n  9. Enter 'ELC123456789' in Confirm Account Number.\n  10. Enter Payment Amount '200.00'.\n  11. Select source account '****5001 (Checking, $5,847.52)'.\n  12. Click Pay.\n\nExpected Result:\n  \"Payment submitted successfully.\" with a reference code is shown; source account (****5001) balance is debited by $200.00 and transaction appears in history.\n\nNotes from prior verification:\n  Used seeded Payee 'Electric Company' and Checking account ****5001 which has sufficient funds. Success message and balance update are dynamic and cannot be statically verified.",
+  "expected_outcome": "\"Payment submitted successfully.\" with a reference code is shown; source account (****5001) balance is debited by $200.00 and transaction appears in history.",
+  "tc_metadata": {
+    "tc_id": "TC-001",
+    "module": "Payments",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Positive",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/bill-pay, executed all 12 step(s) for 'Submit bill payment happy path'. Outcome validation confirmed: \"Payment submitted successfully.\" with a reference code is shown; source account (****5001) balance is debited by $200.00 and transaction appears in history.",
+    "errors": "None"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "original_goal": "[Module: Open New Account | TC-011 | Type: Negative | Priority: High]\nTitle: Funding account has insufficient balance for requested deposit\n\n\u25b6 Start URL:    http://localhost:8080/open-new-account\n\u25b6 Requires Auth: Yes\n\u25b6 Test Data:\n{\n  \"account_type\": \"Checking\",\n  \"initial_deposit\": \"6000\",\n  \"funding_account\": \"****5001 (Checking)\",\n  \"funding_account_balance\": \"5847.52\",\n  \"user_email\": \"admin@parabank.com\",\n  \"username\": \"admin\"\n}\n\nPreconditions:\n  User is on the Open New Account page and logged in as 'admin' (admin@parabank.com). A funding account exists (Checking ****5001 with $5,847.52).\n\nSteps to Execute:\n  1. Select 'Checking' as Account Type\n  2. Enter '6000' in Initial Deposit Amount (amount exceeding the selected funding account balance)\n  3. Select the under-funded account '****5001 (Checking, $5,847.52)' from the Funding Source dropdown\n  4. Click 'Open Account'\n\nExpected Result:\n  Funding Source Account dropdown shows inline error about insufficient balance; form does not submit; no account is created\n\nNotes from prior verification:\n  Selected an amount (6000) that exceeds the seeded Checking account balance ($5,847.52) to trigger the insufficient-funds path. All steps reference concrete seeded data.",
+  "expected_outcome": "Funding Source Account dropdown shows inline error about insufficient balance; form does not submit; no account is created",
+  "tc_metadata": {
+    "tc_id": "TC-011",
+    "module": "Open New Account",
+    "verdict": "valid",
+    "priority": "High",
+    "type": "Negative",
+    "steps_adjusted": false
+  },
+  "llm_analysis": {
+    "test_result": "PASSED",
+    "success": true,
+    "summary": "Agent navigated to http://localhost:8080/open-new-account, executed all 4 step(s) for 'Funding account has insufficient balance for requested deposit'. Outcome validation confirmed: Funding Source Account dropdown shows inline error about insufficient balance; form does not submit; no account is created",
+    "errors": "None"
+  }
+}
