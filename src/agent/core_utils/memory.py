@@ -12,17 +12,15 @@ from pathlib import Path
 
 class EnhancedMemory:
     """
-    Simplified memory system that stores only essential information:
-    - current_state from LLM responses 
-    - Essential tool execution outputs (message, findings, validation_passed)
+    Memory system that stores LLM states and tool outputs per test-case task.
     """
-    
-    def __init__(self, debug_file_path: Optional[str] = None):
-        """Initialize the simplified memory system."""
-        self.llm_states = []
-        self.tool_outputs = []
+
+    def __init__(self, debug_file_path: Optional[str] = None, max_context_chars: int = 800):
+        self.llm_states: list = []
+        self.tool_outputs: list = []
         self.session_start_time = datetime.now()
         self.debug_file_path = debug_file_path
+        self.max_context_chars = max_context_chars
         
     def save_llm_response(self, llm_response: Dict[str, Any], 
                          step_number: int, browser_context: Dict[str, Any] = None):
@@ -145,37 +143,43 @@ class EnhancedMemory:
         return patterns
         
     def format_memory_context(self) -> str:
-        """Format simplified memory context for LLM prompts."""
+        """Format memory context for LLM prompts."""
         if not self.llm_states and not self.tool_outputs:
             return "No previous actions executed in this session."
-        
-        context_lines = []
-        
-        # Add recent LLM states
+
+        lines = []
+        mc = self.max_context_chars
+
         recent_states = self.get_recent_llm_states(3)
         if recent_states:
-            context_lines.append("Recent LLM States:")
+            lines.append("Recent LLM States:")
             for state in recent_states:
-                current_state = state["current_state"]
-                context_lines.append(f"  Step {state['step_number']}:")
-                context_lines.append(f"    Evaluation: {current_state.get('evaluation_previous_goal', 'Unknown')}")
-                context_lines.append(f"    Memory: {current_state.get('memory', 'No memory')[:500]}...")
-                context_lines.append(f"    Next Goal: {current_state.get('next_goal', 'Unknown')}")
-            context_lines.append("")
-        
-        # Add recent tool outputs
+                cs = state["current_state"]
+                mem_text = cs.get('memory', 'No memory')
+                if len(mem_text) > mc:
+                    mem_text = mem_text[:mc] + "…"
+                lines.append(f"  Step {state['step_number']}:")
+                lines.append(f"    Evaluation: {cs.get('evaluation_previous_goal', 'Unknown')}")
+                lines.append(f"    Memory: {mem_text}")
+                lines.append(f"    Next Goal: {cs.get('next_goal', 'Unknown')}")
+            lines.append("")
+
         recent_tools = self.get_recent_tool_outputs(2)
         if recent_tools:
-            context_lines.append("Recent Tool Outputs:")
+            lines.append("Recent Tool Outputs:")
             for tool in recent_tools:
-                tool_output = tool["tool_output"]
-                context_lines.append(f"  Step {tool['step_number']} Tool:")
-                context_lines.append(f"    Request: {tool_output.get('request_reason', 'No reason provided')}")
-                if tool_output.get('findings'):
-                    context_lines.append(f"    Findings: {tool_output['findings'][:1000]}...")
-            context_lines.append("")
-        
-        return "\n".join(context_lines)
+                to = tool["tool_output"]
+                findings = to.get('findings', '')
+                # Truncate from the FRONT so we keep the conclusion
+                if len(findings) > mc:
+                    findings = "…" + findings[-mc:]
+                lines.append(f"  Step {tool['step_number']} Tool:")
+                lines.append(f"    Request: {to.get('request_reason', '')}")
+                if findings:
+                    lines.append(f"    Findings: {findings}")
+            lines.append("")
+
+        return "\n".join(lines)
         
     def _log_to_debug_file(self, event_type: str, data: Dict[str, Any]):
         """Log memory events to debug file if available."""

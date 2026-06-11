@@ -1,4 +1,4 @@
-# 🤖 Testing Agent - AI-Powered Intelligent Test Case Generation and Execution
+<!-- # 🤖 Testing Agent - AI-Powered Intelligent Test Case Generation and Execution
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![Playwright](https://img.shields.io/badge/Playwright-Supported-green.svg)](https://playwright.dev)
@@ -404,4 +404,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Ready to automate? Start with the [Quick Start](#-quick-start) guide and build your first AI-powered browser automation!** 🚀
+**Ready to automate? Start with the [Quick Start](#-quick-start) guide and build your first AI-powered browser automation!** 🚀 -->

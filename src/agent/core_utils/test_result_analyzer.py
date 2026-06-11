@@ -1,23 +1,25 @@
 """
-Simple Test Result Analyzer for Testing Agent
+Test Result Analyzer — post-task LLM verdict on whether a test passed or failed.
+Uses its own LLM client so a cheaper/faster model can be specified separately.
 """
 
 import json
-import os
-from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from src.agent.core_utils.llm import LLMClient
 from src.agent.core_utils.memory import EnhancedMemory
 from src.agent.core_utils.logging_utils import debug_logger
 
+
 class TestResultAnalyzer:
-    """
-    Simple analyzer that tells you if test passed or failed and why.
-    """
-    
-    def __init__(self, llm_client: LLMClient):
-        """Initialize with LLM client."""
-        self.llm = llm_client
+    """Analyzes test execution memory and returns a PASSED/FAILED verdict."""
+
+    def __init__(self, llm_client: LLMClient, analyzer_llm_client: Optional[LLMClient] = None):
+        """
+        Args:
+            llm_client:          Navigation LLM (used as fallback).
+            analyzer_llm_client: Optional separate, cheaper model for post-task reasoning.
+        """
+        self.llm = analyzer_llm_client or llm_client
         
     def analyze_test_execution(self, memory: EnhancedMemory, 
                              original_test_goal: str,

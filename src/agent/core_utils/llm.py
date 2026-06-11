@@ -1,55 +1,46 @@
 """
 Unified LLM client using LiteLLM.
 Supports any provider (openai, anthropic, gemini, openrouter, etc.)
-via a single interface.
 """
 
-import os
-import sys
+import time
 import litellm
 
-# Set up project root and add to sys.path
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.insert(0, PROJECT_ROOT)
-
-# Suppress litellm's verbose logging by default
 litellm.suppress_debug_info = True
 
 
 class LLMClient:
-    """
-    Unified LLM client powered by LiteLLM.
-
-    Usage:
-        client = LLMClient(model="gpt-5-mini", provider="openai")
-        response = client.ask("Hello, world!")
-
-    LiteLLM reads API keys from environment variables automatically:
-        - openai    → OPENAI_API_KEY
-        - anthropic → ANTHROPIC_API_KEY
-        - gemini    → GEMINI_API_KEY
-        - openrouter → OPENROUTER_API_KEY
-    """
-
     def __init__(
         self,
         model: str = "gemini-2.0-flash",
         provider: str = "gemini",
         system_prompt: str = "You are a helpful assistant.",
+        timeout: int = 60,
+        max_retries: int = 3,
     ):
-        # LiteLLM model format: "provider/model" (e.g. "openai/gpt-5-mini")
         self.model = f"{provider}/{model}"
         self.system_prompt = system_prompt
+        self.timeout = timeout
+        self.max_retries = max_retries
 
     def ask(self, user_prompt: str) -> str:
-        """
-        Sends a prompt to the model via LiteLLM and returns the response text.
-        """
-        response = litellm.completion(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-        )
-        return response.choices[0].message.content
+        """Send a prompt via LiteLLM with retry + exponential backoff."""
+        last_error = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                response = litellm.completion(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": self.system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    timeout=self.timeout,
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                last_error = e
+                if attempt < self.max_retries:
+                    wait = 2 ** attempt  # 2s, 4s, 8s
+                    print(f"  [LLM] Attempt {attempt} failed ({e}). Retrying in {wait}s…")
+                    time.sleep(wait)
+        raise RuntimeError(f"LLM call failed after {self.max_retries} attempts: {last_error}")

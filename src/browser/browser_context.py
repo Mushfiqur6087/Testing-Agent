@@ -6,6 +6,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 sys.path.insert(0, PROJECT_ROOT)
 
 from typing import Optional, List, Dict, Any
+from datetime import datetime
 from playwright.sync_api import Page, BrowserContext, sync_playwright, Browser
 from src.browser.dom_tree_parser import DOMTreeParser, DOMElementNode
 
@@ -87,8 +88,7 @@ class BrowserSession:
 
     def navigate_to(self, url: str) -> None:
         page = self.get_current_page()
-        page.goto(url)
-        # clear DOM/selector caches
+        page.goto(url, timeout=15000, wait_until="domcontentloaded")
         self._parser = None
         self._selector_map = None
 
@@ -239,6 +239,8 @@ class BrowserSession:
             
 
     def close(self) -> None:
+        if self._playwright is None:
+            return  # already closed
         self._tabs.clear()
         self._parser = None
         self._selector_map = None
@@ -252,14 +254,12 @@ class BrowserSession:
         self._playwright = None
 
     def _track_alert(self, message: str, alert_type: str = "info") -> None:
-        """
-        Track an alert message.
-        """
         if len(self._recent_alerts) >= self._max_alert_history:
-            self._recent_alerts.pop(0)  # remove oldest alert
+            self._recent_alerts.pop(0)
         self._recent_alerts.append({
             "message": message,
-            "type": alert_type
+            "type": alert_type,
+            "timestamp": datetime.now().isoformat(),
         })
 
     def get_recent_alerts(self) -> List[Dict[str, Any]]:

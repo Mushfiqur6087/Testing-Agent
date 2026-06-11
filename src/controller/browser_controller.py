@@ -66,6 +66,10 @@ class BrowserController:
             if not selector_map or element_index not in selector_map:
                 return False
 
+            # Clear stale alerts BEFORE the click so only alerts from this
+            # specific action are captured (not leftovers from prior steps)
+            self.browser_context.clear_alerts()
+
             element = selector_map[element_index]
             xpath   = element.xpath
             attrs   = element.attributes or {}            # Try ID first
@@ -137,6 +141,8 @@ class BrowserController:
 
     def navigate_to(self, url: str) -> bool:
         try:
+            # Clear stale alerts before navigating to a new page
+            self.browser_context.clear_alerts()
             self.browser_context.navigate_to(url)
             return True
         except Exception as e:
@@ -164,10 +170,19 @@ class BrowserController:
             }
 
     def end(self, reason: Optional[str] = None) -> bool:
+        """
+        Signal that the current task is complete.
+        Does NOT close the browser — that is handled by TestAgent.cleanup()
+        so the session can persist across multiple test cases.
+        """
+        return True
+
+    def close_browser(self) -> bool:
+        """Explicitly close the browser session. Called by TestAgent.cleanup()."""
         try:
             self.browser_context.close()
             return True
-        except Exception as e:
+        except Exception:
             return False
 
     def available_commands(self) -> list:

@@ -31,6 +31,9 @@ class Agent:
         self.browser_controller = None
         self.recent_alerts = []
         self.session_start_time = datetime.now()
+        # Carries a summary of previously completed test cases so the LLM
+        # knows what has already been validated in this run.
+        self.prior_context: str = ""
         
         # Create debug log file if debug is enabled
         if self.debug:
@@ -116,22 +119,22 @@ class Agent:
         
     def build_context_prompt(self, user_goal: str) -> str:
         """Build the complete context prompt for the LLM."""
-        # Get system prompt
         system_prompt = self.system_prompt.get_prompt()
-        
-        # Get recent memory context
         memory_context = self._format_memory_context()
-        
-        # Format previous steps
         previous_steps_text = self._format_previous_steps()
-        
-        # Format current browser state
         browser_state = self._format_browser_state()
-        
-        # Build the complete prompt
+
+        # Inject a summary of previously completed test cases when available
+        prior_block = ""
+        if self.prior_context:
+            prior_block = f"""
+# Previously Completed Test Cases (this run)
+{self.prior_context}
+"""
+
         context_prompt = f"""
 {system_prompt}
-
+{prior_block}
 # Current Task
 {user_goal}
 
@@ -149,7 +152,6 @@ class Agent:
 
 Please provide your next action(s) in the required JSON format.
 """
-        
         return context_prompt
         
     def _format_memory_context(self) -> str:
@@ -379,17 +381,17 @@ Interactive Elements:
             elif action_name == "end":
                 reason = action_params.get("reason", "Session ended by user request")
                 result = self.browser_controller.execute_command("end", reason)
-                
-                # Export memory data when session ends
+
+                # Export memory to the current test-case subfolder
                 try:
-                    memory_export_path = debug_logger.get_debug_file_path("memory_export")
-                    memory_export_path = memory_export_path.replace('.log', '.json')
-                    self.memory.export_session_data(memory_export_path)
+                    tc_dir = debug_logger.get_test_case_dir(
+                        getattr(self, '_current_test_case_name', 'test_case')
+                    )
+                    export_path = str(tc_dir / "memory_export.json")
+                    self.memory.export_session_data(export_path)
                 except Exception as e:
-                    print(f"Error exporting memory data: {str(e)}")
-                    # Silent fail for memory export - don't break main execution
-                    pass
-                
+                    pass  # never break execution over a logging export
+
                 return {"success": result, "message": f"Session ended: {reason}", "terminate": True}
                 
             else:
@@ -423,8 +425,9 @@ Interactive Elements:
 
             # Capture any recent browser alerts/dialogs (JS alert, confirm, prompt)
             self.recent_alerts = self.browser_controller.get_recent_alerts()
-            # Clear after reading so stale alerts don't persist across steps
-            self.browser_controller.clear_alerts()
+            # NOTE: alerts are NOT cleared here — they persist until the next
+            # click/navigate action so that multiple tool calls in one step all
+            # see the same alert data.
             
         except Exception as e:
             print(f"Error refreshing browser state: {str(e)}")
@@ -460,18 +463,15 @@ Interactive Elements:
             
             # Check if we should stop
             actions = action_response.get("action", [])
-                
-            # Filter out 'end' actions when chained with other actions
+
+            # Filter 'end' when chained with other actions
             actions = self._filter_chained_end_actions(actions)
-                
-            # Execute each action in sequence
+
+            # Per-step accumulators
             all_success = True
             action_results = []
             should_terminate = False
-            
-            # Filter out 'end' actions if they are chained with other actions
-            actions = self._filter_chained_end_actions(actions)
-            
+
             for action_item in actions:
                 action_name = list(action_item.keys())[0]
                 
@@ -519,16 +519,32 @@ Interactive Elements:
         return execution_log
         
     def reset_session(self):
-        """Reset the current session and create a new memory instance."""
+        """Full reset — clears everything including prior_context."""
         self.previous_steps = []
         self.current_url = ""
         self.open_tabs = []
         self.interactive_elements = ""
         self.valid_actions = ""
         self.session_start_time = datetime.now()
-        
-        # Create a new memory instance for the new session
+        self.prior_context = ""
         self.memory = EnhancedMemory(debug_file_path=self.debug_file)
+
+    def prepare_for_next_task(self, test_case_name: str, prior_context: str = "") -> None:
+        """
+        Soft reset between test cases — browser stays open.
+        Redirects debug log, clears per-task memory, injects prior results.
+        """
+        self._current_test_case_name = test_case_name
+        if self.debug:
+            tc_dir = debug_logger.get_test_case_dir(test_case_name)
+            self.debug_file = debug_logger.get_debug_file_path(
+                "agent", debug_file_prefix=test_case_name, output_dir=tc_dir
+            )
+        self.previous_steps = []
+        self.session_start_time = datetime.now()
+        self.recent_alerts = []
+        self.memory = EnhancedMemory(debug_file_path=self.debug_file)
+        self.prior_context = prior_context
                     
     def get_session_summary(self) -> Dict[str, Any]:
         """Get a summary of the current session."""

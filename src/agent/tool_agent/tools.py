@@ -1,11 +1,13 @@
 import json
-from typing import Dict, Any, Optional
+import base64
+from typing import Dict, Any
 from datetime import datetime
 from pathlib import Path
 import os
 import sys
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, PROJECT_ROOT)
+# pyrefly: ignore [missing-import]
 from src.browser.browser_context import BrowserSession
 
 class Tools:
@@ -114,120 +116,131 @@ class Tools:
             }
     
     def _get_page_info(self, browser_context: BrowserSession) -> Dict[str, Any]:
-        """Get basic page information for LLM analysis."""
+        """Get page information (DOM, alerts, screenshot) for LLM analysis."""
         try:
             page = browser_context.get_current_page()
             if page is None:
                 return {"error": "No active page"}
-            
-            # Get page basics
-            url = page.url
-            title = page.title()
-            
-            # Get element tree string which contains all information
-            element_tree_string = browser_context.get_element_tree_string(refresh=True)
-            
-            # Get alert information
-            alerts_info = browser_context.get_formatted_alerts_for_llm()
-            has_alerts = browser_context.has_recent_alerts()
-            
+
             page_info = {
-                "url": url,
-                "title": title,
-                "element_tree": element_tree_string or "No elements found",
-                "has_alerts": has_alerts
+                "url": page.url,
+                "title": page.title(),
+                "element_tree": browser_context.get_element_tree_string(refresh=True) or "No elements found",
+                "has_alerts": browser_context.has_recent_alerts(),
             }
-            
-            # Only include alerts info if there are alerts
+
+            alerts_info = browser_context.get_formatted_alerts_for_llm()
             if alerts_info:
                 page_info["alerts"] = alerts_info
-            
+
+            # Capture screenshot as base64 for vision-capable models
+            try:
+                screenshot_bytes = page.screenshot(type="jpeg", quality=60, full_page=False)
+                page_info["screenshot_b64"] = base64.b64encode(screenshot_bytes).decode()
+            except Exception:
+                pass  # not all setups support screenshots; degrade gracefully
+
             return page_info
-            
+
         except Exception as e:
             return {"error": f"Failed to get page info: {e}"}
 
     def _analyze_with_llm(self, reason: str, page_info: Dict[str, Any], llm_client) -> Dict[str, Any]:
         """Use LLM to analyze the current page state and provide intelligent insights."""
         try:
-            # Build prompt for LLM analysis
-            analysis_prompt = f"""
-You are analyzing a web page to provide intelligent insights for browser automation testing.
+            screenshot_b64 = page_info.pop("screenshot_b64", None)
 
-ANALYSIS REQUEST: {reason}
+            analysis_prompt = f"""ANALYSIS REQUEST: {reason}
 
-CURRENT PAGE INFORMATION:
+CURRENT PAGE STATE:
 - URL: {page_info.get('url', 'Unknown')}
-- Page Title: {page_info.get('title', 'Unknown')}"""
+- Title: {page_info.get('title', 'Unknown')}"""
 
-            # Add alert information only if present
             if page_info.get('has_alerts', False):
                 analysis_prompt += f"""
-- Browser Alerts Detected: YES
-
+- Browser Alert Observed: YES
 {page_info.get('alerts', '')}"""
+            else:
+                analysis_prompt += "\n- Browser Alert Observed: NO"
 
             analysis_prompt += f"""
 
-COMPLETE DOM TREE STRUCTURE:
+DOM SNAPSHOT (note: input .value is a JS property, never shown as HTML attribute — absence of value= does NOT mean fields are empty):
 {page_info.get('element_tree', 'No elements found')}
 
-Based on the analysis request and current page state, please provide your assessment in JSON format:
-
+Using the screenshot (if provided) as the primary visual source of truth, answer the analysis request above.
+Respond with JSON only:
 {{
-    "message": "Summary message for the user",
-    "findings": "Detailed description of what you observed",
-    "validation_passed": true/false
+    "message": "One-sentence verdict",
+    "findings": "What you actually observed (screenshot + alerts + DOM). Keep it under 3 sentences.",
+    "validation_passed": true or false
 }}
-
-Focus on the specific request and provide actionable insights. If there were any browser alerts, include them in your analysis as they may be important for understanding the current state of the page.
 """
-
-            # Log the tools LLM request and response if debug logging is enabled
             if self.log_debug_func:
-                try:
-                    self._log_tools_llm_request(analysis_prompt)
-                except Exception:
-                    pass  # Don't let logging errors break the tools functionality
+                self._log_tools_llm_request(analysis_prompt)
 
-            # Get LLM response
-            llm_response = llm_client.ask(analysis_prompt)
-            
-            # Log the tools LLM response if debug logging is enabled
+            # Build the messages list; attach screenshot if available and model supports vision
+            messages: list = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a pragmatic browser test validator. "
+                        "Your job is to decide whether a test PASSED or FAILED based on observable evidence.\n\n"
+                        "VALIDATION RULES:\n"
+                        "1. TRUST the screenshot first — it shows the real visual state of the page. "
+                        "DOM attributes (like 'value') are static snapshots and often do NOT reflect live JS state.\n"
+                        "2. If the screenshot and browser alerts together support the expected outcome, set validation_passed=true.\n"
+                        "3. Only set validation_passed=false if there is CLEAR POSITIVE EVIDENCE of failure "
+                        "(e.g., wrong alert text, error message visible, form did not reset when it clearly should have).\n"
+                        "4. Missing DOM attributes are NOT evidence of failure — JS properties like .value are never "
+                        "reflected as HTML attributes after user input.\n"
+                        "5. If you are uncertain but the main observable outcome matches the request, default to PASS.\n"
+                        "6. Be concise. Do not list things you cannot check — only report what you can actually observe."
+                    ),
+                },
+            ]
+            if screenshot_b64:
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": analysis_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{screenshot_b64}"},
+                        },
+                    ],
+                })
+            else:
+                messages.append({"role": "user", "content": analysis_prompt})
+
+            # Call LLM directly via litellm so we can pass a rich messages list
+            import litellm
+            response = litellm.completion(
+                model=llm_client.model,
+                messages=messages,
+                timeout=llm_client.timeout,
+            )
+            llm_response = response.choices[0].message.content
+
             if self.log_debug_func:
-                try:
-                    self._log_tools_llm_response(llm_response)
-                except Exception:
-                    pass  # Don't let logging errors break the tools functionality
-            
+                self._log_tools_llm_response(llm_response)
+
             # Parse JSON response
+            cleaned = llm_response.strip()
+            if cleaned.startswith("```json"):
+                cleaned = cleaned[7:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
             try:
-                # Clean up the response
-                if llm_response.startswith("```json"):
-                    llm_response = llm_response[7:]
-                if llm_response.endswith("```"):
-                    llm_response = llm_response[:-3]
-                    
-                analysis_result = json.loads(llm_response.strip())
-                
+                result = json.loads(cleaned.strip())
                 return {
-                    "message": analysis_result.get("message", "LLM analysis completed"),
-                    "findings": analysis_result.get("findings", ""),
-                    "validation_passed": analysis_result.get("validation_passed", False)
+                    "message": result.get("message", "LLM analysis completed"),
+                    "findings": result.get("findings", ""),
+                    "validation_passed": result.get("validation_passed", False),
                 }
-                
             except json.JSONDecodeError:
-                # If JSON parsing fails, use the raw response as findings
-                return {
-                    "message": "Analysis completed",
-                    "findings": llm_response.strip(),
-                    "validation_passed": True  # Assume success if we got a response
-                }
-                
+                return {"message": "Analysis completed", "findings": cleaned, "validation_passed": True}
+
         except Exception as e:
-            return {
-                "message": "LLM analysis unavailable",
-                "findings": f"LLM analysis failed: {str(e)}",
-                "validation_passed": False
-            }
+            return {"message": "LLM analysis unavailable", "findings": str(e), "validation_passed": False}
 
